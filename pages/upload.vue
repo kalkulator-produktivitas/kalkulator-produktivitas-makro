@@ -12,9 +12,19 @@
               <p class="text-lg">Tentukan jenis file yang akan anda Upload</p>
               <div class="flex gap-4">
                 <div class="border border-slate-200 rounded-lg p-6 w-[50%]">
-                  <p class="block text-md text-gray-700 mb-2">
-                    Pilih file CSV
-                  </p>
+                  <div class="flex justify-between">
+                    <p class="block text-md text-gray-700 mb-2">
+                      Pilih File CSV
+                    </p>
+                    <div class="flex">
+                      <Icon name="mdi:download" size="6mm" class=" text-[#034EA2] my-auto" />
+                      <span class="text-[#034EA2] hover:underline cursor-pointer my-auto">
+
+                        Download Template
+                      </span>
+                    </div>
+                  </div>
+                  
                   <div class="border-2 border-dashed border-[#034EA2] rounded-lg p-8 text-center bg-blue-50 relative">
                     <div class="flex flex-col items-center">
                       <Icon name="mdi:cloud-upload-outline" size="12mm"
@@ -23,14 +33,24 @@
                           class="text-[#034EA2] hover:underline cursor-pointer">browse</span></p>
                       <p class="text-xs text-gray-500">Max 10 MB files are allowed</p>
                     </div>
-                    <input type="file" accept=".csv" class="absolute inset-0 w-full h-full cursor-pointer opacity-0" />
+                    <input type="file" accept=".csv" class="absolute inset-0 w-full h-full cursor-pointer opacity-0"
+                      @change="selectedFile = $event.target.files[0]" />
                   </div>
                 </div>
 
                 <div class="border border-slate-200 rounded-lg p-6 w-[50%]">
-                  <label class="block text-md text-gray-700 mb-2">
-                    Pilih File Excel
-                  </label>
+                  <div class="flex justify-between">
+                    <p class="block text-md text-gray-700 mb-2">
+                      Pilih File Excel
+                    </p>
+                    <div class="flex">
+                      <Icon name="mdi:download" size="6mm" class=" text-[#034EA2] my-auto" />
+                      <span class="text-[#034EA2] hover:underline cursor-pointer my-auto">
+
+                        Download Template
+                      </span>
+                    </div>
+                  </div>
                   <div class="border-2 border-dashed border-green-700 bg-green-50 rounded-lg p-8 text-center relative">
                     <div class="flex flex-col items-center">
                       <Icon name="mdi:cloud-upload-outline" size="12mm"
@@ -52,7 +72,7 @@
     </div>
     <div class="md:mx-auto mt-6 mx-auto flex">
       <div class="shrink-0 w-[5%]"></div>
-      <div class="border border-slate-200 rounded-lg p-6 w-[92vw]">
+      <div class="border border-slate-200 rounded-lg p-6 w-[92vw] flex flex-col">
         <h2 class="text-[#034EA2] font-bold mb-4">Uploaded Files</h2>
         <table class="w-full">
           <thead>
@@ -65,67 +85,40 @@
             </tr>
           </thead>
           <tbody>
-            <tr class="border-t border-slate-200">
+            <tr class="border-t border-slate-200" v-if="selectedFile">
               <td class="py-3">
                 <div class="flex items-center gap-2">
                   <Icon name="vscode-icons:file-type-excel" class="text-xl" />
                   <div>
-                    <p class="font-medium">File Laporan 1.csv</p>
-                    <p class="text-sm text-gray-500">500kb</p>
+                    <p class="font-medium">{{ selectedFile.name }}</p>
+                    <p class="text-sm text-gray-500">{{ (selectedFile.size / 1024).toFixed(2) }} KB</p>
                   </div>
                 </div>
               </td>
               <td>
-                <div class="flex items-center gap-2">
-                  <div class="w-24 bg-gray-200 rounded-full h-2">
-                    <div class="bg-[#034EA2] h-2 rounded-full" style="width: 60%"></div>
-                  </div>
-                  <span class="text-sm">60%</span>
-                </div>
+                Terunggah
               </td>
-              <td class="text-sm">05 December 2024 10:35 a.m</td>
-              <td class="text-sm">Albert Einstein</td>
+              <td class="text-sm">{{ new Date().toLocaleString('en-US', {
+                day: '2-digit', month: 'long', year:
+                  'numeric', hour: 'numeric', minute: '2-digit', hour12: true
+              }) }}</td>
+              <td class="text-sm">Rizal Herwanto</td>
               <td>
                 <div class="flex gap-2">
                   <button class="text-[#034EA2]">
                     <Icon name="material-symbols:refresh" />
                   </button>
-                  <button class="text-red-500">
+                  <button class="text-red-500" @click="selectedFile = null">
                     <Icon name="material-symbols:delete-outline" />
                   </button>
                 </div>
               </td>
             </tr>
-            <!-- Example of failed upload -->
-            <tr class="border-t border-slate-200">
-              <td class="py-3">
-                <div class="flex items-center gap-2">
-                  <Icon name="vscode-icons:file-type-excel" class="text-xl" />
-                  <div>
-                    <p class="font-medium">File Laporan 2.xls</p>
-                    <p class="text-sm text-gray-500">120kb</p>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm">Upload Failed</span>
-              </td>
-              <td class="text-sm">05 December 2024 10:27 a.m</td>
-              <td class="text-sm">Albert Einstein</td>
-              <td>
-                <div class="flex gap-2">
-                  <button class="text-[#034EA2]">
-                    <Icon name="material-symbols:refresh" />
-                  </button>
-                  <button class="text-red-500">
-                    <Icon name="material-symbols:delete-outline" />
-                  </button>
-                </div>
-              </td>
-            </tr>
+
           </tbody>
         </table>
-        <button class="w-full bg-[#034EA2] text-white py-2 rounded-lg mt-4">Upload</button>
+        <button class="w-[10%] bg-[#034EA2] text-white py-2 rounded-lg mt-4 self-center hover:bg-[#023b7d] transition-all duration-300"
+          @click="uploadFile">Kirim</button>
       </div>
     </div>
   </div>
@@ -133,23 +126,9 @@
 
 <script setup>
 const selectedFile = ref(null);
-const uploadedFiles = ref([
-  {
-    name: 'File Laporan 1.csv',
-    size: '500kb',
-    status: 'uploading',
-    progress: 60,
-    processedOn: '05 December 2024 10:35 a.m',
-    user: 'Albert Einstein'
-  },
-  {
-    name: 'File Laporan 2.xls',
-    size: '120kb',
-    status: 'failed',
-    processedOn: '05 December 2024 10:27 a.m',
-    user: 'Albert Einstein'
-  }
-]);
+const uploadFile = () => {
+  console.log(selectedFile.value);
+}
 </script>
 
 <style scoped>

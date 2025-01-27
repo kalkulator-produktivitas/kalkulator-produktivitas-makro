@@ -1,7 +1,7 @@
 <template>
-  <div id="layout" class="md:mx-auto my-3 mx-auto flex">
+  <div id="layout" class="md:mx-auto mx-auto flex">
     <div class="shrink-0 w-[5%]"></div>
-    <div class="h-full relative">
+    <div class="h-full relative mt-4">
       <p class="font-bold text-xl">Dashboard Produktivitas Makro</p>
       <div class="mt-2 flex">
         <div class="overflow-x-auto">
@@ -78,7 +78,7 @@
         Buat Laporan
       </button>
     </div>
-    <ReportProvinsiGen v-if="preview" class="w-[120px]" @close-preview="preview = false" />
+    <ReportProvinsiGen v-if="preview" class="fixed" @close-preview="preview = false" />
   </div>
 
   <!-- <div class="ml-8">
