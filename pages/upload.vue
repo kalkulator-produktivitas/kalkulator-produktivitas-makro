@@ -1,7 +1,11 @@
 <template>
   <div>
     <div class="md:mx-auto mt-6 mx-auto flex">
-      <div class="shrink-0 w-[5%]"></div>
+      <div class="shrink-0 w-[3%]">
+        <Icon name="mdi:arrow-left-bold" class="text-blue-500 hover:text-blue-800 transition-all duration-300 fixed top-2 cursor-pointer"
+          @click="navigateTo('/')" size="32" />
+          <p class="text-blue-500 mt-2">Back</p>
+      </div>
       <div class="h-full relative w-[92vw]">
         <p class="font-bold text-xl text-[#034EA2]">Upload Files</p>
 
@@ -24,7 +28,7 @@
                       </span>
                     </div>
                   </div>
-                  
+
                   <div class="border-2 border-dashed border-[#034EA2] rounded-lg p-8 text-center bg-blue-50 relative">
                     <div class="flex flex-col items-center">
                       <Icon name="mdi:cloud-upload-outline" size="12mm"
@@ -117,7 +121,8 @@
 
           </tbody>
         </table>
-        <button class="w-[10%] bg-[#034EA2] text-white py-2 rounded-lg mt-4 self-center hover:bg-[#023b7d] transition-all duration-300"
+        <button
+          class="w-[10%] bg-[#034EA2] text-white py-2 rounded-lg mt-4 self-center hover:bg-[#023b7d] transition-all duration-300"
           @click="uploadFile">Kirim</button>
       </div>
     </div>

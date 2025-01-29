@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col relative bg-white rounded-xl border border-slate-200 hover:shadow-xl transition duration-300 w-full">
+  <div class="flex flex-col relative bg-white w-full">
     <div class="flex justify-between px-3 pt-2 bg-gradient-to-r rounded-t-xl">
       <p class="font-bold text-md ml-2 text-[#034EA2]">{{ title }}</p>
     </div>
@@ -50,9 +50,6 @@ const chartOptions = {
       },
       color: "#003366",
     },
-    datalabels: {
-      display: false,
-    }
   },
   scales: {
     x: {

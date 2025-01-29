@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col relative bg-white rounded-xl border border-slate-200 hover:shadow-xl transition-shadow duration-300">
+    class="flex flex-col relative bg-transparent ">
     <div class="flex justify-between px-3 pt-2 bg-gradient-to-r rounded-t-xl">
       <p class="font-bold text-md ml-2 text-[#034EA2] text-balance">{{ title }}</p>
       <div class="justify-end flex text-xs gap-1">
@@ -17,9 +17,9 @@
       </div>
     </div>
     <!-- Outer container to enable horizontal scrolling -->
-    <div class="w-full overflow-x-auto custom-scrollbar">
+    <div class="w-full">
       <!-- Inner container with a larger width to enable scrolling -->
-      <div class="w-[1200px]">
+      <div class="">
         <Bar :options="chartOptions" :data="props.chartData" />
       </div>
     </div>
@@ -59,20 +59,26 @@ const chartOptions = {
       position: "top",
       labels: {
         font: {
-          size: 12,
+          size: 10,
         },
-        boxWidth: 10,
-        boxHeight: 10,
-        useBorderRadius: true,
+        boxWidth: 7,
+        boxHeight: 7,
+        useBorderRadius: false,
         borderRadius: 5
       },
     },
+    datalabels: {
+      display: false
+    }
   },
   scales: {
     x: {
       stacked: false,
       ticks: {
         color: "#666666",
+      },
+      grid: {
+        display: false
       },
     },
     y: {
@@ -84,49 +90,15 @@ const chartOptions = {
       },
       grid: {
         color: "#EDEDED",
+        drawBorder: false,
+        drawTicks: false,
+        lineWidth: 0.5,
+        borderDash: [2, 2]
       },
     },
-  },
-  datalabels: {
-    display: false,
   }
 }
 
-const dataset = {
-  labels: ["Kode A", "Kode B", "Kode C", "Kode D", "Kode E", "Kode F"],
-  datasets: [
-    {
-      label: "2020",
-      data: [60, 40, 50, 70, 80, 90],
-      backgroundColor: "#5A8DEE",
-      borderRadius: 100,
-    },
-    {
-      label: "2021",
-      data: [50, 80, 40, 60, 70, 85],
-      backgroundColor: "#FF5E57",
-      borderRadius: 100,
-    },
-    {
-      label: "2022",
-      data: [45, 50, 60, 65, 55, 75],
-      backgroundColor: "#5DD39E",
-      borderRadius: 100,
-    },
-    {
-      label: "2023",
-      data: [30, 60, 70, 50, 60, 80],
-      backgroundColor: "#FFC048",
-      borderRadius: 100,
-    },
-    {
-      label: "2024",
-      data: [70, 90, 80, 85, 90, 95],
-      backgroundColor: "#18A0FB",
-      borderRadius: 100,
-    },
-  ],
-}
 
 </script>
 

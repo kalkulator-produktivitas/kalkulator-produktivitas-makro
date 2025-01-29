@@ -1,7 +1,14 @@
 <template>
   <div id="layout" class="md:mx-auto mx-auto flex">
-    <div class="shrink-0 w-[5%]"></div>
-    <div class="h-full relative mt-4">
+    <div class="flex shrink-0 w-[3%]">
+    </div>
+    <div class="px-1 py-1 absolute flex bottom-5 left-5 items-center bg-blue-700 rounded-full">
+      <Icon name="mdi:arrow-left-circle" class="cursor-pointer rounded-full border border-white bg-white"
+        @click="navigateTo('/')" size="32" />
+
+      <p class="text-white cursor-pointer mr-2" @click="navigateTo('/')">Back</p>
+    </div>
+    <div class="h-full relative mt-8">
       <p class="font-bold text-xl">Dashboard Produktivitas Makro</p>
       <div class="mt-2 flex">
         <div class="overflow-x-auto">
@@ -40,7 +47,6 @@
         <div class="col-span-2 px-4 pt-2 flex w-full">
           <div class="border border-slate-200 w-full h-[100%] rounded-lg px-2 relative">
             <div class="absolute inset-0 overflow-y-auto px-2">
-
               <div class="sticky top-0 bg-white z-10">
                 <div class="flex justify-between">
                   <p class="mt-2 text-[#034EA2] font-bold">Filters</p>
@@ -73,17 +79,28 @@
           </div>
         </div>
       </div>
-      <button @click="preview = true"
-        class="bg-[#034EA2] text-white p-2 rounded-lg self-center hover:bg-[#023b7d] transition-all duration-300 absolute top-0 right-4">
-        Buat Laporan
-      </button>
+      <div class="absolute -top-3 right-5 flex">
+        <div class="flex flex-col gap-2 p-2">
+          <div class="flex items-center gap-2 justify-end">
+            <label for="provinsi" class="text-sm">Provinsi</label>
+            <input type="radio" id="provinsi" name="region" value="Provinsi" v-model="reportType" class="w-4 h-4">
+          </div>
+          <div class="flex items-center gap-2 justify-end">
+            <label for="kabupaten" class="text-sm">Kabupaten/Kota</label>
+            <input type="radio" id="kabupaten" name="region" value="Kabupaten" v-model="reportType" class="w-4 h-4">
+          </div>
+        </div>
+        <button @click="createReport" :disabled="!buttonActive"
+          class="bg-[#034EA2] text-white p-2 rounded-lg self-center hover:bg-[#023b7d] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+          Buat Laporan
+        </button>
+      </div>
     </div>
-    <ReportProvinsiGen v-if="preview" class="fixed" @close-preview="preview = false" />
+    <ReportProvinsiGen v-if="reportType === 'Provinsi' && preview === true" class="fixed" @close-preview="reloadApp" />
+    <ReportKotaGen v-if="reportType === 'Kabupaten' && preview === true" :kota="subTab" class="fixed"
+      @close-preview="reloadApp" />
+    <Popup v-if="modal.show === true" :title="modal.title" :message="modal.message" @close="closeModal" />
   </div>
-
-  <!-- <div class="ml-8">
-  
-    </div> -->
 </template>
 
 <script setup>
@@ -93,7 +110,9 @@ definePageMeta({
 
 import macro from '~/assets/macro.json'
 
-let selectedRegion = ref("Business Development & Planning")
+import rawData from '~/assets/macro_2_restructured.json'
+
+let reportType = ref("Provinsi")
 
 let tabList = ref(['Provinsi DKI Jakarta', 'Jakarta Utara', 'Jakarta Timur', 'Jakarta Barat', 'Jakarta Selatan', 'Jakarta Pusat', 'Kepulauan Seribu'])
 
@@ -108,7 +127,7 @@ const sum = arr => arr.reduce((a, b) => a + b, 0);
 
 const mean = arr => sum(arr) / arr.length;
 
-const preview = ref(false)
+const preview = ref(null)
 // sample standard deviation
 const std = (arr) => {
   const mu = mean(arr);
@@ -134,6 +153,13 @@ const modal = ref({
   message: '',
   status: undefined
 })
+
+const reloadApp = () => {
+  reloadNuxtApp({
+    path: "/dashboard",
+    ttl: 100,
+  });
+}
 
 const state = ref(0)
 
@@ -254,9 +280,15 @@ const changeTab = (x) => {
   let filteredUsaha = lapanganUsaha.value.filter(x => x.status === true)
   let filteredKode = filteredUsaha.map(x => x.kode)
   data.value = macro[subTab.value].filter(x => filteredKode.includes(x["Kode Lapangan Usaha"]))
-
-  data.value = filtering
 }
+
+const buttonActive = computed(() => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(true)
+    }, 3000)
+  })
+})
 
 const data_1 = computed(() => {
   let dataNew = macro[subTab.value].filter((x) => x["Kode Lapangan Usaha"] === "TOTAL")[0]
@@ -585,6 +617,21 @@ const data_7 = computed(() => {
   return dataset
 })
 
+const reportData = ref([])
+
+const createReport = () => {
+  // console.log("clicked");
+  // console.log(subTab.value)
+  // console.log(reportType.value)
+  if (subTab.value === 'Provinsi DKI Jakarta' && reportType.value === 'Kabupaten') {
+    console.log("wrong");
+    modal.value.show = true
+    modal.value.title = 'Silahkan Pilih Kota'
+    modal.value.message = 'Mohon ubah pilihan tab selain provinsi'
+  } else {
+    preview.value = true
+  }
+}
 
 
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -609,11 +656,11 @@ const selectedMonth = ref('Jan')
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #034EA2;
+  background: #5a5a5a;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #023b7d;
+  background: #3f3f3f;
 }
 </style>
