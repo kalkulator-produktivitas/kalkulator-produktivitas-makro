@@ -624,7 +624,6 @@ const createReport = () => {
   // console.log(subTab.value)
   // console.log(reportType.value)
   if (subTab.value === 'Provinsi DKI Jakarta' && reportType.value === 'Kabupaten') {
-    console.log("wrong");
     modal.value.show = true
     modal.value.title = 'Silahkan Pilih Kota'
     modal.value.message = 'Mohon ubah pilihan tab selain provinsi'

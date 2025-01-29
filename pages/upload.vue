@@ -1,10 +1,11 @@
 <template>
   <div>
     <div class="md:mx-auto mt-6 mx-auto flex">
-      <div class="shrink-0 w-[3%]">
-        <Icon name="mdi:arrow-left-bold" class="text-blue-500 hover:text-blue-800 transition-all duration-300 fixed top-2 cursor-pointer"
+      <div class="px-1 py-1 absolute flex bottom-5 left-5 items-center bg-blue-700 rounded-full">
+        <Icon name="mdi:arrow-left-circle" class="cursor-pointer rounded-full border border-white bg-white"
           @click="navigateTo('/')" size="32" />
-          <p class="text-blue-500 mt-2">Back</p>
+
+        <p class="text-white cursor-pointer mr-2" @click="navigateTo('/')">Back</p>
       </div>
       <div class="h-full relative w-[92vw]">
         <p class="font-bold text-xl text-[#034EA2]">Upload Files</p>
