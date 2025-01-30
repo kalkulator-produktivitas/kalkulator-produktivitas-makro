@@ -1,6 +1,8 @@
 <template>
   <div>
     <div class="md:mx-auto mt-6 mx-auto flex">
+      <div class="flex shrink-0 w-[3%]">
+      </div>
       <div class="px-1 py-1 absolute flex bottom-5 left-5 items-center bg-blue-700 rounded-full">
         <Icon name="mdi:arrow-left-circle" class="cursor-pointer rounded-full border border-white bg-white"
           @click="navigateTo('/')" size="32" />
@@ -21,12 +23,12 @@
                     <p class="block text-md text-gray-700 mb-2">
                       Pilih File CSV
                     </p>
-                    <div class="flex">
-                      <Icon name="mdi:download" size="6mm" class=" text-[#034EA2] my-auto" />
-                      <span class="text-[#034EA2] hover:underline cursor-pointer my-auto">
-
+                    <div class="flex items-center">
+                      <a class="text-[#034EA2] hover:underline cursor-pointer my-auto flex items-center" href="/files/template_analisis_makro.xlsx"
+                        download>
+                        <Icon name="mdi:download" size="6mm" class=" text-[#034EA2] my-auto" />
                         Download Template
-                      </span>
+                      </a>
                     </div>
                   </div>
 
@@ -49,11 +51,11 @@
                       Pilih File Excel
                     </p>
                     <div class="flex">
-                      <Icon name="mdi:download" size="6mm" class=" text-[#034EA2] my-auto" />
-                      <span class="text-[#034EA2] hover:underline cursor-pointer my-auto">
-
+                      <a class="text-[#034EA2] hover:underline cursor-pointer my-auto flex items-center" href="/files/template_analisis_makro.xlsx"
+                        download>
+                        <Icon name="mdi:download" size="6mm" class=" text-[#034EA2] my-auto" />
                         Download Template
-                      </span>
+                      </a>
                     </div>
                   </div>
                   <div class="border-2 border-dashed border-green-700 bg-green-50 rounded-lg p-8 text-center relative">
@@ -134,6 +136,15 @@
 const selectedFile = ref(null);
 const uploadFile = () => {
   console.log(selectedFile.value);
+}
+
+const downloadTemplate = () => {
+  const link = document.createElement('a');
+  link.href = '/template_analisis_makro.xlsx';
+  link.download = 'template_analisis_makro.xlsx';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 </script>
 
