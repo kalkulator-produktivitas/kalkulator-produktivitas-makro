@@ -19,7 +19,7 @@
     <!-- Outer container to enable horizontal scrolling -->
     <div class="w-full overflow-x-auto custom-scrollbar">
       <!-- Inner container with a larger width to enable scrolling -->
-      <div class="w-[1200px]">
+      <div :style="{ width: `${Math.max(500, props.chartData.labels.length * 100)}px` }">
         <Bar :options="chartOptions" :data="props.chartData" />
       </div>
     </div>
@@ -52,7 +52,7 @@ const props = defineProps(['title', 'chartData', 'ribuan'])
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
-  aspectRatio: 2.5,
+  aspectRatio: 2,
   plugins: {
     legend: {
       display: false,

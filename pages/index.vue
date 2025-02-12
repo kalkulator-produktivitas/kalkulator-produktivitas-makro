@@ -13,7 +13,7 @@
           <p class="text-gray-500 text-sm">Buat laporan dan analisis produktivitas perusahaan</p>
         </button>
 
-        <button @click="navigateTo('/dashboard')"
+        <button @click="navigateTo('/navigasi')"
           class="group p-6 bg-white shadow-lg hover:shadow-xl rounded-xl border-2 border-transparent hover:border-blue-500 transition-all">
           <div class="text-2xl mb-2">📈</div>
           <h2 class="font-bold text-xl mb-2 text-blue-800">Dashboard Produktivitas</h2>

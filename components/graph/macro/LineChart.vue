@@ -1,10 +1,11 @@
 <template>
-  <div class="flex flex-col relative bg-transparent w-full hover:shadow-xl transition duration-300">
+  <div
+    class="flex flex-col relative bg-white rounded-xl border border-slate-200 hover:shadow-xl transition duration-300 w-full">
     <div class="flex justify-between px-3 pt-2 bg-gradient-to-r rounded-t-xl">
       <p class="font-bold text-md ml-2 text-[#034EA2]">{{ title }}</p>
     </div>
     <div class="">
-      <Line :options="chartOptions" class="px-4" :data="chartData" />
+      <Line :options="chartOptions" class="px-4" :data="chartData" :plugins="[DataLabels]" />
     </div>
   </div>
 
@@ -31,8 +32,7 @@ ChartJS.register(
   LineElement,
   CategoryScale,
   LinearScale,
-  PointElement,
-  DataLabels
+  PointElement
 );
 const showTooltip = ref(false)
 
@@ -43,6 +43,7 @@ const chartOptions = {
   responsive: true,
   maintainAspectRatio: true,
   aspectRatio: props.options.aspectRatio ? props.options.aspectRatio : 2.4,
+  plugins: [DataLabels],
   plugins: {
     legend: {
       display: props.options.legends ? true : false,
@@ -50,16 +51,15 @@ const chartOptions = {
       labels: {
         usePointStyle: true,
         pointStyle: 'circle',
-        padding: 20,
+        padding: 1,
       }
     },
     title: {
       display: true,
       font: {
         size: 16,
-        weight: "bold",
       },
-      color: "#003366",
+      color: "black",
     },
     datalabels: {
       display: props.options.datalabels ? true : false,
@@ -74,9 +74,12 @@ const chartOptions = {
           return `${value.toFixed(1)}`;
         }
       },
-      color: '#666666',
+      color: 'black',
       font: {
-        weight: 'bold'
+        family: "'helvetica', 'arial', 'sans-serif'",
+        weight: 'normal',
+        size: 11,
+        lineHeight: 1
       }
     }
   },
@@ -95,11 +98,11 @@ const chartOptions = {
         display: false,
       },
       ticks: {
-        callback: function(value) {
+        callback: function (value) {
           if (props.millions) {
             return `${(value / 1000000).toFixed(0)}M`;
           } else if (props.thousands) {
-            return `${(value / 1000).toFixed(0)}Jt`; 
+            return `${(value / 1000).toFixed(0)}Jt`;
           } else {
             return value.toFixed(0);
           }
@@ -108,6 +111,7 @@ const chartOptions = {
       }
     },
   },
+
 }
 
 </script>

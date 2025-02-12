@@ -43,12 +43,12 @@
                     <tr class="">
                       <td class="">1. Jumlah Penduduk Provinsi</td>
                       <td class="px-2 ">:</td>
-                      <td class="">{{ rawData.metadata.jumlah_penduduk }}</td>
+                      <td class="">{{ rawData.metadata.jumlah_penduduk }} Orang</td>
                     </tr>
                     <tr class="">
                       <td class="">2. Jumlah Angkatan Kerja Provinsi</td>
                       <td class="px-2 ">:</td>
-                      <td class="">{{ rawData.metadata.jumlah_angkatan_kerja }}</td>
+                      <td class="">{{ rawData.metadata.jumlah_angkatan_kerja }} Orang</td>
                     </tr>
                     <tr class="">
                       <td class="">3. Produk Domestik Regional Bruto (ADHK) Provinsi</td>

@@ -1,103 +1,108 @@
 <template>
-  <div id="layout" class="md:mx-auto mx-auto flex">
-    <div class="flex shrink-0 w-[3%]">
-    </div>
-    <div class="px-1 py-1 absolute flex bottom-5 left-5 items-center bg-blue-700 rounded-full">
-      <Icon name="mdi:arrow-left-circle" class="cursor-pointer rounded-full border border-white bg-white"
-        @click="navigateTo('/')" size="32" />
-
-      <p class="text-white cursor-pointer mr-2" @click="navigateTo('/')">Back</p>
-    </div>
-    <div class="h-full relative mt-8">
-      <p class="font-bold text-xl">Dashboard Produktivitas Makro</p>
-      <div class="mt-2 flex">
-        <div class="overflow-x-auto">
-          <ul class="flex list-none flex-row flex-wrap border-b-0 pl-0 mx-auto bg-blue-200 rounded-full">
-            <li class="font-bold text-xs" v-for="subt in tabList" :key="subt">
-              <button class="w-[160px] py-1.5 rounded-full" @click="changeTab(subt)"
-                :class="subTab === subt ? 'text-white active bg-[#034EA2]' : 'hover:text-gray-600 hover:border-gray-300 bg-blue-200'">{{
-                  subt }}</button>
-            </li>
-          </ul>
-        </div>
-
+  <div class="">
+    <div id="layout" class="md:mx-auto mx-auto flex">
+      <div class="flex shrink-0 w-[3%]">
       </div>
+      <div class="relative mt-8">
+        <p class="font-bold text-xl">Dashboard Produktivitas Makro</p>
+        <div class="mt-2 flex gap-4 justify-between w-[70%]">
+          <div class="flex gap-4">
+            <div class="px-1 py-1 flex items-center bg-blue-700 rounded-full">
+              <Icon name="mdi:arrow-left-circle" class="cursor-pointer rounded-full border border-white bg-white"
+                @click="navigateTo('/')" size="24" />
 
-      <div class="grid grid-cols-10">
-        <!-- <div class="col-span-8">{{ data }}</div> -->
-        <div class="col-span-8">
-          <div class="flex mt-2 w-full">
-            <GraphMacroBarChart :chart-data="data_1" title="Produktivitas Tenaga Kerja" :ribuan="true" :key="state" />
-            <GraphMacroBarChart :chart-data="data_2" title="Pertumbuhan Produktivitas Tenaga Kerja" :ribuan="false"
-              :key="state" class="mx-1" />
-            <GraphMacroBarChart :chart-data="data_3" title="Produktivitas Upah" :ribuan="false" :key="state" />
+              <p class="text-white cursor-pointer mr-2" @click="navigateTo('/')">Back</p>
+            </div>
+            <select v-model="subTab" @change="changeTab(subTab)"
+              class="w-[200px] py-1.5 px-3 rounded-lg border border-blue-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option v-for="subt in tabList" :key="subt" :value="subt" class="py-1">
+                {{ subt }}
+              </option>
+            </select>
           </div>
-          <div class="grid grid-cols-2 mt-2 gap-2">
-            <GraphMacroBarChart2 :chart-data="data_4" title="Produktivitas Tenaga Kerja Berdasarkan Lapangan Usaha"
-              :key="state" :ribuan="true" />
-            <GraphMacroBarChart2 :chart-data="data_5"
-              title="Produktivitas Jam Kerja Berdasarkan Klasifikasi Lapangan Usaha" :ribuan="false" :key="state" />
-            <GraphMacroBarChart2 :chart-data="data_6" title="Produktivitas Upah Berdasarkan Klasifikasi Lapangan Usaha"
-              :key="state" :ribuan="false" />
-            <GraphMacroBarChart2 :chart-data="data_7"
-              title="Pertumbuhan Produktivitas TK Berdasarkan Klasifikasi Lapangan Usaha" :ribuan="false"
-              :key="state" />
+          <div class="flex gap-4 absolute top-3 right-5">
+            <ul class="flex flex-row pl-0 mx-auto bg-blue-200 rounded-full">
+              <li class="font-bold text-sm" :key="'a'">
+                <button class="w-[160px] h-full rounded-full" @click="reportType = 'Provinsi'"
+                  :class="reportType === 'Provinsi' ? 'text-white active bg-[#034EA2]' : 'hover:text-gray-600 hover:border-gray-300 bg-blue-200'">Provinsi</button>
+              </li>
+              <li class="font-bold text-sm" :key="'b'">
+                <button class="w-[160px] h-full rounded-full" @click="reportType = 'Kabupaten'"
+                  :class="reportType === 'Kabupaten' ? 'text-white active bg-[#034EA2]' : 'hover:text-gray-600 hover:border-gray-300 bg-blue-200'">Kabupaten/Kota</button>
+              </li>
+            </ul>
+            <button @click="createReport" :disabled="!buttonActive"
+              class="bg-[#034EA2] text-white px-3 py-1 rounded-lg self-center hover:bg-[#023b7d] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+              Buat Laporan
+            </button>
           </div>
+
+
         </div>
-        <div class="col-span-2 px-4 pt-2 flex w-full">
-          <div class="border border-slate-200 w-full h-[100%] rounded-lg px-2 relative">
-            <div class="absolute inset-0 overflow-y-auto px-2">
-              <div class="sticky top-0 bg-white z-10">
-                <div class="flex justify-between">
-                  <p class="mt-2 text-[#034EA2] font-bold">Filters</p>
-                </div>
-                <div class="flex flex-col justify-between border-b border-slate-200 pb-2">
-                  <p class="text-sm mt-2 pb-2">Lapangan Usaha</p>
-                  <div class="flex justify-between">
-                    <button @click="addAll"
-                      class="px-2 py-1 text-sm border-2 border-blue-500 bg-white text-black rounded-md hover:bg-blue-200 transition-all duration-300">
-                      Pilih Semua
-                    </button>
-                    <button @click="removeAll"
-                      class="px-2 py-1 text-sm border-2 border-red-500 bg-white text-black rounded-md hover:bg-red-200 transition-all duration-300">
-                      Hapus Semua
-                    </button>
+
+        <div class="grid grid-cols-10">
+          <!-- <div class="col-span-8">{{ data }}</div> -->
+          <div class="col-span-8">
+            <div class="flex mt-2 w-full gap-x-2">
+              <GraphMacroLineChart :chart-data="data_1_new" title="Produktivitas Tenaga Kerja (Juta)" :key="state"
+                :millions="true" :options="{ legends: false, datalabels: true }" />
+              <GraphMacroLineChart :chart-data="data_2_new" title="Pertumbuhan Produktivitas Tenaga Kerja" :key="state"
+                :millions="false" :options="{ legends: false, datalabels: true }" />
+              <GraphMacroLineChart :chart-data="data_3_new" title="Produktivitas Upah" :key="state" :millions="false"
+                :options="{ legends: false, datalabels: true }" />
+            </div>
+            <div class="grid grid-cols-2 mt-2 gap-2">
+              <GraphMacroBarChart2 :chart-data="data_4" title="Produktivitas Tenaga Kerja" :key="state"
+                :ribuan="true" />
+              <GraphMacroBarChart2 :chart-data="data_5" title="Produktivitas Jam Kerja" :ribuan="false" :key="state" />
+              <GraphMacroBarChart2 :chart-data="data_6" title="Produktivitas Upah" :key="state" :ribuan="false" />
+              <GraphMacroBarChart2 :chart-data="data_7" title="Pertumbuhan Produktivitas Tenaga Kerja" :ribuan="false"
+                :key="state" />
+            </div>
+
+          </div>
+          <div class="col-span-2 px-4 pt-2 flex w-full">
+            <div class="border border-slate-200 w-full h-[100%] rounded-lg px-2 relative">
+              <div class="absolute inset-0 overflow-y-auto px-2">
+                <div class="sticky top-0 bg-white z-10 flex justify-between border-b border-slate-400">
+                  <div>
+                    <div class="flex justify-between">
+                      <p class="mt-2 text-[#034EA2] font-bold">Filters</p>
+                    </div>
+                    <p class="text-sm mt-2 pb-2">Lapangan Usaha</p>
+                  </div>
+                  <div class="flex flex-col pb-2">
+                    <div class="flex flex-col gap-1 my-auto">
+                      <button @click="addAll"
+                        class="px-1 py-1 text-xs border border-gray-500 bg-white text-black rounded-md hover:bg-gray-200 transition-all duration-300">
+                        Pilih Semua
+                      </button>
+                      <button @click="removeAll"
+                        class="px-1 py-1 text-xs border border-gray-500 bg-white text-black rounded-md hover:bg-gray-200 transition-all duration-300">
+                        Hapus Semua
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div>
-                <div v-for="usaha of lapanganUsaha" :key="usaha.nama" class="flex items-start mb-0.5"
-                  @change="applyFilter">
-                  <input :id="usaha.kode" type="checkbox" v-model="usaha.status"
-                    class="mt-1 w-[10px] h-4 text-[#034EA2] bg-gray-100 border-gray-300 rounded dark:border-gray-600 ">
-                  <label :for="usaha.kode" class="ms-2 text-sm "
-                    :class="`${usaha.kode ? 'text-[#034EA2]' : 'text-gray-900'}`">
-                    {{ usaha.nama }} (Kode {{ usaha.kode }})</label>
+                <div>
+                  <div v-for="usaha of lapanganUsaha" :key="usaha.nama" class="flex items-start mb-0.5"
+                    @change="applyFilter">
+                    <input :id="usaha.kode" type="checkbox" v-model="usaha.status"
+                      class="mt-1 w-[10px] h-4 text-[#034EA2] bg-gray-100 border-gray-300 rounded dark:border-gray-600 ">
+                    <label :for="usaha.kode" class="ms-2 text-sm "
+                      :class="`${usaha.kode ? 'text-[#034EA2]' : 'text-gray-900'}`">
+                      {{ usaha.nama }} (Kode {{ usaha.kode }})</label>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="absolute -top-3 right-5 flex">
-        <div class="flex flex-col gap-2 p-2">
-          <div class="flex items-center gap-2 justify-end">
-            <label for="provinsi" class="text-sm">Provinsi</label>
-            <input type="radio" id="provinsi" name="region" value="Provinsi" v-model="reportType" class="w-4 h-4">
-          </div>
-          <div class="flex items-center gap-2 justify-end">
-            <label for="kabupaten" class="text-sm">Kabupaten/Kota</label>
-            <input type="radio" id="kabupaten" name="region" value="Kabupaten" v-model="reportType" class="w-4 h-4">
-          </div>
-        </div>
-        <button @click="createReport" :disabled="!buttonActive"
-          class="bg-[#034EA2] text-white p-2 rounded-lg self-center hover:bg-[#023b7d] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
-          Buat Laporan
-        </button>
-      </div>
     </div>
-    <ReportProvinsiGen v-if="reportType === 'Provinsi' && preview === true" class="fixed" @close-preview="reloadApp" />
-    <ReportKotaGen v-if="reportType === 'Kabupaten' && preview === true" :kota="subTab" class="fixed"
+    <ReportProvinsiGen v-if="reportType === 'Provinsi' && preview === true" class="fixed inset-0 z-50"
+      @close-preview="reloadApp" />
+    <ReportKotaGen v-if="reportType === 'Kabupaten' && preview === true" :kota="subTab" class="fixed inset-0 z-50"
       @close-preview="reloadApp" />
     <Popup v-if="modal.show === true" :title="modal.title" :message="modal.message" @close="closeModal" />
   </div>
@@ -108,6 +113,7 @@ definePageMeta({
   layout: 'dashboard',
 });
 
+import { GraphMacroLineChart } from '#components';
 import macro from '~/assets/macro.json'
 
 import rawData from '~/assets/macro_2_restructured.json'
@@ -255,7 +261,9 @@ const lapanganUsaha = ref([
   }
 ])
 
-
+const countSelected = computed(() => {
+  return lapanganUsaha.value.filter(x => x.status === true).length
+})
 
 const applyFilter = () => {
   let filteredUsaha = lapanganUsaha.value.filter(x => x.status === true)
@@ -290,134 +298,56 @@ const buttonActive = computed(() => {
   })
 })
 
-const data_1 = computed(() => {
-  let dataNew = macro[subTab.value].filter((x) => x["Kode Lapangan Usaha"] === "TOTAL")[0]
+
+const data_1_new = computed(() => {
   let dataset = {
     labels: ["2018", "2019", "2020", "2021", "2022"],
     datasets: [
       {
         label: "Produktivitas",
         data: null,
-        backgroundColor: [
-          "#3867D6", // Dark blue
-          "#5A8DEE", // Lighter blue
-          "#82B1FF", // Lightest blue
-          "#5A8DEE", // Lighter blue
-          "#2743A7", // Darkest blue
-        ],
+        backgroundColor: "#3867D6",
         borderRadius: 5,
       },
     ],
   }
-
-  let calcData = [dataNew["Tahun 2018"],
-  dataNew["Tahun 2019"],
-  dataNew["Tahun 2020"],
-  dataNew["Tahun 2021"],
-  dataNew["Tahun 2022"]].map(x => parseFloat(x.replaceAll('.', '')))
+  let calcData = rawData.data["Provinsi DKI Jakarta"]["TOTAL"]["produktivitas"].map(x => x ? parseFloat(x.replaceAll('.', '')) : x)
   dataset.datasets[0].data = calcData
-
-  let color = []
-  for (let x of calcData) {
-    if (x > quantile(calcData, .75)) {
-      color.push("#2743A7")
-    } else if (x > quantile(calcData, .5)) {
-      color.push("#3867D6")
-    } else if (x > quantile(calcData, .5)) {
-      color.push("#5A8DEE")
-    } else {
-      color.push("#82B1FF")
-    }
-  }
-  dataset.datasets[0].backgroundColor = color
-
   return dataset
 })
 
-const data_2 = computed(() => {
-  let dataNew = macro[subTab.value].filter((x) => x["Kode Lapangan Usaha"] === "TOTAL")[0]
+const data_2_new = computed(() => {
   let dataset = {
-    labels: ["2019", "2020", "2021", "2022"],
+    labels: [],
     datasets: [
       {
         label: "Produktivitas",
         data: null,
-        backgroundColor: [
-          "#3867D6", // Dark blue
-          "#5A8DEE", // Lighter blue
-          "#82B1FF", // Lightest blue
-          "#5A8DEE", // Lighter blue
-          "#2743A7", // Darkest blue
-        ],
+        backgroundColor: "#3867D6",
         borderRadius: 5,
       },
     ],
   }
-
-  let calcData = [dataNew["Growth Produktivitas TK 2019"],
-  dataNew["Growth Produktivitas TK 2020"],
-  dataNew["Growth Produktivitas TK 2021"],
-  dataNew["Growth Produktivitas TK 2022"]].map(x => parseFloat(x.replace(",", ".").replace("%", "")))
-  dataset.datasets[0].data = calcData
-
-  let color = []
-  for (let x of calcData) {
-    if (x > quantile(calcData, .75)) {
-      color.push("#2743A7")
-    } else if (x > quantile(calcData, .5)) {
-      color.push("#3867D6")
-    } else if (x > quantile(calcData, .5)) {
-      color.push("#5A8DEE")
-    } else {
-      color.push("#82B1FF")
-    }
-  }
-  dataset.datasets[0].backgroundColor = color
-
+  let calcData = rawData.data["Provinsi DKI Jakarta"]["TOTAL"]["growth_produktivitas"].map(x => x ? parseFloat(x.replace(",", ".").replace("%", "")) : x)
+  dataset.datasets[0].data = calcData.filter(x => x !== null)
+  dataset.labels = rawData.metadata.tahun.slice(1, calcData.length)
   return dataset
 })
 
-const data_3 = computed(() => {
-  let dataNew = macro[subTab.value].filter((x) => x["Kode Lapangan Usaha"] === "TOTAL")[0]
+const data_3_new = computed(() => {
   let dataset = {
-    labels: ["2019", "2020", "2021", "2022"],
+    labels: ["2018", "2019", "2020", "2021", "2022"],
     datasets: [
       {
         label: "Produktivitas",
         data: null,
-        backgroundColor: [
-          "#3867D6", // Dark blue
-          "#5A8DEE", // Lighter blue
-          "#82B1FF", // Lightest blue
-          "#5A8DEE", // Lighter blue
-          "#2743A7", // Darkest blue
-        ],
+        backgroundColor: "#3867D6",
         borderRadius: 5,
       },
     ],
   }
-
-  let calcData = [dataNew["Upah 2018"],
-  dataNew["Upah 2019"],
-  dataNew["Upah 2020"],
-  dataNew["Upah 2021"],
-  dataNew["Upah 2022"]].map(x => parseFloat(x.replace(',', '.')))
+  let calcData = rawData.data["Provinsi DKI Jakarta"]["TOTAL"]["upah"].map(x => x ? parseFloat(x.replaceAll(',', '.')) : x)
   dataset.datasets[0].data = calcData
-
-  let color = []
-  for (let x of calcData) {
-    if (x > quantile(calcData, .75)) {
-      color.push("#2743A7")
-    } else if (x > quantile(calcData, .5)) {
-      color.push("#3867D6")
-    } else if (x > quantile(calcData, .5)) {
-      color.push("#5A8DEE")
-    } else {
-      color.push("#82B1FF")
-    }
-  }
-  dataset.datasets[0].backgroundColor = color
-
   return dataset
 })
 
