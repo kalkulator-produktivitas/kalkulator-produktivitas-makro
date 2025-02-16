@@ -3,7 +3,7 @@
     <div class="md:mx-auto mt-6 mx-auto flex">
       <div class="flex shrink-0 w-[3%]">
       </div>
-      <div class="px-1 py-1 absolute flex bottom-5 left-5 items-center bg-blue-700 rounded-full">
+      <div class="px-1 py-1 absolute flex top-5 left-[12%] items-center bg-blue-700 rounded-full z-10">
         <Icon name="mdi:arrow-left-circle" class="cursor-pointer rounded-full border border-white bg-white"
           @click="navigateTo('/')" size="32" />
 
@@ -18,14 +18,14 @@
 
               <p class="text-lg">Tentukan jenis file yang akan anda Upload</p>
               <div class="flex gap-4">
-                <div class="border border-slate-200 rounded-lg p-6 w-[50%]">
+                <!-- <div class="border border-slate-200 rounded-lg p-6 w-[50%]">
                   <div class="flex justify-between">
                     <p class="block text-md text-gray-700 mb-2">
                       Pilih File CSV
                     </p>
                     <div class="flex items-center">
-                      <a class="text-[#034EA2] hover:underline cursor-pointer my-auto flex items-center" href="/files/template_analisis_makro.xlsx"
-                        download>
+                      <a class="text-[#034EA2] hover:underline cursor-pointer my-auto flex items-center"
+                        href="/files/template_analisis_makro.xlsx" download>
                         <Icon name="mdi:download" size="6mm" class=" text-[#034EA2] my-auto" />
                         Download Template
                       </a>
@@ -43,16 +43,21 @@
                     <input type="file" accept=".csv" class="absolute inset-0 w-full h-full cursor-pointer opacity-0"
                       @change="selectedFile = $event.target.files[0]" />
                   </div>
-                </div>
+                </div> -->
 
-                <div class="border border-slate-200 rounded-lg p-6 w-[50%]">
+                <div class="border border-slate-200 rounded-lg p-6 w-[50%] mx-auto">
                   <div class="flex justify-between">
                     <p class="block text-md text-gray-700 mb-2">
                       Pilih File Excel
                     </p>
                     <div class="flex">
-                      <a class="text-[#034EA2] hover:underline cursor-pointer my-auto flex items-center" href="/files/template_analisis_makro.xlsx"
-                        download>
+                      <!-- <a class="text-[#034EA2] hover:underline cursor-pointer my-auto flex items-center"
+                        href="/files/template_analisis_makro.xlsx" download>
+                        <Icon name="mdi:download" size="6mm" class=" text-[#034EA2] my-auto" />
+                        Download Template
+                      </a> -->
+                      <a class="text-[#034EA2] hover:underline cursor-pointer my-auto flex items-center"
+                        @click="downloadTemplate">
                         <Icon name="mdi:download" size="6mm" class=" text-[#034EA2] my-auto" />
                         Download Template
                       </a>
@@ -79,7 +84,7 @@
     </div>
     <div class="md:mx-auto mt-6 mx-auto flex">
       <div class="shrink-0 w-[5%]"></div>
-      <div class="border border-slate-200 rounded-lg p-6 w-[92vw] flex flex-col">
+      <div class="border border-slate-200 rounded-lg p-6 w-[92vw] flex flex-col overflow-y-auto max-h-[300px] relative">
         <h2 class="text-[#034EA2] font-bold mb-4">Uploaded Files</h2>
         <table class="w-full">
           <thead>
@@ -98,18 +103,18 @@
                   <Icon name="vscode-icons:file-type-excel" class="text-xl" />
                   <div>
                     <p class="font-medium">{{ selectedFile.name }}</p>
-                    <p class="text-sm text-gray-500">{{ (selectedFile.size / 1024).toFixed(2) }} KB</p>
+                    <!-- <p class="text-sm text-gray-500">{{ (selectedFile.size / 1024).toFixed(2) }} KB</p> -->
                   </div>
                 </div>
               </td>
               <td>
-                Terunggah
+                READY
               </td>
               <td class="text-sm">{{ new Date().toLocaleString('en-US', {
                 day: '2-digit', month: 'long', year:
                   'numeric', hour: 'numeric', minute: '2-digit', hour12: true
               }) }}</td>
-              <td class="text-sm">Rizal Herwanto</td>
+              <td class="text-sm">Admin</td>
               <td>
                 <div class="flex gap-2">
                   <button class="text-[#034EA2]">
@@ -121,30 +126,166 @@
                 </div>
               </td>
             </tr>
-
+            <tr class="border-t border-slate-200" v-for="item in uploaded" :key="item.id">
+              <td class="py-3">
+                <div class="flex items-center gap-2">
+                  <Icon name="vscode-icons:file-type-excel" class="text-xl" />
+                  <div>
+                    <p class="font-medium">{{ item.file_name }}</p>
+                  </div>
+                </div>
+              </td>
+              <td>
+                {{ item.status }}
+              </td>
+              <td class="text-sm">{{ dateFormatter(item.created_at) }}</td>
+              <td class="text-sm">Admin</td>
+              <td>
+                <div class="flex gap-2">
+                  <button class="text-[#034EA2]">
+                    <Icon name="material-symbols:download" />
+                  </button>
+                </div>
+              </td>
+            </tr>
           </tbody>
         </table>
         <button
-          class="w-[10%] bg-[#034EA2] text-white py-2 rounded-lg mt-4 self-center hover:bg-[#023b7d] transition-all duration-300"
+          class="absolute top-0 right-10 w-[10%] bg-[#034EA2] text-white py-2 rounded-lg mt-4 self-center hover:bg-[#023b7d] transition-all duration-300"
           @click="uploadFile">Kirim</button>
       </div>
     </div>
+    <Popup v-if="modal.show === true" :title="modal.title" :message="modal.message" :type="modal.type" @close="modal.show = false" />
+    <Loading v-if="loading" text="Uploading..." />
   </div>
 </template>
 
 <script setup>
+const global = useRuntimeConfig();
+import { getUploadsList, postUpload, getTemplate } from '~/_service/upload/uploads';
+import { useRequest } from '~/composables/useRequest';
+import { ErrorApiResponse } from '~/_service/http/schema';
+
 const selectedFile = ref(null);
-const uploadFile = () => {
-  console.log(selectedFile.value);
+
+const uploadList = useRequest(getUploadsList);
+const upload = useRequest(postUpload);
+const template = useRequest(getTemplate);
+
+const uploaded = ref([]);
+
+const modal = ref({
+  show: false,
+  type: '',
+  message: '',
+  status: undefined
+})
+
+const loading = ref(false);
+
+try {
+  const res = await uploadList.call()
+  uploaded.value = res.list
+} catch (e) {
+  if (e instanceof ErrorApiResponse) {
+    // console.log(e);
+    console.error(`ERROR | code: ${e.code} | message: ${e.message}`)
+    modal.value.type = 'ERROR'
+    modal.value.message = e.message
+    modal.value.show = true
+    loading.value = false
+  } else {
+    // console.log(e);
+    console.error('UNKNOWN ERROR: ', (e)?.message ?? 'Unknown Error')
+    modal.value.type = 'ERROR'
+    modal.value.message = 'UNKNOWN ERROR: '
+    modal.value.show = true
+    loading.value = false
+  }
 }
 
-const downloadTemplate = () => {
-  const link = document.createElement('a');
-  link.href = '/template_analisis_makro.xlsx';
-  link.download = 'template_analisis_makro.xlsx';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+const dateFormatter = (date) => {
+  return new Date(date).toLocaleString('en-US', {
+    day: '2-digit', month: 'long', year:
+      'numeric', hour: 'numeric', minute: '2-digit', hour12: true
+  })
+}
+
+const uploadFile = async () => {
+  try {
+    if (!selectedFile.value) {
+      modal.value.type = 'ERROR'
+      modal.value.message = 'Please select a file first'
+      modal.value.show = true
+      return
+    }
+
+    loading.value = true
+    // Create FormData and append the file
+    const formData = new FormData()
+    formData.append('file', selectedFile.value)
+
+    // Pass the FormData to the upload call
+    await upload.call(formData, "dki_jakarta")
+
+    // Refresh the list after successful upload
+    const res = await uploadList.call("dki_jakarta")
+    uploaded.value = res.list
+
+
+    modal.value.type = 'SUCCESS'
+    modal.value.message = 'File berhasil diunggah'
+    modal.value.show = true
+
+
+    // Clear the selected file
+    selectedFile.value = null
+  } catch (e) {
+    if (e instanceof ErrorApiResponse) {
+      console.error(`ERROR | code: ${e.code} | message: ${e.message}`)
+      modal.value.type = 'ERROR'
+      modal.value.message = e.message
+      modal.value.show = true
+      loading.value = false
+    } else {
+      console.error('UNKNOWN ERROR: ', (e)?.message ?? 'Unknown Error')
+      modal.value.type = 'ERROR'
+      modal.value.message = 'UNKNOWN ERROR: '
+      modal.value.show = true
+      loading.value = false
+    }
+  } finally {
+    loading.value = false
+  }
+}
+
+const downloadTemplate = async () => {
+
+  try {
+    const response = await fetch(`${global.public.goURL}/v1/makro/files/template?id_provinsi=dki_jakarta`, {
+      method: 'GET',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to download template');
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'template.xlsx';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('ERROR: ', (error)?.message ?? 'Unknown Error')
+    modal.value.type = 'ERROR'
+    modal.value.message = error.message ? error.message : 'Unknown Error'
+    modal.value.show = true
+    loading.value = false
+  }
 }
 </script>
 

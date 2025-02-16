@@ -1,9 +1,9 @@
 <template>
   <div class="">
-    <div id="layout" class="md:mx-auto mx-auto flex">
+    <div id="layout" class="md:mx-auto mx-auto flex w-full">
       <div class="flex shrink-0 w-[3%]">
       </div>
-      <div class="relative mt-8">
+      <div class="lg:relative mt-8">
         <p class="font-bold text-xl">Dashboard Produktivitas Makro</p>
         <div class="mt-2 flex gap-4 justify-between w-[70%]">
           <div class="flex gap-4">
@@ -40,10 +40,10 @@
 
         </div>
 
-        <div class="grid grid-cols-10">
+        <div class="lg:grid lg:grid-cols-10">
           <!-- <div class="col-span-8">{{ data }}</div> -->
-          <div class="col-span-8">
-            <div class="flex mt-2 w-full gap-x-2">
+          <div class="lg:col-span-8">
+            <div class="flex mt-2 lg:w-full w-1/2 gap-x-2">
               <GraphMacroLineChart :chart-data="data_1_new" title="Produktivitas Tenaga Kerja (Juta)" :key="state"
                 :millions="true" :options="{ legends: false, datalabels: true }" />
               <GraphMacroLineChart :chart-data="data_2_new" title="Pertumbuhan Produktivitas Tenaga Kerja" :key="state"
@@ -51,7 +51,7 @@
               <GraphMacroLineChart :chart-data="data_3_new" title="Produktivitas Upah" :key="state" :millions="false"
                 :options="{ legends: false, datalabels: true }" />
             </div>
-            <div class="grid grid-cols-2 mt-2 gap-2">
+            <div class="lg:grid lg:grid-cols-2 lg:w-full w-1/2 mt-2 gap-2">
               <GraphMacroBarChart2 :chart-data="data_4" title="Produktivitas Tenaga Kerja" :key="state"
                 :ribuan="true" />
               <GraphMacroBarChart2 :chart-data="data_5" title="Produktivitas Jam Kerja" :ribuan="false" :key="state" />
@@ -61,9 +61,9 @@
             </div>
 
           </div>
-          <div class="col-span-2 px-4 pt-2 flex w-full">
-            <div class="border border-slate-200 w-full h-[100%] rounded-lg px-2 relative">
-              <div class="absolute inset-0 overflow-y-auto px-2">
+          <div class="lg:col-span-2 px-4 pt-2 flex w-full">
+            <div class="border border-slate-200 lg:w-full h-[100%] rounded-lg px-2 relative">
+              <div class="lg:absolute lg:inset-0 lg:overflow-y-auto px-2">
                 <div class="sticky top-0 bg-white z-10 flex justify-between border-b border-slate-400">
                   <div>
                     <div class="flex justify-between">

@@ -15,7 +15,7 @@
         >
           <option value="" disabled>Pilih provinsi...</option>
           <option v-for="province in provinces" :key="province.id" :value="province.id">
-            {{ province.name }}
+            {{ province.nama_lengkap }}
           </option>
         </select>
 
@@ -36,16 +36,30 @@ definePageMeta({
   layout: 'dashboard',
 });
 
+import { getProvince } from '~/_service/navigasi/nav';
+import { useRequest } from '~/composables/useRequest';
+import { ErrorApiResponse } from '~/_service/http/schema';
+
 const selectedProvince = ref('')
+
+const provinceList = useRequest(getProvince);
+
 const provinces = ref([
-  { id: 1, name: 'DKI Jakarta' },
-  { id: 2, name: 'Jawa Barat' },
-  { id: 3, name: 'Jawa Tengah' },
-  { id: 4, name: 'Jawa Timur' },
-  { id: 5, name: 'DI Yogyakarta' },
-  { id: 6, name: 'Banten' },
-  // Add more provinces as needed
+
 ])
+
+try {
+  const res = await provinceList.call()
+  provinces.value = res.list
+  console.log(res.list);
+} catch (e) {
+  if (e instanceof ErrorApiResponse) {
+    console.error(`ERROR | code: ${e.code} | message: ${e.message}`)
+  } else {
+    console.error('UNKNOWN ERROR: ', (e)?.message ?? 'Unknown Error')
+  }
+}
+
 
 const handleSubmit = () => {
   if (selectedProvince.value) {

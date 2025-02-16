@@ -7,5 +7,12 @@ export default defineNuxtConfig({
   tailwindcss: {
     exposeConfig: true,
     viewer: true,
-  }
+  },
+  runtimeConfig: {
+    public: {
+      // baseURL: 'http://localhost:2020',
+      baseURL: process.env.API_BASE_URL,
+      goURL: process.env.API_GO_URL
+    },
+  },
 })
