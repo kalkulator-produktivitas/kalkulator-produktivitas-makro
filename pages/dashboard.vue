@@ -2,6 +2,7 @@
   <div class="">
     <div id="layout" class="md:mx-auto mx-auto flex w-full">
       <div class="flex shrink-0 w-[3%]">
+
       </div>
       <div class="lg:relative mt-8">
         <p class="font-bold text-xl">Dashboard Produktivitas Makro</p>
@@ -45,7 +46,7 @@
           <div class="lg:col-span-8">
             <div class="flex mt-2 lg:w-full w-1/2 gap-x-2">
               <GraphMacroLineChart :chart-data="data_1_new" title="Produktivitas Tenaga Kerja (Juta)" :key="state"
-                :millions="true" :options="{ legends: false, datalabels: true }" />
+                :millions="false" :options="{ legends: false, datalabels: true }" />
               <GraphMacroLineChart :chart-data="data_2_new" title="Pertumbuhan Produktivitas Tenaga Kerja" :key="state"
                 :millions="false" :options="{ legends: false, datalabels: true }" />
               <GraphMacroLineChart :chart-data="data_3_new" title="Produktivitas Upah" :key="state" :millions="false"
@@ -97,6 +98,7 @@
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -113,10 +115,18 @@ definePageMeta({
   layout: 'dashboard',
 });
 
-import { GraphMacroLineChart } from '#components';
+import { getDashboardApi } from '~/_service/dashboard/dashboardData';
+import { useRequest } from '~/composables/useRequest';
+import { ErrorApiResponse } from '~/_service/http/schema';
+
+const route = useRoute()
+
+const dashboardApi = useRequest(getDashboardApi);
+
 import macro from '~/assets/macro.json'
 
 import rawData from '~/assets/macro_2_restructured.json'
+const rawData2 = ref(null);
 
 let reportType = ref("Provinsi")
 
@@ -125,6 +135,14 @@ let tabList = ref(['Provinsi DKI Jakarta', 'Jakarta Utara', 'Jakarta Timur', 'Ja
 let subTab = ref('Provinsi DKI Jakarta')
 
 const data = ref(macro['Provinsi DKI Jakarta'])
+
+
+try {
+  const res = await dashboardApi.call(route.query.tahun_start, route.query.tahun_end, route.query.id_provinsi)
+  rawData2.value = res
+} catch (error) {
+  console.log(error)
+}
 
 // sort array ascending
 const asc = arr => arr.sort((a, b) => a - b);
@@ -311,8 +329,12 @@ const data_1_new = computed(() => {
       },
     ],
   }
-  let calcData = rawData.data["Provinsi DKI Jakarta"]["TOTAL"]["produktivitas"].map(x => x ? parseFloat(x.replaceAll('.', '')) : x)
-  dataset.datasets[0].data = calcData
+
+
+  let calcData = rawData2.value["provinsi"]["agregat"]["produktivitas_tenaga_kerja"]
+  dataset.datasets[0].data = calcData.filter(x => x !== null)
+  dataset.labels = rawData2.value.metadata.tahun.slice(1, calcData.length)
+
   return dataset
 })
 
@@ -328,9 +350,10 @@ const data_2_new = computed(() => {
       },
     ],
   }
-  let calcData = rawData.data["Provinsi DKI Jakarta"]["TOTAL"]["growth_produktivitas"].map(x => x ? parseFloat(x.replace(",", ".").replace("%", "")) : x)
+  let calcData = rawData2.value["provinsi"]["agregat"]["growth_produktivitas_tenaga_kerja"]
   dataset.datasets[0].data = calcData.filter(x => x !== null)
-  dataset.labels = rawData.metadata.tahun.slice(1, calcData.length)
+  dataset.labels = rawData2.value.metadata.tahun.slice(1, calcData.length)
+
   return dataset
 })
 
@@ -346,8 +369,9 @@ const data_3_new = computed(() => {
       },
     ],
   }
-  let calcData = rawData.data["Provinsi DKI Jakarta"]["TOTAL"]["upah"].map(x => x ? parseFloat(x.replaceAll(',', '.')) : x)
-  dataset.datasets[0].data = calcData
+  let calcData = rawData2.value["provinsi"]["agregat"]["produktivitas_upah"]
+  dataset.datasets[0].data = calcData.filter(x => x !== null)
+  dataset.labels = rawData2.value.metadata.tahun.slice(1, calcData.length)
   return dataset
 })
 

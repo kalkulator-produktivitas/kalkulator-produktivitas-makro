@@ -27,6 +27,7 @@
           Lanjutkan
         </button>
       </div>
+      <!-- {{ selectedProvince }} -->
     </div>
   </div>
 </template>
@@ -51,7 +52,6 @@ const provinces = ref([
 try {
   const res = await provinceList.call()
   provinces.value = res.list
-  console.log(res.list);
 } catch (e) {
   if (e instanceof ErrorApiResponse) {
     console.error(`ERROR | code: ${e.code} | message: ${e.message}`)
@@ -64,7 +64,7 @@ try {
 const handleSubmit = () => {
   if (selectedProvince.value) {
     // Handle the province selection
-    navigateTo('/dashboard')
+    navigateTo(`/dashboard?id_provinsi=${selectedProvince.value}&tahun_start=2018&tahun_end=2023`)
     // You can add navigation or other logic here
   }
 }

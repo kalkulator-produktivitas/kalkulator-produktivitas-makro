@@ -84,7 +84,7 @@ export const request = async (options: RequestOptions) => {
     headers: myHeaders
   };
 
-  console.log(options.body);
+  // console.log(options.body);
   
 
   if (options.body) {
