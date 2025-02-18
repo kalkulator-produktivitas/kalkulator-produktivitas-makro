@@ -5,15 +5,15 @@
       <p class="font-bold text-md ml-2 text-[#034EA2] text-balance">{{ title }}</p>
       <div class="justify-end flex text-xs gap-1">
         <div class="w-2 h-2 bg-[#5A8DEE] rounded-full my-auto"></div>
-        <p class="my-auto">2020</p>
+        <p class="my-auto">2018</p>
         <div class="w-2 h-2 bg-[#FF5E57] rounded-full my-auto"></div>
-        <p class="my-auto">2021</p>
+        <p class="my-auto">2019</p>
         <div class="w-2 h-2 bg-[#5DD39E] rounded-full my-auto"></div>
-        <p class="my-auto">2022</p>
+        <p class="my-auto">2020</p>
         <div class="w-2 h-2 bg-[#FFC048] rounded-full my-auto"></div>
-        <p class="my-auto">2023</p>
+        <p class="my-auto">2021</p>
         <div class="w-2 h-2 bg-[#18A0FB] rounded-full my-auto"></div>
-        <p class="my-auto">2024</p>
+        <p class="my-auto">2022</p>
       </div>
     </div>
     <!-- Outer container to enable horizontal scrolling -->

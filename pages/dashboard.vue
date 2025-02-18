@@ -11,7 +11,6 @@
             <div class="px-1 py-1 flex items-center bg-blue-700 rounded-full">
               <Icon name="mdi:arrow-left-circle" class="cursor-pointer rounded-full border border-white bg-white"
                 @click="navigateTo('/')" size="24" />
-
               <p class="text-white cursor-pointer mr-2" @click="navigateTo('/')">Back</p>
             </div>
             <select v-model="subTab" @change="changeTab(subTab)"
@@ -54,7 +53,7 @@
             </div>
             <div class="lg:grid lg:grid-cols-2 lg:w-full w-1/2 mt-2 gap-2">
               <GraphMacroBarChart2 :chart-data="data_4" title="Produktivitas Tenaga Kerja" :key="state"
-                :ribuan="true" />
+                :ribuan="false" />
               <GraphMacroBarChart2 :chart-data="data_5" title="Produktivitas Jam Kerja" :ribuan="false" :key="state" />
               <GraphMacroBarChart2 :chart-data="data_6" title="Produktivitas Upah" :key="state" :ribuan="false" />
               <GraphMacroBarChart2 :chart-data="data_7" title="Pertumbuhan Produktivitas Tenaga Kerja" :ribuan="false"
@@ -98,7 +97,6 @@
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
@@ -116,12 +114,15 @@ definePageMeta({
 });
 
 import { getDashboardApi } from '~/_service/dashboard/dashboardData';
+import { getCity, getProvince } from '~/_service/navigasi/nav';
 import { useRequest } from '~/composables/useRequest';
 import { ErrorApiResponse } from '~/_service/http/schema';
 
 const route = useRoute()
 
 const dashboardApi = useRequest(getDashboardApi);
+const provinceApi = useRequest(getProvince);
+const cityApi = useRequest(getCity);
 
 import macro from '~/assets/macro.json'
 
@@ -130,16 +131,31 @@ const rawData2 = ref(null);
 
 let reportType = ref("Provinsi")
 
-let tabList = ref(['Provinsi DKI Jakarta', 'Jakarta Utara', 'Jakarta Timur', 'Jakarta Barat', 'Jakarta Selatan', 'Jakarta Pusat', 'Kepulauan Seribu'])
+let tabList = ref([])
 
-let subTab = ref('Provinsi DKI Jakarta')
+let subTab = ref('')
 
-const data = ref(macro['Provinsi DKI Jakarta'])
+const data = ref()
+const fullData = ref()
 
+let listProvince
+let listKota
 
 try {
+  listProvince = await provinceApi.call()
+  listProvince = listProvince.list.filter(x => x.id === route.query.id_provinsi)[0]
+  tabList.value.push(listProvince.nama)
+  subTab.value = listProvince.nama
+  listKota = await cityApi.call(listProvince.id)
+  listKota.list.forEach(x => {
+    tabList.value.push(x.nama)
+  })
+
+
   const res = await dashboardApi.call(route.query.tahun_start, route.query.tahun_end, route.query.id_provinsi)
   rawData2.value = res
+  data.value = rawData2.value["provinsi"]["lapangan_usaha"]
+  fullData.value = rawData2.value["provinsi"]["lapangan_usaha"]
 } catch (error) {
   console.log(error)
 }
@@ -286,9 +302,15 @@ const countSelected = computed(() => {
 const applyFilter = () => {
   let filteredUsaha = lapanganUsaha.value.filter(x => x.status === true)
   let filteredKode = filteredUsaha.map(x => x.kode)
-  let filtering = macro[subTab.value].filter(x => filteredKode.includes(x["Kode Lapangan Usaha"]))
 
-  data.value = filtering
+  // Filter the object by keeping only selected keys
+  const filtered = Object.fromEntries(
+    Object.entries(fullData.value).filter(([key]) =>
+      filteredKode.includes(key)
+    )
+  )
+
+  data.value = filtered
 }
 
 const addAll = () => {
@@ -303,9 +325,12 @@ const removeAll = () => {
 
 const changeTab = (x) => {
   subTab.value = x
-  let filteredUsaha = lapanganUsaha.value.filter(x => x.status === true)
-  let filteredKode = filteredUsaha.map(x => x.kode)
-  data.value = macro[subTab.value].filter(x => filteredKode.includes(x["Kode Lapangan Usaha"]))
+  if (subTab.value === 'DKI Jakarta') {
+    data.value = rawData2.value["provinsi"]["lapangan_usaha"]
+  } else {
+    let kotaData = rawData2.value["kota"].filter(x => x.nama === subTab.value)[0]
+    data.value = kotaData.lapangan_usaha
+  }
 }
 
 const buttonActive = computed(() => {
@@ -377,6 +402,7 @@ const data_3_new = computed(() => {
 
 const data_4 = computed(() => {
   let dataNew = data.value
+
   const dataset = {
     labels: [],
     datasets: [
@@ -413,13 +439,12 @@ const data_4 = computed(() => {
     ],
   }
 
-  for (let x of dataNew) {
-    dataset.labels.push(`Kode ${x['Kode Lapangan Usaha']}`)
-    dataset.datasets[0].data.push(parseFloat((x['Tahun 2018']).replaceAll('.', '')))
-    dataset.datasets[1].data.push(parseFloat((x['Tahun 2019']).replaceAll('.', '')))
-    dataset.datasets[2].data.push(parseFloat((x['Tahun 2020']).replaceAll('.', '')))
-    dataset.datasets[3].data.push(parseFloat((x['Tahun 2021']).replaceAll('.', '')))
-    dataset.datasets[4].data.push(parseFloat((x['Tahun 2022']).replaceAll('.', '')))
+  for (let x in dataNew) {
+
+    dataset.labels.push(`Kode ${x}`)
+    for (let i = 0; i < 5; i++) {
+      dataset.datasets[i].data.push(parseFloat((dataNew[x]['produktivitas_tenaga_kerja'][i])))
+    }
   }
   return dataset
 })
@@ -462,13 +487,11 @@ const data_5 = computed(() => {
     ],
   }
 
-  for (let x of dataNew) {
-    dataset.labels.push(`Kode ${x['Kode Lapangan Usaha']}`)
-    dataset.datasets[0].data.push(parseFloat((x['Jam Kerja 2018'])))
-    dataset.datasets[1].data.push(parseFloat((x['Jam Kerja 2019'])))
-    dataset.datasets[2].data.push(parseFloat((x['Jam Kerja 2020'])))
-    dataset.datasets[3].data.push(parseFloat((x['Jam Kerja 2021'])))
-    dataset.datasets[4].data.push(parseFloat((x['Jam Kerja 2022'])))
+  for (let x in dataNew) {
+    dataset.labels.push(`Kode ${x}`)
+    for (let i = 0; i < 5; i++) {
+      dataset.datasets[i].data.push(parseFloat((dataNew[x]['produktivitas_jam_kerja'][i])))
+    }
   }
   return dataset
 })
@@ -511,13 +534,11 @@ const data_6 = computed(() => {
     ],
   }
 
-  for (let x of dataNew) {
-    dataset.labels.push(`Kode ${x['Kode Lapangan Usaha']}`)
-    dataset.datasets[0].data.push(parseFloat((x['Upah 2018'])))
-    dataset.datasets[1].data.push(parseFloat((x['Upah 2019'])))
-    dataset.datasets[2].data.push(parseFloat((x['Upah 2020'])))
-    dataset.datasets[3].data.push(parseFloat((x['Upah 2021'])))
-    dataset.datasets[4].data.push(parseFloat((x['Upah 2022'])))
+  for (let x in dataNew) {
+    dataset.labels.push(`Kode ${x}`)
+    for (let i = 0; i < 5; i++) {
+      dataset.datasets[i].data.push(parseFloat((dataNew[x]['produktivitas_upah'][i])))
+    }
   }
   return dataset
 })
@@ -560,13 +581,11 @@ const data_7 = computed(() => {
     ],
   }
 
-  for (let x of dataNew) {
-    dataset.labels.push(`Kode ${x['Kode Lapangan Usaha']}`)
-    dataset.datasets[0].data.push(parseFloat((x['Growth Produktivitas TK 2018'])))
-    dataset.datasets[1].data.push(parseFloat((x['Growth Produktivitas TK 2019'])))
-    dataset.datasets[2].data.push(parseFloat((x['Growth Produktivitas TK 2020'])))
-    dataset.datasets[3].data.push(parseFloat((x['Growth Produktivitas TK 2021'])))
-    dataset.datasets[4].data.push(parseFloat((x['Growth Produktivitas TK 2022'])))
+  for (let x in dataNew) {    
+    dataset.labels.push(`Kode ${x}`)
+    for (let i = 0; i < 5; i++) {
+      dataset.datasets[i].data.push(parseFloat((dataNew[x]['growth_produktivitas_tenaga_kerja'][i])))
+    }
   }
   return dataset
 })

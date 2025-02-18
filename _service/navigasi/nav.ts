@@ -11,3 +11,10 @@ export const getProvince = (): Promise<ApiSuccessResponse<any>> => {
   })
 }
 
+export const getCity = (id_provinsi: string): Promise<ApiSuccessResponse<any>> => {
+  return request({
+    url: `/v1/makro/kota/${id_provinsi}`,
+    method: 'GET',
+    skipAuthToken: true
+  })
+}
