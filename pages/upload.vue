@@ -18,49 +18,28 @@
 
               <p class="text-lg">Tentukan jenis file yang akan anda Upload</p>
               <div class="flex gap-4">
-                <!-- <div class="border border-slate-200 rounded-lg p-6 w-[50%]">
-                  <div class="flex justify-between">
-                    <p class="block text-md text-gray-700 mb-2">
-                      Pilih File CSV
-                    </p>
-                    <div class="flex items-center">
-                      <a class="text-[#034EA2] hover:underline cursor-pointer my-auto flex items-center"
-                        href="/files/template_analisis_makro.xlsx" download>
-                        <Icon name="mdi:download" size="6mm" class=" text-[#034EA2] my-auto" />
-                        Download Template
-                      </a>
-                    </div>
-                  </div>
-
-                  <div class="border-2 border-dashed border-[#034EA2] rounded-lg p-8 text-center bg-blue-50 relative">
-                    <div class="flex flex-col items-center">
-                      <Icon name="mdi:cloud-upload-outline" size="12mm"
-                        class="my-auto flex-none text-[#034EA2] self-center" />
-                      <p class="mb-2 text-sm text-gray-500">Drag your file(s) or <span
-                          class="text-[#034EA2] hover:underline cursor-pointer">browse</span></p>
-                      <p class="text-xs text-gray-500">Max 10 MB files are allowed</p>
-                    </div>
-                    <input type="file" accept=".csv" class="absolute inset-0 w-full h-full cursor-pointer opacity-0"
-                      @change="selectedFile = $event.target.files[0]" />
-                  </div>
-                </div> -->
 
                 <div class="border border-slate-200 rounded-lg p-6 w-[50%] mx-auto">
                   <div class="flex justify-between">
                     <p class="block text-md text-gray-700 mb-2">
                       Pilih File Excel
                     </p>
-                    <div class="flex">
-                      <!-- <a class="text-[#034EA2] hover:underline cursor-pointer my-auto flex items-center"
-                        href="/files/template_analisis_makro.xlsx" download>
-                        <Icon name="mdi:download" size="6mm" class=" text-[#034EA2] my-auto" />
-                        Download Template
-                      </a> -->
-                      <a class="text-[#034EA2] hover:underline cursor-pointer my-auto flex items-center"
-                        @click="downloadTemplate">
-                        <Icon name="mdi:download" size="6mm" class=" text-[#034EA2] my-auto" />
-                        Download Template
-                      </a>
+                    <div class="flex mb-4">
+                      <select v-model="selectedProvince"
+                        class="p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="" disabled>Pilih provinsi...</option>
+                        <option v-for="province in provinces" :key="province.id" :value="province.id">
+                          {{ province.nama_lengkap }}
+                        </option>
+                      </select>
+
+                      <div class="flex">
+                        <a class="text-[#034EA2] hover:underline cursor-pointer my-auto flex items-center"
+                          @click="downloadTemplate">
+                          <Icon name="mdi:download" size="6mm" class=" text-[#034EA2] my-auto" />
+                          Download Template
+                        </a>
+                      </div>
                     </div>
                   </div>
                   <div class="border-2 border-dashed border-green-700 bg-green-50 rounded-lg p-8 text-center relative">
@@ -155,7 +134,8 @@
           @click="uploadFile">Kirim</button>
       </div>
     </div>
-    <Popup v-if="modal.show === true" :title="modal.title" :message="modal.message" :type="modal.type" @close="modal.show = false" />
+    <Popup v-if="modal.show === true" :title="modal.title" :message="modal.message" :type="modal.type"
+      @close="modal.show = false" />
     <Loading v-if="loading" text="Uploading..." />
   </div>
 </template>
@@ -163,6 +143,7 @@
 <script setup>
 const global = useRuntimeConfig();
 import { getUploadsList, postUpload, getTemplate } from '~/_service/upload/uploads';
+import { getProvince } from '~/_service/navigasi/nav';
 import { useRequest } from '~/composables/useRequest';
 import { ErrorApiResponse } from '~/_service/http/schema';
 
@@ -171,8 +152,24 @@ const selectedFile = ref(null);
 const uploadList = useRequest(getUploadsList);
 const upload = useRequest(postUpload);
 const template = useRequest(getTemplate);
-
 const uploaded = ref([]);
+
+const selectedProvince = ref('')
+
+const provinceList = useRequest(getProvince);
+
+const provinces = ref([])
+
+try {
+  const res = await provinceList.call()
+  provinces.value = res.list
+} catch (e) {
+  if (e instanceof ErrorApiResponse) {
+    console.error(`ERROR | code: ${e.code} | message: ${e.message}`)
+  } else {
+    console.error('UNKNOWN ERROR: ', (e)?.message ?? 'Unknown Error')
+  }
+}
 
 const modal = ref({
   show: false,
@@ -261,8 +258,13 @@ const uploadFile = async () => {
 
 const downloadTemplate = async () => {
 
+
   try {
-    const response = await fetch(`${global.public.goURL}/v1/makro/files/template?id_provinsi=dki_jakarta`, {
+    if (selectedProvince.value === '') {
+      throw new Error('Please select province');
+    }
+
+    const response = await fetch(`${global.public.goURL}/v1/makro/files/template?id_provinsi=${selectedProvince.value}`, {
       method: 'GET',
     });
 
