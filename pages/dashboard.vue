@@ -43,13 +43,19 @@
         <div class="lg:grid lg:grid-cols-10">
           <!-- <div class="col-span-8">{{ data }}</div> -->
           <div class="lg:col-span-8">
-            <div class="flex mt-2 lg:w-full w-1/2 gap-x-2">
-              <GraphMacroLineChart :chart-data="data_1_new" title="Produktivitas Tenaga Kerja (Juta)" :key="state"
-                :millions="false" :options="{ legends: false, datalabels: true }" />
-              <GraphMacroLineChart :chart-data="data_2_new" title="Pertumbuhan Produktivitas Tenaga Kerja" :key="state"
-                :millions="false" :options="{ legends: false, datalabels: true }" />
-              <GraphMacroLineChart :chart-data="data_3_new" title="Produktivitas Upah" :key="state" :millions="false"
-                :options="{ legends: false, datalabels: true }" />
+            <div class="flex flex-col lg:flex-row mt-2 lg:w-full w-full gap-x-2">
+              <div class="w-full lg:w-1/3">
+                <GraphMacroLineChart :chart-data="data_1_new" title="Produktivitas Tenaga Kerja (Juta)" :key="state"
+                  :millions="false" :options="{ legends: false, datalabels: true }" />
+              </div>
+              <div class="w-full lg:w-1/3">
+                <GraphMacroLineChart :chart-data="data_2_new" title="Pertumbuhan Produktivitas Tenaga Kerja" :key="state"
+                  :millions="false" :options="{ legends: false, datalabels: true }" />
+              </div>
+              <div class="w-full lg:w-1/3">
+                <GraphMacroLineChart :chart-data="data_3_new" title="Produktivitas Upah" :key="state" :millions="false"
+                  :options="{ legends: false, datalabels: true }" />
+              </div>
             </div>
             <div class="lg:grid lg:grid-cols-2 lg:w-full w-1/2 mt-2 gap-2">
               <GraphMacroBarChart2 :chart-data="data_4" title="Produktivitas Tenaga Kerja" :key="state"
@@ -100,6 +106,7 @@
         </div>
       </div>
     </div>
+    <!-- {{ rawData2 }} -->
     <ReportProvinsiGen v-if="reportType === 'Provinsi' && preview === true" class="fixed inset-0 z-50"
       @close-preview="reloadApp" />
     <ReportKotaGen v-if="reportType === 'Kabupaten' && preview === true" :kota="subTab" class="fixed inset-0 z-50"
@@ -355,8 +362,13 @@ const data_1_new = computed(() => {
     ],
   }
 
-
-  let calcData = rawData2.value["provinsi"]["agregat"]["produktivitas_tenaga_kerja"]
+  let calcData
+  if (subTab.value === "DKI Jakarta") {
+    calcData = rawData2.value["provinsi"]["agregat"]["produktivitas_tenaga_kerja"]
+  } else {
+    const kotaData = rawData2.value["kota"].find(k => k.nama === subTab.value)
+    calcData = kotaData ? kotaData.agregat.produktivitas_tenaga_kerja : []
+  }
   dataset.datasets[0].data = calcData.filter(x => x !== null)
   dataset.labels = rawData2.value.metadata.tahun.slice(1, calcData.length)
 
@@ -375,7 +387,13 @@ const data_2_new = computed(() => {
       },
     ],
   }
-  let calcData = rawData2.value["provinsi"]["agregat"]["growth_produktivitas_tenaga_kerja"]
+  let calcData
+  if (subTab.value === "DKI Jakarta") {
+    calcData = rawData2.value["provinsi"]["agregat"]["growth_produktivitas_tenaga_kerja"]
+  } else {
+    const kotaData = rawData2.value["kota"].find(k => k.nama === subTab.value)
+    calcData = kotaData ? kotaData.agregat.growth_produktivitas_tenaga_kerja : []
+  }
   dataset.datasets[0].data = calcData.filter(x => x !== null)
   dataset.labels = rawData2.value.metadata.tahun.slice(1, calcData.length)
 
@@ -394,7 +412,13 @@ const data_3_new = computed(() => {
       },
     ],
   }
-  let calcData = rawData2.value["provinsi"]["agregat"]["produktivitas_upah"]
+  let calcData
+  if (subTab.value === "DKI Jakarta") {
+    calcData = rawData2.value["provinsi"]["agregat"]["produktivitas_upah"]
+  } else {
+    const kotaData = rawData2.value["kota"].find(k => k.nama === subTab.value)
+    calcData = kotaData ? kotaData.agregat.produktivitas_upah : []
+  }
   dataset.datasets[0].data = calcData.filter(x => x !== null)
   dataset.labels = rawData2.value.metadata.tahun.slice(1, calcData.length)
   return dataset
