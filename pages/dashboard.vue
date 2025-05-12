@@ -4,7 +4,7 @@
       <div class="flex shrink-0 w-[3%]">
 
       </div>
-      <div class="lg:relative mt-8">
+      <div class="lg:relative mt-8 w-full">
         <p class="font-bold text-xl">Dashboard Produktivitas Makro</p>
         <div class="mt-2 flex gap-4 justify-between w-[70%]">
           <div class="flex gap-4">
@@ -20,27 +20,30 @@
               </option>
             </select>
           </div>
+
+          <div class="w-full flex justify-center items-center gap-4">
+            <p class="text-md text-gray-700">{{ yearSlider.minValue }}</p>
+            <WidgetSlider class="w-[80%]" :min-threshold="yearSlider.min" :max-threshold="yearSlider.max"
+              :min="yearSlider.minValue" :max="yearSlider.maxValue" @update:min="value => yearSlider.minValue = value"
+              @update:max="value => yearSlider.maxValue = value" :id="state" :key="state">
+            </WidgetSlider>
+            <p class="text-md text-gray-700">{{ yearSlider.maxValue }}</p>
+
+            <button @click="downloadData" :disabled="!buttonActive || isLoading"
+              class="bg-[#034EA2] text-white px-3 py-1 rounded-lg self-center hover:bg-[#023b7d] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+              Submit
+            </button>
+          </div>
+
           <div class="flex gap-4 absolute top-3 right-5">
-            <ul class="flex flex-row pl-0 mx-auto bg-blue-200 rounded-full">
-              <li class="font-bold text-sm" :key="'a'">
-                <button class="w-[160px] h-full rounded-full" @click="reportType = 'Provinsi'"
-                  :class="reportType === 'Provinsi' ? 'text-white active bg-[#034EA2]' : 'hover:text-gray-600 hover:border-gray-300 bg-blue-200'">Provinsi</button>
-              </li>
-              <li class="font-bold text-sm" :key="'b'">
-                <button class="w-[160px] h-full rounded-full" @click="reportType = 'Kabupaten'"
-                  :class="reportType === 'Kabupaten' ? 'text-white active bg-[#034EA2]' : 'hover:text-gray-600 hover:border-gray-300 bg-blue-200'">Kabupaten/Kota</button>
-              </li>
-            </ul>
             <button @click="createReport" :disabled="!buttonActive"
               class="bg-[#034EA2] text-white px-3 py-1 rounded-lg self-center hover:bg-[#023b7d] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
               Buat Laporan
             </button>
           </div>
-
-
         </div>
 
-        <div class="lg:grid lg:grid-cols-10">
+        <div v-if="hasData" class="lg:grid lg:grid-cols-10">
           <!-- <div class="col-span-8">{{ data }}</div> -->
           <div class="lg:col-span-8">
             <div class="flex flex-col lg:flex-row mt-2 lg:w-full w-full gap-x-2">
@@ -49,8 +52,8 @@
                   :millions="false" :options="{ legends: false, datalabels: true }" />
               </div>
               <div class="w-full lg:w-1/3">
-                <GraphMacroLineChart :chart-data="data_2_new" title="Pertumbuhan Produktivitas Tenaga Kerja" :key="state"
-                  :millions="false" :options="{ legends: false, datalabels: true }" />
+                <GraphMacroLineChart :chart-data="data_2_new" title="Pertumbuhan Produktivitas Tenaga Kerja"
+                  :key="state" :millions="false" :options="{ legends: false, datalabels: true }" />
               </div>
               <div class="w-full lg:w-1/3">
                 <GraphMacroLineChart :chart-data="data_3_new" title="Produktivitas Upah" :key="state" :millions="false"
@@ -59,11 +62,13 @@
             </div>
             <div class="lg:grid lg:grid-cols-2 lg:w-full w-1/2 mt-2 gap-2">
               <GraphMacroBarChart2 :chart-data="data_4" title="Produktivitas Tenaga Kerja" :key="state"
-                :ribuan="false" />
-              <GraphMacroBarChart2 :chart-data="data_5" title="Produktivitas Jam Kerja" :ribuan="false" :key="state" />
-              <GraphMacroBarChart2 :chart-data="data_6" title="Produktivitas Upah" :key="state" :ribuan="false" />
+                :years="rawData2.metadata.tahun" :ribuan="false" />
+              <GraphMacroBarChart2 :chart-data="data_5" title="Produktivitas Jam Kerja" :ribuan="false" :key="state"
+                :years="rawData2.metadata.tahun" />
+              <GraphMacroBarChart2 :chart-data="data_6" title="Produktivitas Upah" :key="state" :ribuan="false"
+                :years="rawData2.metadata.tahun" />
               <GraphMacroBarChart2 :chart-data="data_7" title="Pertumbuhan Produktivitas Tenaga Kerja" :ribuan="false"
-                :key="state" />
+                :key="state" :years="rawData2.metadata.tahun" />
             </div>
 
           </div>
@@ -104,14 +109,18 @@
             </div>
           </div>
         </div>
+        <div v-else class="flex justify-center items-center h-[50vh]">
+          <p class="text-gray-500">Pilih tahun dan klik "Submit" untuk melihat dashboard</p>
+        </div>
       </div>
     </div>
-    <!-- {{ rawData2 }} -->
+    <!-- {{ yearSlider }} -->
     <ReportProvinsiGen v-if="reportType === 'Provinsi' && preview === true" class="fixed inset-0 z-50"
-      @close-preview="reloadApp" />
+      @close-preview="reloadApp" :rawdata="rawData2" />
     <ReportKotaGen v-if="reportType === 'Kabupaten' && preview === true" :kota="subTab" class="fixed inset-0 z-50"
-      @close-preview="reloadApp" />
+      @close-preview="reloadApp" :rawdata="rawData2" />
     <Popup v-if="modal.show === true" :title="modal.title" :message="modal.message" @close="closeModal" />
+    <Loading v-if="isLoading" text="Fetching Data..." />
   </div>
 </template>
 
@@ -120,21 +129,34 @@ definePageMeta({
   layout: 'dashboard',
 });
 
-import { getDashboardApi } from '~/_service/dashboard/dashboardData';
+import { getDashboardApi, getYearsApi } from '~/_service/dashboard/dashboardData';
 import { getCity, getProvince } from '~/_service/navigasi/nav';
 import { useRequest } from '~/composables/useRequest';
 import { ErrorApiResponse } from '~/_service/http/schema';
+import { ChartColors, BrightColors } from '~/assets/helpers/colors'
 
 const route = useRoute()
 
 const dashboardApi = useRequest(getDashboardApi);
+const yearsApi = useRequest(getYearsApi);
 const provinceApi = useRequest(getProvince);
 const cityApi = useRequest(getCity);
 
 import macro from '~/assets/macro.json'
 
-import rawData from '~/assets/macro_2_restructured.json'
+let years = ref([])
+
+let yearSlider = ref({
+  min: 0,
+  max: 0,
+  minValue: 0,
+  maxValue: 0
+})
+
 const rawData2 = ref(null);
+const isLoading = ref(false)
+const hasData = ref(false)
+const buttonActive = ref(true)
 
 let reportType = ref("Provinsi")
 
@@ -149,22 +171,37 @@ let listProvince
 let listKota
 
 try {
-  listProvince = await provinceApi.call()
-  listProvince = listProvince.list.filter(x => x.id === route.query.id_provinsi)[0]
-  tabList.value.push(listProvince.nama)
-  subTab.value = listProvince.nama
-  listKota = await cityApi.call(listProvince.id)
-  listKota.list.forEach(x => {
-    tabList.value.push(x.nama)
-  })
+  isLoading.value = true
+  years.value = await yearsApi.call(route.query.id_provinsi)
+  years.value = years.value.tahun
+  if (years.value.length !== 0) { 
+    buttonActive.value = true
+    yearSlider.value.min = Math.min(...years.value)
+    yearSlider.value.max = Math.max(...years.value)
+    yearSlider.value.minValue = yearSlider.value.min
+    yearSlider.value.maxValue = yearSlider.value.max
+    listProvince = await provinceApi.call()
+    listProvince = listProvince.list.filter(x => x.id === route.query.id_provinsi)[0]
+    tabList.value.push(listProvince.nama)
+    subTab.value = listProvince.nama
+    listKota = await cityApi.call(listProvince.id)
+    isLoading.value = false
+  } else {
+    hasData.value = false
+    isLoading.value = false
+    buttonActive.value = false
+    yearSlider.value.min = null
+    yearSlider.value.max = null
+    yearSlider.value.minValue = null
+    yearSlider.value.maxValue = null
 
-
-  const res = await dashboardApi.call(route.query.tahun_start, route.query.tahun_end, route.query.id_provinsi)
-  rawData2.value = res
-  data.value = rawData2.value["provinsi"]["lapangan_usaha"]
-  fullData.value = rawData2.value["provinsi"]["lapangan_usaha"]
-} catch (error) {
-  console.log(error)
+  }
+} catch (e) {
+  if (e instanceof ErrorApiResponse) {
+    console.error(`ERROR | code: ${e.code} | message: ${e.message}`)
+  } else {
+    console.error('UNKNOWN ERROR: ', (e)?.message ?? 'Unknown Error')
+  }
 }
 
 // sort array ascending
@@ -202,10 +239,11 @@ const modal = ref({
 })
 
 const reloadApp = () => {
-  reloadNuxtApp({
-    path: "/dashboard",
-    ttl: 100,
-  });
+  // reloadNuxtApp({
+  //   path: "/dashboard",
+  //   ttl: 100,
+  // });
+  preview.value = false
 }
 
 const state = ref(0)
@@ -331,27 +369,21 @@ const removeAll = () => {
 }
 
 const changeTab = (x) => {
+  // listKota.map(kota => kota.nama)
   subTab.value = x
-  if (subTab.value === 'DKI Jakarta') {
+  if (subTab.value === listProvince.nama) {
+    reportType.value = "Provinsi"
     data.value = rawData2.value["provinsi"]["lapangan_usaha"]
-  } else {
+  } else if (listKota.list.map(kota => kota.nama).includes(subTab.value)) {
+    reportType.value = "Kabupaten"
     let kotaData = rawData2.value["kota"].filter(x => x.nama === subTab.value)[0]
     data.value = kotaData.lapangan_usaha
   }
 }
 
-const buttonActive = computed(() => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(true)
-    }, 3000)
-  })
-})
-
-
 const data_1_new = computed(() => {
   let dataset = {
-    labels: ["2018", "2019", "2020", "2021", "2022"],
+    labels: [],
     datasets: [
       {
         label: "Produktivitas",
@@ -370,7 +402,7 @@ const data_1_new = computed(() => {
     calcData = kotaData ? kotaData.agregat.produktivitas_tenaga_kerja : []
   }
   dataset.datasets[0].data = calcData.filter(x => x !== null)
-  dataset.labels = rawData2.value.metadata.tahun.slice(1, calcData.length)
+  dataset.labels = rawData2.value.metadata.tahun.slice(0, calcData.length)
 
   return dataset
 })
@@ -402,7 +434,7 @@ const data_2_new = computed(() => {
 
 const data_3_new = computed(() => {
   let dataset = {
-    labels: ["2018", "2019", "2020", "2021", "2022"],
+    labels: [],
     datasets: [
       {
         label: "Produktivitas",
@@ -420,55 +452,34 @@ const data_3_new = computed(() => {
     calcData = kotaData ? kotaData.agregat.produktivitas_upah : []
   }
   dataset.datasets[0].data = calcData.filter(x => x !== null)
-  dataset.labels = rawData2.value.metadata.tahun.slice(1, calcData.length)
+  dataset.labels = rawData2.value.metadata.tahun.slice(0, calcData.length)
   return dataset
 })
 
 const data_4 = computed(() => {
   let dataNew = data.value
-
+  // console.log(dataNew["A"])
   const dataset = {
     labels: [],
     datasets: [
-      {
-        label: "2018",
-        data: [],
-        backgroundColor: "#5A8DEE",
-        borderRadius: 100,
-      },
-      {
-        label: "2019",
-        data: [],
-        backgroundColor: "#FF5E57",
-        borderRadius: 100,
-      },
-      {
-        label: "2020",
-        data: [],
-        backgroundColor: "#5DD39E",
-        borderRadius: 100,
-      },
-      {
-        label: "2021",
-        data: [],
-        backgroundColor: "#FFC048",
-        borderRadius: 100,
-      },
-      {
-        label: "2022",
-        data: [],
-        backgroundColor: "#18A0FB",
-        borderRadius: 100,
-      },
+
     ],
+  }
+  for (let year of rawData2.value.metadata.tahun) {
+    dataset.datasets.push({
+      label: year,
+      data: [],
+      backgroundColor: BrightColors[rawData2.value.metadata.tahun.indexOf(year)],
+      borderRadius: 100,
+    })
   }
 
   for (let x in dataNew) {
-
     dataset.labels.push(`Kode ${x}`)
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i <= rawData2.value.metadata.tahun.length - 1; i++) {
       dataset.datasets[i].data.push(parseFloat((dataNew[x]['produktivitas_tenaga_kerja'][i])))
     }
+
   }
   return dataset
 })
@@ -477,43 +488,20 @@ const data_5 = computed(() => {
   let dataNew = data.value
   const dataset = {
     labels: [],
-    datasets: [
-      {
-        label: "2018",
-        data: [],
-        backgroundColor: "#5A8DEE",
-        borderRadius: 100,
-      },
-      {
-        label: "2019",
-        data: [],
-        backgroundColor: "#FF5E57",
-        borderRadius: 100,
-      },
-      {
-        label: "2020",
-        data: [],
-        backgroundColor: "#5DD39E",
-        borderRadius: 100,
-      },
-      {
-        label: "2021",
-        data: [],
-        backgroundColor: "#FFC048",
-        borderRadius: 100,
-      },
-      {
-        label: "2022",
-        data: [],
-        backgroundColor: "#18A0FB",
-        borderRadius: 100,
-      },
-    ],
+    datasets: [],
+  }
+  for (let year of rawData2.value.metadata.tahun) {
+    dataset.datasets.push({
+      label: year,
+      data: [],
+      backgroundColor: BrightColors[rawData2.value.metadata.tahun.indexOf(year)],
+      borderRadius: 100,
+    })
   }
 
   for (let x in dataNew) {
     dataset.labels.push(`Kode ${x}`)
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i <= rawData2.value.metadata.tahun.length - 1; i++) {
       dataset.datasets[i].data.push(parseFloat((dataNew[x]['produktivitas_jam_kerja'][i])))
     }
   }
@@ -524,43 +512,20 @@ const data_6 = computed(() => {
   let dataNew = data.value
   const dataset = {
     labels: [],
-    datasets: [
-      {
-        label: "2018",
-        data: [],
-        backgroundColor: "#5A8DEE",
-        borderRadius: 100,
-      },
-      {
-        label: "2019",
-        data: [],
-        backgroundColor: "#FF5E57",
-        borderRadius: 100,
-      },
-      {
-        label: "2020",
-        data: [],
-        backgroundColor: "#5DD39E",
-        borderRadius: 100,
-      },
-      {
-        label: "2021",
-        data: [],
-        backgroundColor: "#FFC048",
-        borderRadius: 100,
-      },
-      {
-        label: "2022",
-        data: [],
-        backgroundColor: "#18A0FB",
-        borderRadius: 100,
-      },
-    ],
+    datasets: [],
+  }
+  for (let year of rawData2.value.metadata.tahun) {
+    dataset.datasets.push({
+      label: year,
+      data: [],
+      backgroundColor: BrightColors[rawData2.value.metadata.tahun.indexOf(year)],
+      borderRadius: 100,
+    })
   }
 
   for (let x in dataNew) {
     dataset.labels.push(`Kode ${x}`)
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i <= rawData2.value.metadata.tahun.length - 1; i++) {
       dataset.datasets[i].data.push(parseFloat((dataNew[x]['produktivitas_upah'][i])))
     }
   }
@@ -571,43 +536,20 @@ const data_7 = computed(() => {
   let dataNew = data.value
   const dataset = {
     labels: [],
-    datasets: [
-      {
-        label: "2018",
-        data: [],
-        backgroundColor: "#5A8DEE",
-        borderRadius: 100,
-      },
-      {
-        label: "2019",
-        data: [],
-        backgroundColor: "#FF5E57",
-        borderRadius: 100,
-      },
-      {
-        label: "2020",
-        data: [],
-        backgroundColor: "#5DD39E",
-        borderRadius: 100,
-      },
-      {
-        label: "2021",
-        data: [],
-        backgroundColor: "#FFC048",
-        borderRadius: 100,
-      },
-      {
-        label: "2022",
-        data: [],
-        backgroundColor: "#18A0FB",
-        borderRadius: 100,
-      },
-    ],
+    datasets: [],
+  }
+  for (let year of rawData2.value.metadata.tahun) {
+    dataset.datasets.push({
+      label: year,
+      data: [],
+      backgroundColor: BrightColors[rawData2.value.metadata.tahun.indexOf(year)],
+      borderRadius: 100,
+    })
   }
 
-  for (let x in dataNew) {    
+  for (let x in dataNew) {
     dataset.labels.push(`Kode ${x}`)
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i <= rawData2.value.metadata.tahun.length - 1; i++) {
       dataset.datasets[i].data.push(parseFloat((dataNew[x]['growth_produktivitas_tenaga_kerja'][i])))
     }
   }
@@ -617,15 +559,14 @@ const data_7 = computed(() => {
 const reportData = ref([])
 
 const createReport = () => {
-  // console.log("clicked");
-  // console.log(subTab.value)
-  // console.log(reportType.value)
-  if (subTab.value === 'Provinsi DKI Jakarta' && reportType.value === 'Kabupaten') {
-    modal.value.show = true
-    modal.value.title = 'Silahkan Pilih Kota'
-    modal.value.message = 'Mohon ubah pilihan tab selain provinsi'
-  } else {
+  if (hasData.value) {
     preview.value = true
+  } else {
+    modal.value = {
+      show: true,
+      title: 'Warning',
+      message: 'Pilih tahun dan klik "Submit" untuk melihat dashboard'
+    }
   }
 }
 
@@ -633,10 +574,37 @@ const createReport = () => {
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 const selectedMonth = ref('Jan')
 
-
-
-
-
+const downloadData = async () => {
+  try {
+    isLoading.value = true
+    listKota.list.forEach(x => {
+      tabList.value.push(x.nama)
+    })
+    const res = await dashboardApi.call(yearSlider.value.minValue, yearSlider.value.maxValue, route.query.id_provinsi)
+    rawData2.value = res
+    data.value = rawData2.value["provinsi"]["lapangan_usaha"]
+    fullData.value = rawData2.value["provinsi"]["lapangan_usaha"]
+    hasData.value = true
+  } catch (e) {
+    if (e instanceof ErrorApiResponse) {
+      console.error(`ERROR | code: ${e.code} | message: ${e.message}`)
+      modal.value = {
+        show: true,
+        title: 'Error',
+        message: `Failed to fetch data: ${e.message}`
+      }
+    } else {
+      console.error('UNKNOWN ERROR: ', (e)?.message ?? 'Unknown Error')
+      modal.value = {
+        show: true,
+        title: 'Error',
+        message: 'Failed to fetch data. Please try again.'
+      }
+    }
+  } finally {
+    isLoading.value = false
+  }
+}
 
 </script>
 

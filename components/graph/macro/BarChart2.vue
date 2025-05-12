@@ -2,18 +2,13 @@
   <div
     class="flex flex-col relative bg-white rounded-xl border border-slate-200 hover:shadow-xl transition-shadow duration-300">
     <div class="flex justify-between px-3 pt-2 bg-gradient-to-r rounded-t-xl">
+      
       <p class="font-bold text-md ml-2 text-[#034EA2] text-balance">{{ title }}</p>
       <div class="justify-end flex text-xs gap-1">
-        <div class="w-2 h-2 bg-[#5A8DEE] rounded-full my-auto"></div>
-        <p class="my-auto">2018</p>
-        <div class="w-2 h-2 bg-[#FF5E57] rounded-full my-auto"></div>
-        <p class="my-auto">2019</p>
-        <div class="w-2 h-2 bg-[#5DD39E] rounded-full my-auto"></div>
-        <p class="my-auto">2020</p>
-        <div class="w-2 h-2 bg-[#FFC048] rounded-full my-auto"></div>
-        <p class="my-auto">2021</p>
-        <div class="w-2 h-2 bg-[#18A0FB] rounded-full my-auto"></div>
-        <p class="my-auto">2022</p>
+        <div v-for="year in years" :key="year" class="flex gap-1">
+          <div :style="{ backgroundColor: BrightColors[years.indexOf(year)] }" class="w-2 h-2 rounded-full my-auto"></div>
+          <p class="my-auto">{{ year }}</p>
+        </div>       
       </div>
     </div>
     <!-- Outer container to enable horizontal scrolling -->
@@ -46,8 +41,9 @@ ChartJS.register(
   CategoryScale,
   LinearScale
 );
+import { BrightColors } from '~/assets/helpers/colors'
 
-const props = defineProps(['title', 'chartData', 'ribuan'])
+const props = defineProps(['title', 'chartData', 'ribuan', 'years'])
 
 const chartOptions = {
   responsive: true,
@@ -92,41 +88,11 @@ const chartOptions = {
   }
 }
 
-const dataset = {
-  labels: ["Kode A", "Kode B", "Kode C", "Kode D", "Kode E", "Kode F"],
-  datasets: [
-    {
-      label: "2020",
-      data: [60, 40, 50, 70, 80, 90],
-      backgroundColor: "#5A8DEE",
-      borderRadius: 100,
-    },
-    {
-      label: "2021",
-      data: [50, 80, 40, 60, 70, 85],
-      backgroundColor: "#FF5E57",
-      borderRadius: 100,
-    },
-    {
-      label: "2022",
-      data: [45, 50, 60, 65, 55, 75],
-      backgroundColor: "#5DD39E",
-      borderRadius: 100,
-    },
-    {
-      label: "2023",
-      data: [30, 60, 70, 50, 60, 80],
-      backgroundColor: "#FFC048",
-      borderRadius: 100,
-    },
-    {
-      label: "2024",
-      data: [70, 90, 80, 85, 90, 95],
-      backgroundColor: "#18A0FB",
-      borderRadius: 100,
-    },
-  ],
-}
+// const yearList = computed(() => {
+//   let temp = props.chartData.datasets.map(x => x.label)
+//   return temp
+// })
+
 
 </script>
 
