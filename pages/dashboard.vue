@@ -52,7 +52,7 @@
                   :millions="false" :options="{ legends: false, datalabels: true }" />
               </div>
               <div class="w-full lg:w-1/3">
-                <GraphMacroLineChart :chart-data="data_2_new" title="Pertumbuhan Produktivitas Tenaga Kerja"
+                <GraphMacroLineChart :chart-data="data_2_new" title="Pertumbuhan Produktivitas Tenaga Kerja (%)"
                   :key="state" :millions="false" :options="{ legends: false, datalabels: true }" />
               </div>
               <div class="w-full lg:w-1/3">
@@ -61,14 +61,38 @@
               </div>
             </div>
             <div class="lg:grid lg:grid-cols-2 lg:w-full w-1/2 mt-2 gap-2">
-              <GraphMacroBarChart2 :chart-data="data_4" title="Produktivitas Tenaga Kerja" :key="state"
+              <!-- <GraphMacroBarChart2 :chart-data="data_4" title="Produktivitas Tenaga Kerja" :key="state"
                 :years="rawData2.metadata.tahun" :ribuan="false" />
               <GraphMacroBarChart2 :chart-data="data_5" title="Produktivitas Jam Kerja" :ribuan="false" :key="state"
                 :years="rawData2.metadata.tahun" />
               <GraphMacroBarChart2 :chart-data="data_6" title="Produktivitas Upah" :key="state" :ribuan="false"
                 :years="rawData2.metadata.tahun" />
               <GraphMacroBarChart2 :chart-data="data_7" title="Pertumbuhan Produktivitas Tenaga Kerja" :ribuan="false"
-                :key="state" :years="rawData2.metadata.tahun" />
+                :key="state" :years="rawData2.metadata.tahun" /> -->
+              <GraphMacroHorizontalBarChart 
+                v-if="dashboardApi.data"
+                title="Produktivitas Tenaga Kerja"
+                paramKey="produktivitas_tenaga_kerja"
+                :data="dashboardApi.data.value"
+              />
+              <GraphMacroHorizontalBarChart 
+                v-if="dashboardApi.data"
+                title="Produktivitas Jam Kerja"
+                paramKey="produktivitas_jam_kerja"
+                :data="dashboardApi.data.value"
+              />
+              <GraphMacroHorizontalBarChart 
+                v-if="dashboardApi.data"
+                title="Produktivitas Upah"
+                paramKey="produktivitas_upah"
+                :data="dashboardApi.data.value"
+              />
+              <GraphMacroHorizontalBarChart 
+                v-if="dashboardApi.data"
+                title="Pertumbuhan Produktivitas Tenaga Kerja"
+                paramKey="growth_produktivitas_tenaga_kerja"
+                :data="dashboardApi.data.value"
+              />
             </div>
 
           </div>
