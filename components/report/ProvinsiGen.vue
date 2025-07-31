@@ -659,42 +659,16 @@ const generatePDF = async () => {
       compress: true
     });
 
-
-    for (let i = 1; i <= 24; i++) {
+    for (let i = 1; i <= 10; i++) {
+      // Skip the 3rd page
+      if (i === 3) continue;
+      
       let canvas = await html2canvas(document.getElementById(`pdfContent-${i}`), {
         scale: 2,
       });
       if (i > 1) doc.addPage();
       doc.addImage(canvas, 'PNG', 0, 0, 210, 297);
     }
-
-    // const htmlContent2 = document.getElementById('pdfContent-2')
-    // const canvas2 = await html2canvas(htmlContent2, {
-    //   scale: 2,
-    // })
-
-    // const htmlContent3 = document.getElementById('pdfContent-3')
-    // const canvas3 = await html2canvas(htmlContent3, {
-    //   scale: 2,
-    // });
-
-    // const htmlContent4 = document.getElementById('pdfContent-4')
-    // let canvas4 = await html2canvas(htmlContent4, {
-    //   scale: 2,
-    // });
-
-    // const htmlContent5 = document.getElementById('pdfContent-5')
-    // let canvas5 = await html2canvas(htmlContent5, {
-    //   scale: 2,
-    // });
-
-    // const htmlContent6 = document.getElementById('pdfContent-6')
-    // let canvas6 = await html2canvas(htmlContent6, {
-    //   scale: 2
-    // });
-
-
-
 
     loading.value = false
     doc.save(title);
