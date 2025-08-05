@@ -23,50 +23,103 @@ import { BrightColors } from '~/assets/helpers/colors'
 const props = defineProps<{
   title: string;
   data: MakroDataAPIResponse;
+  chartData: any;
   paramKey: keyof ParameterProduktivitasMakro;
 }>();
 
 // Sort lapangan_usaha berdasarkan rata-rata nilai per tahun.
 const sortedLapanganUsaha = computed(() => {
-  const list = props.data.metadata.lapangan_usaha.list
-    .map(w => ({
-      kode: w.kode,
-      nama: w.nama,
-      data: props.data.provinsi.lapangan_usaha[w.kode][props.paramKey],
-      avg: (props.data.provinsi.lapangan_usaha[w.kode][props.paramKey]
-        .reduce(
-          (prev, curr) => { return (prev === null ? 0 : prev) + (curr === null ? 0 : curr) },
-          0,
-        ) || 0) / props.data.provinsi.lapangan_usaha[w.kode][props.paramKey].length
-      ,
-    }));
-  list.sort((a, b) => a.avg > b.avg ? -1 : 1);
-  return list;
+  // Check if chartData exists and has the required properties
+  if (!props.chartData || !props.chartData.labels || !props.chartData.datasets) {
+    return [];
+  }
+  
+  // Calculate average for each lapangan usaha across all years
+  const averages = props.chartData.labels.map((label: string, index: number) => {
+    const values = props.chartData.datasets.map((dataset: any) => dataset.data[index]);
+    const avg = values.reduce((sum: number, val: number) => sum + val, 0) / values.length;
+    
+    return {
+      kode: label,
+      nama: label,
+      data: values,
+      avg: avg
+    };
+  });
+  
+  // Sort by average in descending order (highest first)
+  averages.sort((a, b) => b.avg - a.avg);
+  return averages;
 })
 
-const chartData = {
-  labels: sortedLapanganUsaha.value.map(v => v.kode),
-  datasets: props.data.metadata.tahun
-    .map((y, i) => {
+const chartDataSorted = computed(() => {
+  // Check if chartData exists and has the required properties
+  if (!props.chartData || !props.chartData.labels || !props.chartData.datasets) {
+    return {
+      labels: [],
+      datasets: []
+    };
+  }
+  
+  return {
+    labels: sortedLapanganUsaha.value.map(v => v.nama),
+    datasets: props.chartData.datasets.map((dataset: any, datasetIndex: number) => {
       return {
         axis: 'y',
-        label: `${y}`,
-        data: sortedLapanganUsaha.value.map(v => v.data[i]),
+        label: dataset.label,
+        data: sortedLapanganUsaha.value.map(v => v.data[datasetIndex]),
         fill: false,
-        backgroundColor: [BrightColors[i]],
-        // borderColor: [
-        //   'rgb(255, 99, 132)',
-        //   'rgb(255, 159, 64)',
-        //   'rgb(255, 205, 86)',
-        //   'rgb(75, 192, 192)',
-        //   'rgb(54, 162, 235)',
-        //   'rgb(153, 102, 255)',
-        //   'rgb(201, 203, 207)'
-        // ],
-        borderWidth: 1
+        backgroundColor: dataset.backgroundColor,
+        borderWidth: 1,
+        borderRadius: dataset.borderRadius
       }
     })
-}
+  }
+})
+
+// Function to wrap text to specified width (StackOverflow solution)
+const formatLabel = (str: string, maxwidth: number): string[] => {
+  var sections: string[] = [];
+  var words = str.split(" ");
+  var temp = "";
+
+  words.forEach(function(item, index){
+    if(temp.length > 0)
+    {
+      var concat = temp + ' ' + item;
+
+      if(concat.length > maxwidth){
+        sections.push(temp);
+        temp = "";
+      }
+      else{
+        if(index == (words.length-1)) {
+          sections.push(concat);
+          return;
+        }
+        else {
+          temp = concat;
+          return;
+        }
+      }
+    }
+
+    if(index == (words.length-1)) {
+      sections.push(item);
+      return;
+    }
+
+    if(item.length < maxwidth) {
+      temp = item;
+    }
+    else {
+      sections.push(item);
+    }
+
+  });
+
+  return sections;
+};
 
 const chartOptions = {
   indexAxis: 'y' as any,
@@ -97,14 +150,25 @@ const chartOptions = {
     },
     y: {
       ticks: {
-        // callback: function (value: any) {
-        //   return props.ribuan ? `${value / 1000000000} milyar` : value;
-        // },
+        callback: function (value: any, index: number) {
+          const label = this.getLabelForValue(value);
+          return formatLabel(label, 20).join('\n');
+        },
         color: "#666666",
+        maxRotation: 0,
+        minRotation: 0,
+        padding: 2,
+        font: {
+          size: 10,
+        },
       },
       grid: {
         color: "#EDEDED",
       },
+      // Increase left margin to accommodate longer labels
+      afterFit: function(axis: any) {
+        axis.width = Math.max(axis.width, 180);
+      }
     },
   },
   datalabels: {
@@ -130,8 +194,8 @@ const chartOptions = {
     <!-- Outer container to enable horizontal scrolling -->
     <div class="w-full overflow-y-auto overflow-x-auto custom-scrollbar">
       <!-- Inner container with a larger width to enable scrolling -->
-      <div :style="{ width: `${Math.max(200, chartData.labels.length * 30)}px`, maxHeight: 100, height: 100 }">
-        <Bar :options="chartOptions" :data="chartData" />
+      <div :style="{maxHeight: 100, height: 100 }">
+                 <Bar :options="chartOptions" :data="chartDataSorted" />
       </div>
     </div>
   </div>

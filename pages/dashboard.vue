@@ -43,88 +43,117 @@
           </div>
         </div>
 
-        <div v-if="hasData" class="lg:grid lg:grid-cols-10">
-          <!-- <div class="col-span-8">{{ data }}</div> -->
-          <div class="lg:col-span-8">
-            <div class="flex flex-col lg:flex-row mt-2 lg:w-full w-full gap-x-2">
-              <div class="w-full lg:w-1/3">
+        <div v-if="hasData" class="w-full">
+          <!-- Main Content Area -->
+          <div class="w-full">
+            <!-- Toggle Sidebar Button -->
+            <div class="flex justify-end mb-4">
+              <button @click="toggleSidebar" 
+                class="flex items-center gap-2 px-3 py-2 bg-[#034EA2] text-white rounded-lg hover:bg-[#023b7d] transition-all duration-300">
+                <Icon :name="sidebarOpen ? 'mdi:chevron-right' : 'mdi:chevron-left'" size="20" />
+                <span class="text-sm">{{ sidebarOpen ? 'Hide' : 'Show' }} Filters</span>
+              </button>
+            </div>
+
+            <!-- Line Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 mt-2">
+              <div>
                 <GraphMacroLineChart :chart-data="data_1_new" title="Produktivitas Tenaga Kerja (Juta)" :key="state"
                   :millions="false" :options="{ legends: false, datalabels: true }" />
               </div>
-              <div class="w-full lg:w-1/3">
+              <div>
                 <GraphMacroLineChart :chart-data="data_2_new" title="Pertumbuhan Produktivitas Tenaga Kerja (%)"
                   :key="state" :millions="false" :options="{ legends: false, datalabels: true }" />
               </div>
-              <div class="w-full lg:w-1/3">
+              <div>
                 <GraphMacroLineChart :chart-data="data_3_new" title="Produktivitas Upah" :key="state" :millions="false"
                   :options="{ legends: false, datalabels: true }" />
               </div>
+              <div>
+                <GraphMacroLineChart :chart-data="data_8" title="Produktivitas Bruto Dalam Negeri" :key="state"
+                  :millions="true" :options="{ legends: false, datalabels: true }" />
+              </div>
+              <div>
+                <GraphMacroLineChart :chart-data="data_9" title="Jumlah Tenaga Kerja" :key="state"
+                  :millions="false" :options="{ legends: false, datalabels: true }" />
+              </div>
             </div>
-            <div class="lg:grid lg:grid-cols-2 lg:w-full w-1/2 mt-2 gap-2">
-              <!-- <GraphMacroBarChart2 :chart-data="data_4" title="Produktivitas Tenaga Kerja" :key="state"
-                :years="rawData2.metadata.tahun" :ribuan="false" />
-              <GraphMacroBarChart2 :chart-data="data_5" title="Produktivitas Jam Kerja" :ribuan="false" :key="state"
-                :years="rawData2.metadata.tahun" />
-              <GraphMacroBarChart2 :chart-data="data_6" title="Produktivitas Upah" :key="state" :ribuan="false"
-                :years="rawData2.metadata.tahun" />
-              <GraphMacroBarChart2 :chart-data="data_7" title="Pertumbuhan Produktivitas Tenaga Kerja" :ribuan="false"
-                :key="state" :years="rawData2.metadata.tahun" /> -->
+            
+            <!-- Bar Charts Section - 2 Columns -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
               <GraphMacroHorizontalBarChart 
                 v-if="dashboardApi.data"
                 title="Produktivitas Tenaga Kerja"
                 paramKey="produktivitas_tenaga_kerja"
                 :data="dashboardApi.data.value"
+                :chart-data="data_4"
+                :key="state"
               />
               <GraphMacroHorizontalBarChart 
                 v-if="dashboardApi.data"
                 title="Produktivitas Jam Kerja"
                 paramKey="produktivitas_jam_kerja"
                 :data="dashboardApi.data.value"
+                :chart-data="data_5"
+                :key="state"
               />
               <GraphMacroHorizontalBarChart 
                 v-if="dashboardApi.data"
                 title="Produktivitas Upah"
                 paramKey="produktivitas_upah"
                 :data="dashboardApi.data.value"
+                :chart-data="data_6"
+                :key="state"
               />
               <GraphMacroHorizontalBarChart 
                 v-if="dashboardApi.data"
                 title="Pertumbuhan Produktivitas Tenaga Kerja"
                 paramKey="growth_produktivitas_tenaga_kerja"
                 :data="dashboardApi.data.value"
+                :chart-data="data_7"
+                :key="state"
               />
             </div>
-
           </div>
-          <div class="lg:col-span-2 px-4 pt-2 flex w-full">
-            <div class="border border-slate-200 lg:w-full h-[100%] rounded-lg px-2 relative">
-              <div class="lg:absolute lg:inset-0 lg:overflow-y-auto px-2">
-                <div class="sticky top-0 bg-white z-10 flex justify-between border-b border-slate-400">
+
+          <!-- Fixed Overlay Sidebar -->
+          <div v-if="sidebarOpen" class="fixed inset-0 z-50">
+            <!-- Darkened Overlay -->
+            <div class="absolute inset-0 bg-black bg-opacity-50" @click="toggleSidebar"></div>
+            
+            <!-- Sidebar Panel -->
+            <div class="absolute right-0 top-0 h-full w-80 bg-white shadow-xl transform transition-transform duration-300 ease-in-out">
+              <div class="h-full flex flex-col">
+                <!-- Header -->
+                <div class="flex justify-between items-start border-b border-slate-300 p-4">
                   <div>
-                    <div class="flex justify-between">
-                      <p class="mt-2 text-[#034EA2] font-bold">Filters</p>
-                    </div>
-                    <p class="text-sm mt-2 pb-2">Lapangan Usaha</p>
+                    <p class="text-[#034EA2] font-bold text-lg">Filters</p>
+                    <p class="text-sm text-gray-600 mt-1">Lapangan Usaha</p>
                   </div>
-                  <div class="flex flex-col pb-2">
-                    <div class="flex flex-col gap-1 my-auto">
-                      <button @click="addAll"
-                        class="px-1 py-1 text-xs border border-gray-500 bg-white text-black rounded-md hover:bg-gray-200 transition-all duration-300">
-                        Pilih Semua
-                      </button>
-                      <button @click="removeAll"
-                        class="px-1 py-1 text-xs border border-gray-500 bg-white text-black rounded-md hover:bg-gray-200 transition-all duration-300">
-                        Hapus Semua
-                      </button>
-                    </div>
-                  </div>
+                  <button @click="toggleSidebar" class="text-gray-500 hover:text-gray-700">
+                    <Icon name="mdi:close" size="24" />
+                  </button>
                 </div>
-                <div>
-                  <div v-for="usaha of lapanganUsaha" :key="usaha.nama" class="flex items-start mb-0.5"
+                
+                <!-- Filter Actions -->
+                <div class="flex gap-2 p-4 border-b border-slate-200">
+                  <button @click="addAll"
+                    class="px-3 py-1 text-xs border border-gray-500 bg-white text-black rounded-md hover:bg-gray-200 transition-all duration-300">
+                    Pilih Semua
+                  </button>
+                  <button @click="removeAll"
+                    class="px-3 py-1 text-xs border border-gray-500 bg-white text-black rounded-md hover:bg-gray-200 transition-all duration-300">
+                    Hapus Semua
+                  </button>
+                </div>
+                
+                <!-- Filter List -->
+                <div class="flex-1 overflow-y-auto p-4">
+                  <div v-for="usaha of lapanganUsaha" :key="usaha.nama" class="flex items-start mb-3"
                     @change="applyFilter">
                     <input :id="usaha.kode" type="checkbox" v-model="usaha.status"
-                      class="mt-1 w-[10px] h-4 text-[#034EA2] bg-gray-100 border-gray-300 rounded dark:border-gray-600 ">
-                    <label :for="usaha.kode" class="ms-2 text-sm "
+                      class="mt-1 w-4 h-4 text-[#034EA2] bg-gray-100 border-gray-300 rounded dark:border-gray-600">
+                    <label :for="usaha.kode" class="ms-3 text-sm leading-relaxed"
                       :class="`${usaha.kode ? 'text-[#034EA2]' : 'text-gray-900'}`">
                       {{ usaha.nama }} (Kode {{ usaha.kode }})</label>
                   </div>
@@ -158,6 +187,7 @@ import { getCity, getProvince } from '~/_service/navigasi/nav';
 import { useRequest } from '~/composables/useRequest';
 import { ErrorApiResponse } from '~/_service/http/schema';
 import { ChartColors, BrightColors } from '~/assets/helpers/colors'
+import { kodeUsaha } from '~/assets/helpers/kode_usaha'
 
 const route = useRoute()
 
@@ -271,9 +301,14 @@ const reloadApp = () => {
 }
 
 const state = ref(0)
+const sidebarOpen = ref(true)
 
 const closeModal = () => {
   modal.value.show = false
+}
+
+const toggleSidebar = () => {
+  sidebarOpen.value = !sidebarOpen.value
 }
 
 const lapanganUsaha = ref([
@@ -480,9 +515,62 @@ const data_3_new = computed(() => {
   return dataset
 })
 
+const data_8 = computed(() => {
+  let dataset = {
+    labels: [],
+    datasets: [
+      {
+        label: "Produktivitas Bruto Dalam Negeri",
+        data: null,
+        backgroundColor: "#3867D6",
+        borderRadius: 5,
+      },
+    ],
+  }
+
+  let calcData
+  if (subTab.value === "DKI Jakarta") {
+    calcData = rawData2.value["provinsi"]["agregat"]["pdrb_adhk"]
+  } else {
+    const kotaData = rawData2.value["kota"].find(k => k.nama === subTab.value)
+    calcData = kotaData ? kotaData.agregat.pdrb_adhk : []
+  }
+  dataset.datasets[0].data = calcData.filter(x => x !== null)
+  dataset.labels = rawData2.value.metadata.tahun.slice(0, calcData.length)
+
+  return dataset
+})
+
+
+const data_9 = computed(() => {
+  let dataset = {
+    labels: [],
+    datasets: [
+      {
+        label: "Jumlah Tenaga Kerja",
+        data: null,
+        backgroundColor: "#3867D6",
+        borderRadius: 5,
+      },
+    ],
+  }
+
+  let calcData
+  if (subTab.value === "DKI Jakarta") {
+    calcData = rawData2.value["provinsi"]["agregat"]["jumlah_tenaga_kerja_bekerja"]
+  } else {
+    const kotaData = rawData2.value["kota"].find(k => k.nama === subTab.value)
+    calcData = kotaData ? kotaData.agregat.jumlah_tenaga_kerja_bekerja : []
+  }
+  dataset.datasets[0].data = calcData.filter(x => x !== null)
+  dataset.labels = rawData2.value.metadata.tahun.slice(0, calcData.length)
+
+  return dataset
+})
+
 const data_4 = computed(() => {
   let dataNew = data.value
-  // console.log(dataNew["A"])
+  
   const dataset = {
     labels: [],
     datasets: [
@@ -499,7 +587,7 @@ const data_4 = computed(() => {
   }
 
   for (let x in dataNew) {
-    dataset.labels.push(`Kode ${x}`)
+    dataset.labels.push(`${kodeUsaha[x]}`)
     for (let i = 0; i <= rawData2.value.metadata.tahun.length - 1; i++) {
       dataset.datasets[i].data.push(parseFloat((dataNew[x]['produktivitas_tenaga_kerja'][i])))
     }
@@ -524,7 +612,7 @@ const data_5 = computed(() => {
   }
 
   for (let x in dataNew) {
-    dataset.labels.push(`Kode ${x}`)
+    dataset.labels.push(`${kodeUsaha[x]}`)
     for (let i = 0; i <= rawData2.value.metadata.tahun.length - 1; i++) {
       dataset.datasets[i].data.push(parseFloat((dataNew[x]['produktivitas_jam_kerja'][i])))
     }
@@ -548,7 +636,7 @@ const data_6 = computed(() => {
   }
 
   for (let x in dataNew) {
-    dataset.labels.push(`Kode ${x}`)
+    dataset.labels.push(`${kodeUsaha[x]}`)
     for (let i = 0; i <= rawData2.value.metadata.tahun.length - 1; i++) {
       dataset.datasets[i].data.push(parseFloat((dataNew[x]['produktivitas_upah'][i])))
     }
