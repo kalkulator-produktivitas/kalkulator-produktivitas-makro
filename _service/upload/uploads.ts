@@ -29,3 +29,12 @@ export const getTemplate = (): Promise<ApiSuccessResponse<any>> => {
     contentType: 'multipart/form-data'
   })
 }
+
+export const getTemplateKota = (id_kota: string): Promise<ApiSuccessResponse<any>> => {
+  return request({
+    url: `/v1/makro/files/template/kota?id_kota=${id_kota}`,
+    method: 'GET',
+    skipAuthToken: true,
+    contentType: 'multipart/form-data'
+  })
+}

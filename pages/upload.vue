@@ -17,26 +17,68 @@
             <div class="flex flex-col gap-4">
 
               <p class="text-lg">Tentukan jenis file yang akan anda Upload</p>
+              
+              <!-- Template Type Selection -->
+              <div class="flex gap-4 mb-4">
+                <div class="flex items-center gap-2">
+                  <input type="radio" id="province" v-model="templateType" value="province" class="text-[#034EA2]" />
+                  <label for="province" class="text-sm font-medium">Template Provinsi</label>
+                </div>
+                <div class="flex items-center gap-2">
+                  <input type="radio" id="city" v-model="templateType" value="city" class="text-[#034EA2]" />
+                  <label for="city" class="text-sm font-medium">Template Kota</label>
+                </div>
+              </div>
+
               <div class="flex gap-4">
 
-                <div class="border border-slate-200 rounded-lg p-6 w-[50%] mx-auto">
+                <div class="border border-slate-200 rounded-lg p-6 mx-auto">
                   <div class="flex justify-between">
-                    <p class="block text-md text-gray-700 mb-2">
+                    <p class="block text-md text-gray-700 mb-2 w-[20%]">
                       Pilih File Excel
                     </p>
-                    <div class="flex mb-4">
-                      <select v-model="selectedProvince"
-                        class="p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <option value="" disabled>Pilih provinsi...</option>
-                        <option v-for="province in provinces" :key="province.id" :value="province.id">
-                          {{ province.nama_lengkap }}
-                        </option>
-                      </select>
+                    <div class="flex mb-4 w-full justify-between">
+                      <!-- Province Selection (shown when templateType is 'province') -->
+                      <div v-if="templateType === 'province'" class="flex gap-2">
+                        <select v-model="selectedProvince"
+                          class="p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                          <option value="" disabled>Pilih provinsi...</option>
+                          <option v-for="province in provinces" :key="province.id" :value="province.id">
+                            {{ province.nama_lengkap }}
+                          </option>
+                        </select>
 
-                      <div class="flex">
-                        <a class="text-[#034EA2] hover:underline cursor-pointer my-auto flex items-center"
+                        <a class="text-[#034EA2] hover:underline cursor-pointer my-auto flex items-center w-[40%]"
                           @click="downloadTemplate">
-                          <Icon name="mdi:download" size="6mm" class=" text-[#034EA2] my-auto" />
+                          <Icon name="mdi:download" size="6mm" class="text-[#034EA2] my-auto" />
+                          Download Template
+                        </a>
+                      </div>
+
+                      <!-- City Selection (shown when templateType is 'city') -->
+                      <div v-if="templateType === 'city'" class="flex gap-2">
+                        <select v-model="selectedProvinceForCity"
+                          @change="getKotaList"
+                          class="p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-[200px]">
+                          <option value="" disabled>Pilih provinsi...</option>
+                          <option v-for="province in provinces" :key="province.id" :value="province.id">
+                            {{ province.nama_lengkap }}
+                          </option>
+                        </select>
+
+                        <select v-model="selectedCity"
+                          :disabled="!selectedProvinceForCity || kotas.length === 0"
+                          class="p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-[200px]">
+                          <option value="" disabled>Pilih kota...</option>
+                          <option v-for="kota in kotas" :key="kota.id" :value="kota.id">
+                            {{ kota.nama }}
+                          </option>
+                        </select>
+
+                        <a class="text-[#034EA2] hover:underline cursor-pointer my-auto flex items-center"
+                          :class="{ 'opacity-50 cursor-not-allowed': !selectedCity }"
+                          @click="downloadCityTemplate">
+                          <Icon name="mdi:download" size="6mm" class="text-[#034EA2] my-auto" />
                           Download Template
                         </a>
                       </div>
@@ -142,8 +184,8 @@
 
 <script setup>
 const global = useRuntimeConfig();
-import { getUploadsList, postUpload, getTemplate } from '~/_service/upload/uploads';
-import { getProvince } from '~/_service/navigasi/nav';
+import { getUploadsList, postUpload, getTemplate, getTemplateKota } from '~/_service/upload/uploads';
+import { getProvince, getCity } from '~/_service/navigasi/nav';
 import { useRequest } from '~/composables/useRequest';
 import { ErrorApiResponse } from '~/_service/http/schema';
 
@@ -152,13 +194,20 @@ const selectedFile = ref(null);
 const uploadList = useRequest(getUploadsList);
 const upload = useRequest(postUpload);
 const template = useRequest(getTemplate);
+const templateKota = useRequest(getTemplateKota);
 const uploaded = ref([]);
 
+// Template type selection
+const templateType = ref('province')
+
 const selectedProvince = ref('')
+const selectedProvinceForCity = ref('')
+const selectedCity = ref('')
 
 const provinceList = useRequest(getProvince);
-
+const kotaList = useRequest(getCity);
 const provinces = ref([])
+const kotas = ref([])
 
 try {
   const res = await provinceList.call()
@@ -256,9 +305,37 @@ const uploadFile = async () => {
   }
 }
 
+const getKotaList = async () => {
+  try {
+    if (!selectedProvinceForCity.value) {
+      kotas.value = []
+      selectedCity.value = ''
+      return
+    }
+    
+    const res = await kotaList.call(selectedProvinceForCity.value)
+    kotas.value = res.list
+    selectedCity.value = '' // Reset city selection when province changes
+  } catch (e) {
+    if (e instanceof ErrorApiResponse) {
+      console.error(`ERROR | code: ${e.code} | message: ${e.message}`)
+      modal.value.type = 'ERROR'
+      modal.value.message = e.message
+      modal.value.show = true
+      loading.value = false
+    } else {
+      console.error('UNKNOWN ERROR: ', (e)?.message ?? 'Unknown Error')
+      modal.value.type = 'ERROR'
+      modal.value.message = 'UNKNOWN ERROR: '
+      modal.value.show = true
+      loading.value = false
+    }
+  } finally {
+    loading.value = false
+  }
+}
+
 const downloadTemplate = async () => {
-
-
   try {
     if (selectedProvince.value === '') {
       throw new Error('Please select province');
@@ -289,6 +366,49 @@ const downloadTemplate = async () => {
     loading.value = false
   }
 }
+
+const downloadCityTemplate = async () => {
+  try {
+    if (selectedCity.value === '') {
+      throw new Error('Please select city');
+    }
+
+    const response = await fetch(`${global.public.goURL}/v1/makro/files/template/kota?id_kota=${selectedCity.value}`, {
+      method: 'GET',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to download city template');
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'template_kota.xlsx';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('ERROR: ', (error)?.message ?? 'Unknown Error')
+    modal.value.type = 'ERROR'
+    modal.value.message = error.message ? error.message : 'Unknown Error'
+    modal.value.show = true
+    loading.value = false
+  }
+}
+
+// Watch for template type changes and reset selections
+watch(templateType, (newType) => {
+  if (newType === 'province') {
+    selectedProvinceForCity.value = ''
+    selectedCity.value = ''
+    kotas.value = []
+  } else if (newType === 'city') {
+    selectedProvince.value = ''
+  }
+})
 </script>
 
 <style scoped>
