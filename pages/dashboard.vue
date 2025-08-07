@@ -79,6 +79,18 @@
               </div>
             </div>
             
+            <!-- Additional Line Chart Section -->
+            <div class="mt-4 w-[90%]">
+              <GraphMacroLineChart 
+                v-if="dashboardApi.data"
+                :chart-data="data_4_line" 
+                title="Produktivitas Tenaga Kerja per Lapangan Usaha" 
+                :key="state"
+                :millions="false" 
+                :options="{ legends: true, datalabels: false }" 
+              />
+            </div>
+            
             <!-- Bar Charts Section - 2 Columns -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
               <GraphMacroHorizontalBarChart 
@@ -443,14 +455,7 @@ const changeTab = (x) => {
 const data_1_new = computed(() => {
   let dataset = {
     labels: [],
-    datasets: [
-      {
-        label: "Produktivitas",
-        data: [],
-        backgroundColor: "#3867D6",
-        borderRadius: 5,
-      },
-    ],
+    datasets: [],
   }
 
   // Check if rawData2 exists and has required properties
@@ -458,15 +463,35 @@ const data_1_new = computed(() => {
     return dataset
   }
 
-  let calcData
-  if (subTab.value === "DKI Jakarta") {
-    calcData = rawData2.value["provinsi"]["agregat"]["produktivitas_tenaga_kerja"] || []
-  } else {
-    const kotaData = rawData2.value["kota"]?.find(k => k.nama === subTab.value)
-    calcData = kotaData?.agregat?.produktivitas_tenaga_kerja || []
+  // Add province data
+  const provinsiData = rawData2.value["provinsi"]["agregat"]["produktivitas_tenaga_kerja"] || []
+  if (provinsiData.length > 0) {
+    dataset.datasets.push({
+      label: "DKI Jakarta",
+      data: provinsiData.filter(x => x !== null),
+      backgroundColor: "#3867D6",
+      borderRadius: 5,
+    })
   }
-  dataset.datasets[0].data = calcData.filter(x => x !== null)
-  dataset.labels = (rawData2.value.metadata.tahun || []).slice(0, calcData.length)
+
+  // Add all cities data
+  if (rawData2.value["kota"] && rawData2.value["kota"].length > 0) {
+    const colors = ["#E74C3C", "#F39C12", "#27AE60", "#8E44AD", "#3498DB", "#E67E22", "#1ABC9C", "#9B59B6"]
+    
+    rawData2.value["kota"].forEach((kota, index) => {
+      const kotaData = kota?.agregat?.produktivitas_tenaga_kerja || []
+      if (kotaData.length > 0) {
+        dataset.datasets.push({
+          label: kota.nama,
+          data: kotaData.filter(x => x !== null),
+          backgroundColor: colors[index % colors.length],
+          borderRadius: 5,
+        })
+      }
+    })
+  }
+
+  dataset.labels = (rawData2.value.metadata.tahun || []).slice(0, Math.max(...dataset.datasets.map(ds => ds.data.length)))
 
   return dataset
 })
@@ -474,14 +499,7 @@ const data_1_new = computed(() => {
 const data_2_new = computed(() => {
   let dataset = {
     labels: [],
-    datasets: [
-      {
-        label: "Produktivitas",
-        data: [],
-        backgroundColor: "#3867D6",
-        borderRadius: 5,
-      },
-    ],
+    datasets: [],
   }
   
   // Check if rawData2 exists and has required properties
@@ -489,15 +507,35 @@ const data_2_new = computed(() => {
     return dataset
   }
   
-  let calcData
-  if (subTab.value === "DKI Jakarta") {
-    calcData = rawData2.value["provinsi"]["agregat"]["growth_produktivitas_tenaga_kerja"] || []
-  } else {
-    const kotaData = rawData2.value["kota"]?.find(k => k.nama === subTab.value)
-    calcData = kotaData?.agregat?.growth_produktivitas_tenaga_kerja || []
+  // Add province data
+  const provinsiData = rawData2.value["provinsi"]["agregat"]["growth_produktivitas_tenaga_kerja"] || []
+  if (provinsiData.length > 0) {
+    dataset.datasets.push({
+      label: "DKI Jakarta",
+      data: provinsiData.filter(x => x !== null),
+      backgroundColor: "#3867D6",
+      borderRadius: 5,
+    })
   }
-  dataset.datasets[0].data = calcData.filter(x => x !== null)
-  dataset.labels = (rawData2.value.metadata.tahun || []).slice(1, calcData.length)
+
+  // Add all cities data
+  if (rawData2.value["kota"] && rawData2.value["kota"].length > 0) {
+    const colors = ["#E74C3C", "#F39C12", "#27AE60", "#8E44AD", "#3498DB", "#E67E22", "#1ABC9C", "#9B59B6"]
+    
+    rawData2.value["kota"].forEach((kota, index) => {
+      const kotaData = kota?.agregat?.growth_produktivitas_tenaga_kerja || []
+      if (kotaData.length > 0) {
+        dataset.datasets.push({
+          label: kota.nama,
+          data: kotaData.filter(x => x !== null),
+          backgroundColor: colors[index % colors.length],
+          borderRadius: 5,
+        })
+      }
+    })
+  }
+
+  dataset.labels = (rawData2.value.metadata.tahun || []).slice(1, Math.max(...dataset.datasets.map(ds => ds.data.length)))
 
   return dataset
 })
@@ -505,14 +543,7 @@ const data_2_new = computed(() => {
 const data_3_new = computed(() => {
   let dataset = {
     labels: [],
-    datasets: [
-      {
-        label: "Produktivitas",
-        data: [],
-        backgroundColor: "#3867D6",
-        borderRadius: 5,
-      },
-    ],
+    datasets: [],
   }
   
   // Check if rawData2 exists and has required properties
@@ -520,29 +551,42 @@ const data_3_new = computed(() => {
     return dataset
   }
   
-  let calcData
-  if (subTab.value === "DKI Jakarta") {
-    calcData = rawData2.value["provinsi"]["agregat"]["produktivitas_upah"] || []
-  } else {
-    const kotaData = rawData2.value["kota"]?.find(k => k.nama === subTab.value)
-    calcData = kotaData?.agregat?.produktivitas_upah || []
+  // Add province data
+  const provinsiData = rawData2.value["provinsi"]["agregat"]["produktivitas_upah"] || []
+  if (provinsiData.length > 0) {
+    dataset.datasets.push({
+      label: "DKI Jakarta",
+      data: provinsiData.filter(x => x !== null),
+      backgroundColor: "#3867D6",
+      borderRadius: 5,
+    })
   }
-  dataset.datasets[0].data = calcData.filter(x => x !== null)
-  dataset.labels = (rawData2.value.metadata.tahun || []).slice(0, calcData.length)
+
+  // Add all cities data
+  if (rawData2.value["kota"] && rawData2.value["kota"].length > 0) {
+    const colors = ["#E74C3C", "#F39C12", "#27AE60", "#8E44AD", "#3498DB", "#E67E22", "#1ABC9C", "#9B59B6"]
+    
+    rawData2.value["kota"].forEach((kota, index) => {
+      const kotaData = kota?.agregat?.produktivitas_upah || []
+      if (kotaData.length > 0) {
+        dataset.datasets.push({
+          label: kota.nama,
+          data: kotaData.filter(x => x !== null),
+          backgroundColor: colors[index % colors.length],
+          borderRadius: 5,
+        })
+      }
+    })
+  }
+
+  dataset.labels = (rawData2.value.metadata.tahun || []).slice(0, Math.max(...dataset.datasets.map(ds => ds.data.length)))
   return dataset
 })
 
 const data_8 = computed(() => {
   let dataset = {
     labels: [],
-    datasets: [
-      {
-        label: "Produktivitas Bruto Dalam Negeri",
-        data: [],
-        backgroundColor: "#3867D6",
-        borderRadius: 5,
-      },
-    ],
+    datasets: [],
   }
 
   // Check if rawData2 exists and has required properties
@@ -550,15 +594,35 @@ const data_8 = computed(() => {
     return dataset
   }
 
-  let calcData
-  if (subTab.value === "DKI Jakarta") {
-    calcData = rawData2.value["provinsi"]["agregat"]["pdrb_adhk"] || []
-  } else {
-    const kotaData = rawData2.value["kota"]?.find(k => k.nama === subTab.value)
-    calcData = kotaData?.agregat?.pdrb_adhk || []
+  // Add province data
+  const provinsiData = rawData2.value["provinsi"]["agregat"]["pdrb_adhk"] || []
+  if (provinsiData.length > 0) {
+    dataset.datasets.push({
+      label: "DKI Jakarta",
+      data: provinsiData.filter(x => x !== null),
+      backgroundColor: "#3867D6",
+      borderRadius: 5,
+    })
   }
-  dataset.datasets[0].data = calcData.filter(x => x !== null)
-  dataset.labels = (rawData2.value.metadata.tahun || []).slice(0, calcData.length)
+
+  // Add all cities data
+  if (rawData2.value["kota"] && rawData2.value["kota"].length > 0) {
+    const colors = ["#E74C3C", "#F39C12", "#27AE60", "#8E44AD", "#3498DB", "#E67E22", "#1ABC9C", "#9B59B6"]
+    
+    rawData2.value["kota"].forEach((kota, index) => {
+      const kotaData = kota?.agregat?.pdrb_adhk || []
+      if (kotaData.length > 0) {
+        dataset.datasets.push({
+          label: kota.nama,
+          data: kotaData.filter(x => x !== null),
+          backgroundColor: colors[index % colors.length],
+          borderRadius: 5,
+        })
+      }
+    })
+  }
+
+  dataset.labels = (rawData2.value.metadata.tahun || []).slice(0, Math.max(...dataset.datasets.map(ds => ds.data.length)))
 
   return dataset
 })
@@ -567,14 +631,7 @@ const data_8 = computed(() => {
 const data_9 = computed(() => {
   let dataset = {
     labels: [],
-    datasets: [
-      {
-        label: "Jumlah Tenaga Kerja",
-        data: [],
-        backgroundColor: "#3867D6",
-        borderRadius: 5,
-      },
-    ],
+    datasets: [],
   }
 
   // Check if rawData2 exists and has required properties
@@ -582,15 +639,35 @@ const data_9 = computed(() => {
     return dataset
   }
 
-  let calcData
-  if (subTab.value === "DKI Jakarta") {
-    calcData = rawData2.value["provinsi"]["agregat"]["jumlah_tenaga_kerja_bekerja"] || []
-  } else {
-    const kotaData = rawData2.value["kota"]?.find(k => k.nama === subTab.value)
-    calcData = kotaData?.agregat?.jumlah_tenaga_kerja_bekerja || []
+  // Add province data
+  const provinsiData = rawData2.value["provinsi"]["agregat"]["jumlah_tenaga_kerja_bekerja"] || []
+  if (provinsiData.length > 0) {
+    dataset.datasets.push({
+      label: "DKI Jakarta",
+      data: provinsiData.filter(x => x !== null),
+      backgroundColor: "#3867D6",
+      borderRadius: 5,
+    })
   }
-  dataset.datasets[0].data = calcData.filter(x => x !== null)
-  dataset.labels = (rawData2.value.metadata.tahun || []).slice(0, calcData.length)
+
+  // Add all cities data
+  if (rawData2.value["kota"] && rawData2.value["kota"].length > 0) {
+    const colors = ["#E74C3C", "#F39C12", "#27AE60", "#8E44AD", "#3498DB", "#E67E22", "#1ABC9C", "#9B59B6"]
+    
+    rawData2.value["kota"].forEach((kota, index) => {
+      const kotaData = kota?.agregat?.jumlah_tenaga_kerja_bekerja || []
+      if (kotaData.length > 0) {
+        dataset.datasets.push({
+          label: kota.nama,
+          data: kotaData.filter(x => x !== null),
+          backgroundColor: colors[index % colors.length],
+          borderRadius: 5,
+        })
+      }
+    })
+  }
+
+  dataset.labels = (rawData2.value.metadata.tahun || []).slice(0, Math.max(...dataset.datasets.map(ds => ds.data.length)))
 
   return dataset
 })
@@ -624,6 +701,37 @@ const data_4 = computed(() => {
       dataset.datasets[i].data.push(parseFloat(value) || 0)
     }
   }
+  return dataset
+})
+
+const data_4_line = computed(() => {
+  let dataset = {
+    labels: [],
+    datasets: [],
+  }
+  
+  // Check if required data exists
+  if (!rawData2.value?.metadata?.tahun || !data.value) {
+    return dataset
+  }
+  
+  // Create a dataset for each lapangan usaha kode
+  const colors = ["#3867D6", "#E74C3C", "#F39C12", "#27AE60", "#8E44AD", "#3498DB", "#E67E22", "#1ABC9C", "#9B59B6", "#34495E", "#95A5A6", "#F1C40F", "#E91E63", "#9C27B0", "#673AB7", "#3F51B5", "#2196F3", "#00BCD4"]
+  
+  for (let kode in data.value) {
+    const kodeData = data.value[kode]?.produktivitas_tenaga_kerja || []
+    if (kodeData.length > 0) {
+      dataset.datasets.push({
+        label: kodeUsaha[kode] || kode,
+        data: kodeData.filter(x => x !== null).map(val => parseFloat(val) || 0),
+        backgroundColor: colors[dataset.datasets.length % colors.length],
+        borderRadius: 5,
+      })
+    }
+  }
+  
+  dataset.labels = (rawData2.value.metadata.tahun || []).slice(0, Math.max(...dataset.datasets.map(ds => ds.data.length)))
+  
   return dataset
 })
 

@@ -5,7 +5,7 @@
       <p class="font-bold text-md ml-2 text-[#034EA2]">{{ title }}</p>
     </div>
     <div class="">
-      <Line :options="chartOptions" class="px-4" :data="chartData" :plugins="[DataLabels]" />
+      <Line :options="chartOptions" class="px-4" :data="chartData" />
     </div>
   </div>
 
@@ -46,13 +46,16 @@ const chartOptions = {
   plugins: [DataLabels],
   plugins: {
     legend: {
-      display: props.options.legends ? true : false,
+      display: true,
       position: 'bottom',
       labels: {
         usePointStyle: true,
         pointStyle: 'circle',
-        padding: 1,
-      }
+        padding: 4,
+      },
+      font: {
+        size: 10,
+      },
     },
     title: {
       display: true,
@@ -61,27 +64,27 @@ const chartOptions = {
       },
       color: "black",
     },
-    datalabels: {
-      display: props.options.datalabels ? true : false,
-      anchor: 'end',
-      align: 'top',
-      formatter: function (value) {
-        if (props.millions) {
-          return `${(value / 1000000).toFixed(1)}`;
-        } else if (props.thousands) {
-          return `${(value / 1000).toFixed(1)}`;
-        } else {
-          return `${value.toFixed(1)}`;
-        }
-      },
-      color: 'black',
-      font: {
-        family: "'helvetica', 'arial', 'sans-serif'",
-        weight: 'normal',
-        size: 11,
-        lineHeight: 1
-      }
-    }
+    // datalabels: {
+    //   display: props.options.datalabels ? true : false,
+    //   anchor: 'end',
+    //   align: 'top',
+    //   formatter: function (value) {
+    //     if (props.millions) {
+    //       return `${(value / 1000000).toFixed(1)}`;
+    //     } else if (props.thousands) {
+    //       return `${(value / 1000).toFixed(1)}`;
+    //     } else {
+    //       return `${value.toFixed(1)}`;
+    //     }
+    //   },
+    //   color: 'black',
+    //   font: {
+    //     family: "'helvetica', 'arial', 'sans-serif'",
+    //     weight: 'normal',
+    //     size: 11,
+    //     lineHeight: 1
+    //   }
+    // }
   },
   scales: {
     x: {
@@ -93,9 +96,9 @@ const chartOptions = {
       },
     },
     y: {
-      display: props.options.yLabel ? true : false,  // This hides the y-axis completely
+      display: true,  // This hides the y-axis completely
       grid: {
-        display: false,
+        display: true,
       },
       ticks: {
         callback: function (value) {
