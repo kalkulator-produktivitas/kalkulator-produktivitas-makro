@@ -36,7 +36,7 @@ ChartJS.register(
 );
 const showTooltip = ref(false)
 
-const props = defineProps(['title', 'chartData', 'thousands', 'millions', "options"])
+const props = defineProps(['title', 'chartData', 'thousands', 'millions','bilion', "options"])
 
 const chartOptions = {
   backgroundColor: 'transparent',
@@ -67,16 +67,18 @@ const chartOptions = {
       align: 'top',
       formatter: function (value) {
         if (props.millions) {
-          return `${(value / 1000000).toFixed(1)}`;
+          return `${(value / 1000000).toFixed(2)}`;
+        } else if (props.bilion) {
+          return `${(value / 1000000000).toFixed(2)}`;
         } else if (props.thousands) {
-          return `${(value / 1000).toFixed(1)}`;
+          return `${(value / 1000).toFixed(2)}`;
         } else {
-          return `${value.toFixed(1)}`;
+          return `${value.toFixed(2)}`;
         }
       },
-      color: '#666666',
+      color: 'black',
       font: {
-        weight: 'bold'
+        weight: 'normal'
       }
     }
   },

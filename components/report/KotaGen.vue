@@ -237,27 +237,31 @@
                     Diagram)</p>
                   <p class="text-center text-sm">Tabel 1. Pengukuran Produktivitas Makro {{ props.kota === 'Kepulauan Seribu'? 'Kabupaten' : 'Kota' }} Administrasi {{ realData.nama }}</p>
                   <table class="w-full text-xs font-normal mt-4">
-                    <tbody>
-                      <tr class="">
-                        <td class="w-[5%] text-center">No</td>
-                        <td class="w-[5%] text-center">Kode</td>
-                        <td class="w-[45%]">Deskripsi</td>
-                        <td class="w-[7%] text-center">Tahun</td>
-                        <td class="w-[30%]">Produktivitas (rp/orang/tahun)</td>
+                    <thead>
+                      <tr class="border-b border-gray-300">
+                        <td class="w-[5%] text-center font-semibold">No</td>
+                        <td class="w-[8%] text-center font-semibold">Kode</td>
+                        <td class="w-[42%] font-semibold">Deskripsi</td>
+                        <td class="w-[45%] text-center font-semibold" colspan="5">Produktivitas (rp/orang/tahun)</td>
                       </tr>
-                      <template v-for="(_, groupIndex) in 2">
-                        <tr v-for="(_, yearIndex) in 5" :key="`group${groupIndex}-year${yearIndex}`">
-                          <td class="text-center">{{ groupIndex * 5 + yearIndex + 1 }}</td>
-                          <template v-if="yearIndex === 0">
-                            <td class="text-center" :rowspan="5">{{ data_7['kode'][groupIndex * 5] }}
-                            </td>
-                            <td :rowspan="5">{{ data_7['deskripsi'][groupIndex * 5] }}</td>
-                          </template>
-                          <td class="text-center">{{ data_7['tahun'][groupIndex * 5 + yearIndex] }}</td>
-                          <td class="text-end px-2">{{ data_7['produktivitas'][groupIndex * 5 + yearIndex
-                          ] }}</td>
-                        </tr>
-                      </template>
+                      <tr class="border-b border-gray-300">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td v-for="year in rawdata.metadata.tahun.slice(-5)" :key="year" class="w-[9%] text-center font-semibold">
+                          {{ year }}
+                        </td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(kode, index) in Object.keys(rawdata.kota[props.kota].lapangan_usaha)" :key="kode" class="border-b border-gray-200">
+                        <td class="text-center">{{ index + 1 }}</td>
+                        <td class="text-center">{{ kode }}</td>
+                        <td>{{ rawdata.metadata.lapangan_usaha.dict[kode] }}</td>
+                        <td v-for="year in rawdata.metadata.tahun.slice(-5)" :key="year" class="text-end px-2">
+                          {{ rawdata.kota[props.kota].lapangan_usaha[kode].produktivitas_tenaga_kerja[rawdata.metadata.tahun.indexOf(year)].toLocaleString('id-ID') }}
+                        </td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>
@@ -269,27 +273,31 @@
                 <p class="page-number text-center">4</p>
                 <div class="border border-black p-2 mb-4">
                   <table class="w-full text-xs font-normal">
-                    <tbody>
-                      <tr class="">
-                        <td class="w-[5%] text-center">No</td>
-                        <td class="w-[5%] text-center">Kode</td>
-                        <td class="w-[45%]">Deskripsi</td>
-                        <td class="w-[7%] text-center">Tahun</td>
-                        <td class="w-[30%]">Produktivitas (rp/orang/tahun)</td>
+                    <thead>
+                      <tr class="border-b border-gray-300">
+                        <td class="w-[5%] text-center font-semibold">No</td>
+                        <td class="w-[8%] text-center font-semibold">Kode</td>
+                        <td class="w-[42%] font-semibold">Deskripsi</td>
+                        <td class="w-[45%] text-center font-semibold" colspan="5">Produktivitas (rp/orang/tahun)</td>
                       </tr>
-                      <template v-for="(_, groupIndex) in 6">
-                        <tr v-for="(_, yearIndex) in 5" :key="`group${groupIndex}-year${yearIndex}`">
-                          <td class="text-center">{{ groupIndex * 5 + yearIndex + 11 }}</td>
-                          <template v-if="yearIndex === 0">
-                            <td class="text-center" :rowspan="5">{{ data_7['kode'][groupIndex * 5 + 10] }}
-                            </td>
-                            <td :rowspan="5">{{ data_7['deskripsi'][groupIndex * 5 + 10] }}</td>
-                          </template>
-                          <td class="text-center">{{ data_7['tahun'][groupIndex * 5 + yearIndex + 10] }}</td>
-                          <td class="text-end px-2">{{ data_7['produktivitas'][groupIndex * 5 + yearIndex
-                            + 10] }}</td>
-                        </tr>
-                      </template>
+                      <tr class="border-b border-gray-300">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td v-for="year in rawdata.metadata.tahun.slice(-5)" :key="year" class="w-[9%] text-center font-semibold">
+                          {{ year }}
+                        </td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(kode, index) in Object.keys(rawdata.kota[props.kota].lapangan_usaha)" :key="kode" class="border-b border-gray-200">
+                        <td class="text-center">{{ index + 1 }}</td>
+                        <td class="text-center">{{ kode }}</td>
+                        <td>{{ rawdata.metadata.lapangan_usaha.dict[kode] }}</td>
+                        <td v-for="year in rawdata.metadata.tahun.slice(-5)" :key="year" class="text-end px-2">
+                          {{ rawdata.kota[props.kota].lapangan_usaha[kode].produktivitas_tenaga_kerja[rawdata.metadata.tahun.indexOf(year)].toLocaleString('id-ID') }}
+                        </td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>
@@ -301,27 +309,31 @@
                 <p class="page-number text-center">5</p>
                 <div class="border border-black p-2 mb-4">
                   <table class="w-full text-xs font-normal">
-                    <tbody>
-                      <tr class="">
-                        <td class="w-[5%] text-center">No</td>
-                        <td class="w-[5%] text-center">Kode</td>
-                        <td class="w-[45%]">Deskripsi</td>
-                        <td class="w-[7%] text-center">Tahun</td>
-                        <td class="w-[30%]">Produktivitas (rp/orang/tahun)</td>
+                    <thead>
+                      <tr class="border-b border-gray-300">
+                        <td class="w-[5%] text-center font-semibold">No</td>
+                        <td class="w-[8%] text-center font-semibold">Kode</td>
+                        <td class="w-[42%] font-semibold">Deskripsi</td>
+                        <td class="w-[45%] text-center font-semibold" colspan="5">Produktivitas (rp/orang/tahun)</td>
                       </tr>
-                      <template v-for="(_, groupIndex) in 6">
-                        <tr v-for="(_, yearIndex) in 5" :key="`group${groupIndex}-year${yearIndex}`">
-                          <td class="text-center">{{ groupIndex * 5 + yearIndex + 41 }}</td>
-                          <template v-if="yearIndex === 0">
-                            <td class="text-center" :rowspan="5">{{ data_7['kode'][groupIndex * 5 + 40] }}
-                            </td>
-                            <td :rowspan="5">{{ data_7['deskripsi'][groupIndex * 5 + 40] }}</td>
-                          </template>
-                          <td class="text-center">{{ data_7['tahun'][groupIndex * 5 + yearIndex + 40] }}</td>
-                          <td class="text-end px-2">{{ data_7['produktivitas'][groupIndex * 5 + yearIndex
-                            + 40] }}</td>
-                        </tr>
-                      </template>
+                      <tr class="border-b border-gray-300">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td v-for="year in rawdata.metadata.tahun.slice(-5)" :key="year" class="w-[9%] text-center font-semibold">
+                          {{ year }}
+                        </td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(kode, index) in Object.keys(rawdata.kota[props.kota].lapangan_usaha)" :key="kode" class="border-b border-gray-200">
+                        <td class="text-center">{{ index + 1 }}</td>
+                        <td class="text-center">{{ kode }}</td>
+                        <td>{{ rawdata.metadata.lapangan_usaha.dict[kode] }}</td>
+                        <td v-for="year in rawdata.metadata.tahun.slice(-5)" :key="year" class="text-end px-2">
+                          {{ rawdata.kota[props.kota].lapangan_usaha[kode].produktivitas_tenaga_kerja[rawdata.metadata.tahun.indexOf(year)].toLocaleString('id-ID') }}
+                        </td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>
@@ -333,27 +345,31 @@
                 <p class="page-number text-center">6</p>
                 <div class="border border-black p-2 mb-4">
                   <table class="w-full text-xs font-normal">
-                    <tbody>
-                      <tr class="">
-                        <td class="w-[5%] text-center">No</td>
-                        <td class="w-[5%] text-center">Kode</td>
-                        <td class="w-[45%]">Deskripsi</td>
-                        <td class="w-[7%] text-center">Tahun</td>
-                        <td class="w-[30%]">Produktivitas (rp/orang/tahun)</td>
+                    <thead>
+                      <tr class="border-b border-gray-300">
+                        <td class="w-[5%] text-center font-semibold">No</td>
+                        <td class="w-[8%] text-center font-semibold">Kode</td>
+                        <td class="w-[42%] font-semibold">Deskripsi</td>
+                        <td class="w-[45%] text-center font-semibold" colspan="5">Produktivitas (rp/orang/tahun)</td>
                       </tr>
-                      <template v-for="(_, groupIndex) in 3">
-                        <tr v-for="(_, yearIndex) in 5" :key="`group${groupIndex}-year${yearIndex}`">
-                          <td class="text-center">{{ groupIndex * 5 + yearIndex + 71 }}</td>
-                          <template v-if="yearIndex === 0">
-                            <td class="text-center" :rowspan="5">{{ data_7['kode'][groupIndex * 5 + 70] }}
-                            </td>
-                            <td :rowspan="5">{{ data_7['deskripsi'][groupIndex * 5 + 70] }}</td>
-                          </template>
-                          <td class="text-center">{{ data_7['tahun'][groupIndex * 5 + yearIndex + 70] }}</td>
-                          <td class="text-end px-2">{{ data_7['produktivitas'][groupIndex * 5 + yearIndex
-                            + 70] }}</td>
-                        </tr>
-                      </template>
+                      <tr class="border-b border-gray-300">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td v-for="year in rawdata.metadata.tahun.slice(-5)" :key="year" class="w-[9%] text-center font-semibold">
+                          {{ year }}
+                        </td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(kode, index) in Object.keys(rawdata.kota[props.kota].lapangan_usaha)" :key="kode" class="border-b border-gray-200">
+                        <td class="text-center">{{ index + 1 }}</td>
+                        <td class="text-center">{{ kode }}</td>
+                        <td>{{ rawdata.metadata.lapangan_usaha.dict[kode] }}</td>
+                        <td v-for="year in rawdata.metadata.tahun.slice(-5)" :key="year" class="text-end px-2">
+                          {{ rawdata.kota[props.kota].lapangan_usaha[kode].produktivitas_tenaga_kerja[rawdata.metadata.tahun.indexOf(year)].toLocaleString('id-ID') }}
+                        </td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>

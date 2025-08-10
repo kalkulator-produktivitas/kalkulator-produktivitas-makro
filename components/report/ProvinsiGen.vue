@@ -92,14 +92,14 @@
                   <p class="text-lg font-bold">Hasil Pengukuran Produktivitas Makro</p>
                   <ol class="list-none ml-2 text-sm">
                     <li>
-                      <p>1. Produktivitas Tenaga Kerja (juta/orang/tahun) :</p>
+                      <p>1. Produktivitas Tenaga Kerja (Rp milyar/orang/tahun) :</p>
                       <div class="w-[120mm]">
-                        <GraphReportingLineChart :chart-data="data_1" title="" :key="state" :millions="true"
+                        <GraphReportingLineChart :chart-data="data_1" title="" :key="state" :bilion="true"
                           :options="{ legends: false, datalabels: true }" />
                       </div>
                     </li>
                     <li>
-                      <p>2. Pertumbuhan Produktivitas Tenaga Kerja yoy (%) :</p>
+                      <p>2. Pertumbuhan Produktivitas Tenaga Kerja yoy :</p>
                       <div class="w-[120mm]">
                         <GraphReportingLineChart :chart-data="data_2" title="" :key="state" :millions="false"
                           :options="{ legends: false, datalabels: true }" />
@@ -113,6 +113,7 @@
               <div class="content page-2">
                 <p class="page-number text-center">2</p>
                 <div class="border border-black p-2 mb-4">
+                  <p class="text-lg font-bold">Hasil Pengukuran Produktivitas Makro</p>
                   <ol class="list-none ml-2 text-sm mt-4">
                     <li class="mb-4">
                       <table class="w-full">
@@ -137,7 +138,7 @@
                           <tr>
                             <td class="px-2 py-1 w-[10%]">{{ data_6["Sektor Penyerapan TK terbesar"][0] }}</td>
                             <td class="px-2 py-1 w-[55%]">{{ data_6["Sektor Penyerapan TK terbesar"][1] }}</td>
-                            <td class="px-2 py-1 w-[35%] text-right">{{ data_6["Sektor Penyerapan TK terbesar"][2] }}</td>
+                            <td class="px-2 py-1 w-[35%] text-right">{{ data_6["Sektor Penyerapan TK terbesar"][2] }} orang</td>
                           </tr>
                         </tbody>
                       </table>
@@ -146,12 +147,12 @@
                       <table class="w-full">
                         <tbody>
                           <tr>
-                            <td :colspan="3" class="pl-2 bg-slate-200 font-semibold">3. Sektor Dengan Produktivitas Tertinggi (orang/tahun):</td>
+                            <td :colspan="3" class="pl-2 bg-slate-200 font-semibold">3. Sektor Dengan Produktivitas Tertinggi :</td>
                           </tr>
                           <tr>
                             <td class="px-2 py-1 w-[10%]">{{ data_6["Sektor Produktivitas terbesar"][0] }}</td>
                             <td class="px-2 py-1 w-[55%]">{{ data_6["Sektor Produktivitas terbesar"][1] }}</td>
-                            <td class="px-2 py-1 w-[35%] text-right">{{ data_6["Sektor Produktivitas terbesar"][2] }}</td>
+                            <td class="px-2 py-1 w-[35%] text-right">{{ data_6["Sektor Produktivitas terbesar"][2] }} <p class="text-xs">per orang/tahun</p></td>
                           </tr>
                         </tbody>
                       </table>
@@ -160,12 +161,12 @@
                       <table class="w-full">
                         <tbody>
                           <tr>
-                            <td :colspan="3" class="pl-2 bg-slate-200 font-semibold">4. Sektor Dengan Produktivitas Terendah (orang/tahun):</td>
+                            <td :colspan="3" class="pl-2 bg-slate-200 font-semibold">4. Sektor Dengan Produktivitas Terendah :</td>
                           </tr>
                           <tr>
                             <td class="px-2 py-1 w-[10%]">{{ data_6["Sektor Produktivitas terendah"][0] }}</td>
                             <td class="px-2 py-1 w-[55%]">{{ data_6["Sektor Produktivitas terendah"][1] }}</td>
-                            <td class="px-2 py-1 w-[35%] text-right">{{ data_6["Sektor Produktivitas terendah"][2] }}</td>
+                            <td class="px-2 py-1 w-[35%] text-right">{{ data_6["Sektor Produktivitas terendah"][2] }} <p class="text-xs">per orang/tahun</p></td>
                           </tr>
                         </tbody>
                       </table>
@@ -174,7 +175,7 @@
                       <table class="w-full">
                         <tbody>
                           <tr>
-                            <td :colspan="3" class="pl-2 bg-slate-200 font-semibold">5. Sektor Dengan Peningkatan Produktivitas Tertinggi (%):</td>
+                            <td :colspan="3" class="pl-2 bg-slate-200 font-semibold">5. Sektor Dengan Peningkatan Produktivitas Tertinggi :</td>
                           </tr>
                           <tr>
                             <td class="px-2 py-1 w-[10%]">{{ data_6["Sektor Peningkatan Produktivitas terbesar"][0] }}</td>
@@ -188,7 +189,7 @@
                       <table class="w-full">
                         <tbody>
                           <tr>
-                            <td :colspan="3" class="pl-2 bg-slate-200 font-semibold">6. Sektor Dengan Peningkatan Produktivitas Terendah (%):</td>
+                            <td :colspan="3" class="pl-2 bg-slate-200 font-semibold">6. Sektor Dengan Peningkatan Produktivitas Terendah :</td>
                           </tr>
                           <tr>
                             <td class="px-2 py-1 w-[10%]">{{ data_6["Sektor Peningkatan Produktivitas terendah"][0] }}</td>
@@ -202,109 +203,49 @@
                 </div>
               </div>
             </div>
-
-            <div class="pdf-content" id="pdfContent-4">
-              <div class="content page-4">
-                <p class="page-number text-center">4</p>
-                <div class="border border-black p-2 mb-4">
-                  <table class="w-full text-xs font-normal">
-                    <tbody> 
-                      <tr class="">
-                        <td class="w-[5%] text-center">No</td>
-                        <td class="w-[5%] text-center">Kode</td>
-                        <td class="w-[45%]">Deskripsi</td>
-                        <td class="w-[7%] text-center">Tahun</td>
-                        <td class="w-[30%]">Produktivitas (rp/orang/tahun)</td>
-                      </tr>
-                      <template v-for="(_, groupIndex) in 6">
-                        <tr v-for="(_, yearIndex) in 5" :key="`group${groupIndex}-year${yearIndex}`">
-                          <td class="text-center">{{ groupIndex * 5 + yearIndex + 11 }}</td>
-                          <template v-if="yearIndex === 0">
-                            <td class="text-center" :rowspan="5">{{ data_7['kode'][groupIndex * 5 + 10] }}
-                            </td>
-                            <td :rowspan="5">{{ data_7['deskripsi'][groupIndex * 5 + 10] }}</td>
-                          </template>
-                          <td class="text-center">{{ data_7['tahun'][groupIndex * 5 + yearIndex + 10] }}</td>
-                          <td class="text-end px-2">{{ data_7['produktivitas'][groupIndex * 5 + yearIndex
-                            + 10].toLocaleString('id-ID') }}</td>
+            <div class="pdf-content landscape-page" id="pdfContent-3">
+                <div class="content page-3 landscape">
+                  <p class="page-number text-center">3</p>
+                  <div class="border border-black p-2 mb-4">
+                    <p class="text-lg font-bold mb-1">Hasil Pengukuran Produktivitas Makro Per Daerah Tingkat I</p>
+                    <p class="text-center text-sm mb-3">Tabel 1. Pengukuran Produktivitas Makro DKI Jakarta</p>
+                    <table class="w-full text-xs font-normal">
+                      <thead>
+                        <tr class="border-b border-gray-300">
+                          <td class="w-[5%] text-center font-semibold" rowspan="2">No</td>
+                          <td class="w-[8%] text-center font-semibold" rowspan="2">Kode</td>
+                          <td class="w-[42%] font-semibold" rowspan="2">Deskripsi</td>
+                          <td class="w-[45%] text-center font-semibold" colspan="5">Produktivitas (Rp juta/orang/tahun)</td>
                         </tr>
-                      </template>
-                    </tbody>
-                  </table>
+                        <tr class="border-b border-gray-300">
+                          <td v-for="year in rawdata.metadata.tahun.slice(-5)" :key="year" class="w-[9%] text-center font-semibold">
+                            {{ year }}
+                          </td>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(kode, index) in Object.keys(rawdata.provinsi.lapangan_usaha)" :key="kode" class="border-b border-gray-200">
+                          <td class="text-center">{{ index + 1 }}</td>
+                          <td class="text-center">{{ kode }}</td>
+                          <td>{{ rawdata.metadata.lapangan_usaha.dict[kode] }}</td>
+                          <td v-for="year in rawdata.metadata.tahun.slice(-5)" :key="year" class="text-end px-2">
+                            {{ rawdata.provinsi.lapangan_usaha[kode].produktivitas_tenaga_kerja[rawdata.metadata.tahun.indexOf(year)].toLocaleString('id-ID') }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div class="pdf-content" id="pdfContent-5">
-              <div class="content page-5">
-                <p class="page-number text-center">5</p>
-                <div class="border border-black p-2 mb-4">
-                  <table class="w-full text-xs font-normal">
-                    <tbody>
-                      <tr class="">
-                        <td class="w-[5%] text-center">No</td>
-                        <td class="w-[5%] text-center">Kode</td>
-                        <td class="w-[45%]">Deskripsi</td>
-                        <td class="w-[7%] text-center">Tahun</td>
-                        <td class="w-[30%]">Produktivitas (rp/orang/tahun)</td>
-                      </tr>
-                      <template v-for="(_, groupIndex) in 6">
-                        <tr v-for="(_, yearIndex) in 5" :key="`group${groupIndex}-year${yearIndex}`">
-                          <td class="text-center">{{ groupIndex * 5 + yearIndex + 41 }}</td>
-                          <template v-if="yearIndex === 0">
-                            <td class="text-center" :rowspan="5">{{ data_7['kode'][groupIndex * 5 + 40] }}
-                            </td>
-                            <td :rowspan="5">{{ data_7['deskripsi'][groupIndex * 5 + 40] }}</td>
-                          </template>
-                          <td class="text-center">{{ data_7['tahun'][groupIndex * 5 + yearIndex + 40] }}</td>
-                          <td class="text-end px-2">{{ data_7['produktivitas'][groupIndex * 5 + yearIndex
-                            + 40].toLocaleString('id-ID') }}</td>
-                        </tr>
-                      </template>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
 
-            <div class="pdf-content" id="pdfContent-6">
-              <div class="content page-6">
-                <p class="page-number text-center">6</p>
-                <div class="border border-black p-2 mb-4">
-                  <table class="w-full text-xs font-normal">
-                    <tbody>
-                      <tr class="">
-                        <td class="w-[5%] text-center">No</td>
-                        <td class="w-[5%] text-center">Kode</td>
-                        <td class="w-[45%]">Deskripsi</td>
-                        <td class="w-[7%] text-center">Tahun</td>
-                        <td class="w-[30%]">Produktivitas (rp/orang/tahun)</td>
-                      </tr>
-                      <template v-for="(_, groupIndex) in 3">
-                        <tr v-for="(_, yearIndex) in 5" :key="`group${groupIndex}-year${yearIndex}`">
-                          <td class="text-center">{{ groupIndex * 5 + yearIndex + 71 }}</td>
-                          <template v-if="yearIndex === 0">
-                            <td class="text-center" :rowspan="5">{{ data_7['kode'][groupIndex * 5 + 70] }}
-                            </td>
-                            <td :rowspan="5">{{ data_7['deskripsi'][groupIndex * 5 + 70] }}</td>
-                          </template>
-                          <td class="text-center">{{ data_7['tahun'][groupIndex * 5 + yearIndex + 70] }}</td>
-                          <td class="text-end px-2">{{ data_7['produktivitas'][groupIndex * 5 + yearIndex
-                            + 70].toLocaleString('id-ID') }}</td>
-                        </tr>
-                      </template>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
 
             <div
               v-for="(region, regionIndex) in Object.keys(rawdata.kota).filter(key => key !== 'Provinsi DKI Jakarta')"
               :key="`region-${region}`">
-              <div class="pdf-content" :id="`pdfContent-${7 + regionIndex * 3}`">
-                <div class="content page-7">
-                  <p class="page-number text-center">{{ regionIndex * 3 + 7 }}</p>
+              <div class="pdf-content landscape-page" :id="`pdfContent-${4 + regionIndex * 3}`">
+                <div class="content page-4 landscape">
+                  <p class="page-number text-center">{{ regionIndex + 4 }}</p>
                   <div class="border border-black p-2 mb-4">
                     <p class="text-lg font-bold mb-1">Hasil Pengukuran Produktivitas Makro Per Daerah Tingkat II (Dalam
                       Diagram)</p>
@@ -312,83 +253,28 @@
                       rawdata.kota[region].nama
                       }}</p>
                     <table class="w-full text-xs font-normal">
-                      <tbody>
-                        <tr class=""> 
-                          <td class="w-[5%] text-center">No</td>
-                          <td class="w-[5%] text-center">Kode</td>
-                          <td class="w-[45%]">Deskripsi</td>
-                          <td class="w-[7%] text-center">Tahun</td>
-                          <td class="w-[30%]">Produktivitas (rp/orang/tahun)</td>
+                      <thead>
+                        <tr class="border-b border-gray-300">
+                          <td class="w-[5%] text-center font-semibold" rowspan="2">No</td>
+                          <td class="w-[8%] text-center font-semibold" rowspan="2">Kode</td>
+                          <td class="w-[42%] font-semibold" rowspan="2">Deskripsi</td>
+                          <td class="w-[45%] text-center font-semibold" colspan="5">Produktivitas (rp/orang/tahun)</td>
                         </tr>
-                        <template v-for="(_, groupIndex) in 6">
-                          <tr v-for="(_, yearIndex) in 5" :key="`group${groupIndex}-year${yearIndex}`">
-                            <td class="text-center">{{ groupIndex * 5 + yearIndex + 1 }}</td>
-                            <template v-if="yearIndex === 0">
-                              <td class="text-center" :rowspan="5">{{ data_8[region]['kode'][groupIndex * 5] }}</td>
-                              <td :rowspan="5">{{ data_8[region]['deskripsi'][groupIndex * 5] }}</td>
-                            </template>
-                            <td class="text-center">{{ data_8[region]['tahun'][groupIndex * 5 + yearIndex] }}</td>
-                            <td class="text-end px-2">{{ data_8[region]['produktivitas'][groupIndex * 5 + yearIndex].toLocaleString('id-ID') }}</td>
-                          </tr>
-                        </template>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-              <div class="pdf-content" :id="`pdfContent-${8 + regionIndex * 3}`">
-                <div class="content page-8">
-                  <p class="page-number text-center">{{ regionIndex * 3 + 8 }}</p>
-                  <div class="border border-black p-2 mb-4">
-                    <table class="w-full text-xs font-normal">
-                      <tbody>
-                        <tr class="">
-                          <td class="w-[5%] text-center">No</td>
-                          <td class="w-[5%] text-center">Kode</td>
-                          <td class="w-[45%]">Deskripsi</td>
-                          <td class="w-[7%] text-center">Tahun</td>
-                          <td class="w-[30%]">Produktivitas (rp/orang/tahun)</td>
+                        <tr class="border-b border-gray-300">
+                          <td v-for="year in rawdata.metadata.tahun.slice(-5)" :key="year" class="w-[9%] text-center font-semibold">
+                            {{ year }}
+                          </td>
                         </tr>
-                        <template v-for="(_, groupIndex) in 6">
-                          <tr v-for="(_, yearIndex) in 5" :key="`group${groupIndex}-year${yearIndex}`">
-                            <td class="text-center">{{ groupIndex * 5 + yearIndex + 31 }}</td>
-                            <template v-if="yearIndex === 0">
-                              <td class="text-center" :rowspan="5">{{ data_8[region]['kode'][groupIndex * 5 + 30] }}</td>
-                              <td :rowspan="5">{{ data_8[region]['deskripsi'][groupIndex * 5 + 30] }}</td>
-                            </template>
-                            <td class="text-center">{{ data_8[region]['tahun'][groupIndex * 5 + yearIndex + 30] }}</td>
-                            <td class="text-end px-2">{{ data_8[region]['produktivitas'][groupIndex * 5 + yearIndex + 30].toLocaleString('id-ID') }}</td>
-                          </tr>
-                        </template>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-              <div class="pdf-content" :id="`pdfContent-${9 + regionIndex * 3}`">
-                <div class="content page-9">
-                  <p class="page-number text-center">{{ regionIndex * 3 + 9 }}</p>
-                  <div class="border border-black p-2 mb-4">
-                    <table class="w-full text-xs font-normal">
+                      </thead>
                       <tbody>
-                        <tr class="">
-                          <td class="w-[5%] text-center">No</td>
-                          <td class="w-[5%] text-center">Kode</td>
-                          <td class="w-[45%]">Deskripsi</td>
-                          <td class="w-[7%] text-center">Tahun</td>
-                          <td class="w-[30%]">Produktivitas (rp/orang/tahun)</td>
+                        <tr v-for="(kode, index) in Object.keys(rawdata.kota[region].lapangan_usaha)" :key="kode" class="border-b border-gray-200">
+                          <td class="text-center">{{ index + 1 }}</td>
+                          <td class="text-center">{{ kode }}</td>
+                          <td>{{ rawdata.metadata.lapangan_usaha.dict[kode] }}</td>
+                          <td v-for="year in rawdata.metadata.tahun.slice(-5)" :key="year" class="text-end px-2">
+                            {{ rawdata.kota[region].lapangan_usaha[kode].produktivitas_tenaga_kerja[rawdata.metadata.tahun.indexOf(year)].toLocaleString('id-ID') }}
+                          </td>
                         </tr>
-                        <template v-for="(_, groupIndex) in 5">
-                          <tr v-for="(_, yearIndex) in 5" :key="`group${groupIndex}-year${yearIndex}`">
-                            <td class="text-center">{{ groupIndex * 5 + yearIndex + 61 }}</td>
-                            <template v-if="yearIndex === 0">
-                              <td class="text-center" :rowspan="5">{{ data_8[region]['kode'][groupIndex * 5 + 60] }}</td>
-                              <td :rowspan="5">{{ data_8[region]['deskripsi'][groupIndex * 5 + 60] }}</td>
-                            </template>
-                            <td class="text-center">{{ data_8[region]['tahun'][groupIndex * 5 + yearIndex + 60] }}</td>
-                            <td class="text-end px-2">{{ data_8[region]['produktivitas'][groupIndex * 5 + yearIndex + 60].toLocaleString('id-ID') }}</td>
-                          </tr>
-                        </template>
                       </tbody>
                     </table>
                   </div>
@@ -454,7 +340,7 @@ const data_2 = computed(() => {
       },
     ],
   }
-  let calcData = props.rawdata.provinsi.agregat.jumlah_tenaga_kerja_bekerja.slice(-5)
+  let calcData = props.rawdata.provinsi.agregat.growth_produktivitas_tenaga_kerja.slice(-5)
   dataset.datasets[0].data = calcData
   return dataset
 })
@@ -659,15 +545,35 @@ const generatePDF = async () => {
       compress: true
     });
 
-    for (let i = 1; i <= 10; i++) {
-      // Skip the 3rd page
-      if (i === 3) continue;
+    // Get all PDF content elements
+    const pdfElements = document.querySelectorAll('[id^="pdfContent-"]');
+    const sortedElements = Array.from(pdfElements).sort((a, b) => {
+      const aNum = parseInt(a.id.replace('pdfContent-', ''));
+      const bNum = parseInt(b.id.replace('pdfContent-', ''));
+      return aNum - bNum;
+    });
+
+    for (let i = 0; i < sortedElements.length; i++) {
+      console.log(`Processing page ${i + 1}`)
+      const element = sortedElements[i];
+      const pageNum = element.id.replace('pdfContent-', '');
       
-      let canvas = await html2canvas(document.getElementById(`pdfContent-${i}`), {
+      // Check if this is a landscape page (after page 3)
+      const isLandscape = parseInt(pageNum) > 3;
+      
+      let canvas = await html2canvas(element, {
         scale: 2,
       });
-      if (i > 1) doc.addPage();
-      doc.addImage(canvas, 'PNG', 0, 0, 210, 297);
+      
+      if (i > 0) doc.addPage();
+      
+      if (isLandscape) {
+        // For landscape pages, use landscape orientation
+        doc.addImage(canvas, 'PNG', 0, 0, 297, 210);
+      } else {
+        // For portrait pages, use portrait orientation
+        doc.addImage(canvas, 'PNG', 0, 0, 210, 297);
+      }
     }
 
     loading.value = false
@@ -801,5 +707,29 @@ td {
   bottom: 40px;
   right: 50%;
   font-size: 1em;
+}
+
+/* Landscape page styles */
+.landscape-page {
+  background-color: #ffffff;
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: 210mm; /* Swapped dimensions for landscape */
+  width: 297mm;  /* Swapped dimensions for landscape */
+}
+
+.landscape-page .content.landscape {
+  padding: 3em 4em 2em; /* Adjusted padding for landscape */
+  position: relative;
+  height: 100%;
+  transform: rotate(0deg); /* Ensure no rotation */
+}
+
+.landscape-page .page-number {
+  position: absolute;
+  bottom: 30px;
+  right: 50%;
+  font-size: 1em;
+  transform: translateX(50%);
 }
 </style>

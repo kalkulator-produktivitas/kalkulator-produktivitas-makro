@@ -56,38 +56,38 @@
             </div>
 
             <!-- Line Charts Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 mt-2">
-              <div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mt-4">
+              <div class="min-h-[350px]">
                 <GraphMacroLineChart :chart-data="data_1_new" title="Produktivitas Tenaga Kerja (Juta)" :key="state"
-                  :millions="false" :options="{ legends: false, datalabels: true }" />
+                  :millions="false" :options="{ legends: false, datalabels: true, height: '320px' }" />
               </div>
-              <div>
+              <div class="min-h-[350px]">
                 <GraphMacroLineChart :chart-data="data_2_new" title="Pertumbuhan Produktivitas Tenaga Kerja (%)"
-                  :key="state" :millions="false" :options="{ legends: false, datalabels: true }" />
+                  :key="state" :millions="false" :options="{ legends: false, datalabels: true, height: '320px' }" />
               </div>
-              <div>
+              <div class="min-h-[350px]">
                 <GraphMacroLineChart :chart-data="data_3_new" title="Produktivitas Upah" :key="state" :millions="false"
-                  :options="{ legends: false, datalabels: true }" />
+                  :options="{ legends: false, datalabels: true, height: '320px' }" />
               </div>
-              <div>
+              <div class="min-h-[350px]">
                 <GraphMacroLineChart :chart-data="data_8" title="Produktivitas Bruto Dalam Negeri" :key="state"
-                  :millions="true" :options="{ legends: false, datalabels: true }" />
+                  :millions="true" :options="{ legends: false, datalabels: true, height: '320px' }" />
               </div>
-              <div>
+              <div class="min-h-[350px]">
                 <GraphMacroLineChart :chart-data="data_9" title="Jumlah Tenaga Kerja" :key="state"
-                  :millions="false" :options="{ legends: false, datalabels: true }" />
+                  :millions="false" :options="{ legends: false, datalabels: true, height: '320px' }" />
               </div>
             </div>
             
             <!-- Additional Line Chart Section -->
-            <div class="mt-4 w-[90%]">
+            <div class="mt-4 w-full">
               <GraphMacroLineChart 
                 v-if="dashboardApi.data"
                 :chart-data="data_4_line" 
                 title="Produktivitas Tenaga Kerja per Lapangan Usaha" 
                 :key="state"
                 :millions="false" 
-                :options="{ legends: true, datalabels: false }" 
+                :options="{ legends: true, datalabels: false, fullWidth: true, height: '450px' }" 
               />
             </div>
             
