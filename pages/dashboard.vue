@@ -1,6 +1,6 @@
 <template>
   <div class="">
-    <div id="layout" class="md:mx-auto mx-auto flex w-full">
+    <div id="layout" class="md:mx-auto mx-auto flex w-[95vw]">
       <div class="flex shrink-0 w-[3%]">
 
       </div>
@@ -8,9 +8,9 @@
         <p class="font-bold text-xl">Dashboard Produktivitas Makro</p>
         <div class="mt-2 flex gap-4 justify-between w-[70%]">
           <div class="flex gap-4">
-            <div class="px-1 py-1 flex items-center bg-blue-700 rounded-full">
+            <div class="px-2 py-3 flex items-center bg-[#034EA2] text-white hover:bg-[#023b7d] transition-all duration-300 rounded-full text-sm">
               <Icon name="mdi:arrow-left-circle" class="cursor-pointer rounded-full border border-white bg-white"
-                @click="navigateTo('/')" size="24" />
+                @click="navigateTo('/')" size="20" />
               <p class="text-white cursor-pointer mr-2" @click="navigateTo('/')">Back</p>
             </div>
             <select v-model="subTab" @change="changeTab(subTab)"
@@ -22,28 +22,49 @@
           </div>
 
           <div class="w-full flex justify-center items-center gap-4">
-            <p class="text-md text-gray-700">{{ yearSlider.minValue }}</p>
-            <WidgetSlider class="w-[80%]" :min-threshold="yearSlider.min" :max-threshold="yearSlider.max"
-              :min="yearSlider.minValue" :max="yearSlider.maxValue" @update:min="value => yearSlider.minValue = value"
-              @update:max="value => yearSlider.maxValue = value" :id="state" :key="state">
-            </WidgetSlider>
-            <p class="text-md text-gray-700">{{ yearSlider.maxValue }}</p>
+            <div class="flex items-center gap-2">
+              <label class="text-sm text-gray-700 font-medium">From:</label>
+              <select v-model="yearSlider.minValue" 
+                class="px-3 py-1.5 rounded-lg border border-blue-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option v-for="year in years" :key="year" :value="year" class="py-1">
+                  {{ year }}
+                </option>
+              </select>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <label class="text-sm text-gray-700 font-medium">To:</label>
+              <select v-model="yearSlider.maxValue" 
+                :class="`px-3 py-1.5 rounded-lg border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  !isYearRangeValid ? 'border-red-300 focus:ring-red-500' : 'border-blue-200 focus:ring-blue-500'
+                }`">
+                <option v-for="year in availableToYears" :key="year" :value="year" class="py-1">
+                  {{ year }}
+                </option>
+              </select>
+            </div>
 
-            <button @click="downloadData" :disabled="!buttonActive || isLoading"
-              class="bg-[#034EA2] text-white px-3 py-1 rounded-lg self-center hover:bg-[#023b7d] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+            <button @click="downloadData" :disabled="!buttonActive || isLoading || !isYearRangeValid"
+              class="bg-[#034EA2] text-white px-3 py-2 text-sm rounded-lg self-center hover:bg-[#023b7d] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
               Submit
             </button>
           </div>
+          
+          <!-- Validation message -->
+          <div v-if="yearSlider.minValue && yearSlider.maxValue && !isYearRangeValid" 
+               class="text-center mt-2">
+            <p class="text-red-500 text-sm">"To" year cannot be lower than "From" year</p>
+          </div>
 
-          <div class="flex gap-4 absolute top-3 right-5">
+          <div class="flex gap-4 absolute top-3 right-0">
             <button @click="createReport" :disabled="!buttonActive"
-              class="bg-[#034EA2] text-white px-3 py-1 rounded-lg self-center hover:bg-[#023b7d] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+              class="bg-[#034EA2] text-white px-3 py-2 text-sm rounded-lg self-center hover:bg-[#023b7d] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
               Buat Laporan
             </button>
           </div>
         </div>
 
-        <div v-if="hasData" class="w-full">
+        <div v-if="hasData" class="w-full border-t-2 border-slate-200 mt-2 pt-2 ">
           <!-- Main Content Area -->
           <div class="w-full">
             <!-- Toggle Sidebar Button -->
@@ -56,31 +77,31 @@
             </div>
 
             <!-- Line Charts Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mt-4">
-              <div class="min-h-[350px]">
+            <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 mt-4">
+              <div class="">
                 <GraphMacroLineChart :chart-data="data_1_new" title="Produktivitas Tenaga Kerja (Juta)" :key="state"
                   :millions="false" :options="{ legends: false, datalabels: true, height: '320px' }" />
               </div>
-              <div class="min-h-[350px]">
+              <div class="">
                 <GraphMacroLineChart :chart-data="data_2_new" title="Pertumbuhan Produktivitas Tenaga Kerja (%)"
                   :key="state" :millions="false" :options="{ legends: false, datalabels: true, height: '320px' }" />
               </div>
-              <div class="min-h-[350px]">
+              <div class="">
                 <GraphMacroLineChart :chart-data="data_3_new" title="Produktivitas Upah" :key="state" :millions="false"
                   :options="{ legends: false, datalabels: true, height: '320px' }" />
               </div>
-              <div class="min-h-[350px]">
+              <div class="">
                 <GraphMacroLineChart :chart-data="data_8" title="Produktivitas Bruto Dalam Negeri" :key="state"
                   :millions="true" :options="{ legends: false, datalabels: true, height: '320px' }" />
               </div>
-              <div class="min-h-[350px]">
+              <div class="">
                 <GraphMacroLineChart :chart-data="data_9" title="Jumlah Tenaga Kerja" :key="state"
                   :millions="false" :options="{ legends: false, datalabels: true, height: '320px' }" />
               </div>
             </div>
             
             <!-- Additional Line Chart Section -->
-            <div class="mt-4 w-full">
+            <!-- <div class="mt-4 w-full">
               <GraphMacroLineChart 
                 v-if="dashboardApi.data"
                 :chart-data="data_4_line" 
@@ -89,21 +110,22 @@
                 :millions="false" 
                 :options="{ legends: true, datalabels: false, fullWidth: true, height: '450px' }" 
               />
-            </div>
+            </div> -->
             
             <!-- Bar Charts Section - 2 Columns -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
               <GraphMacroHorizontalBarChart 
                 v-if="dashboardApi.data"
-                title="Produktivitas Tenaga Kerja"
+                title="Produktivitas Tenaga Kerja (Rp milyar/orang/tahun)"
                 paramKey="produktivitas_tenaga_kerja"
                 :data="dashboardApi.data.value"
                 :chart-data="data_4"
                 :key="state"
+                :options="{ datalabels: true, unit: 'milyar' }"
               />
               <GraphMacroHorizontalBarChart 
                 v-if="dashboardApi.data"
-                title="Produktivitas Jam Kerja"
+                title="Produktivitas Jam Kerja (Rp juta/orang/jam)"
                 paramKey="produktivitas_jam_kerja"
                 :data="dashboardApi.data.value"
                 :chart-data="data_5"
@@ -111,15 +133,16 @@
               />
               <GraphMacroHorizontalBarChart 
                 v-if="dashboardApi.data"
-                title="Produktivitas Upah"
+                title="Produktivitas Upah (Rp /orang/tahun)"
                 paramKey="produktivitas_upah"
                 :data="dashboardApi.data.value"
                 :chart-data="data_6"
                 :key="state"
+                :options="{ datalabels: true, unit: 'per juta' }"
               />
               <GraphMacroHorizontalBarChart 
                 v-if="dashboardApi.data"
-                title="Pertumbuhan Produktivitas Tenaga Kerja"
+                title="Pertumbuhan Produktivitas Tenaga Kerja (%)"
                 paramKey="growth_produktivitas_tenaga_kerja"
                 :data="dashboardApi.data.value"
                 :chart-data="data_7"
@@ -467,7 +490,7 @@ const data_1_new = computed(() => {
   const provinsiData = rawData2.value["provinsi"]["agregat"]["produktivitas_tenaga_kerja"] || []
   if (provinsiData.length > 0) {
     dataset.datasets.push({
-      label: "DKI Jakarta",
+      label: rawData2.value.provinsi.nama,
       data: provinsiData.filter(x => x !== null),
       backgroundColor: "#3867D6",
       borderRadius: 5,
@@ -826,6 +849,27 @@ const data_7 = computed(() => {
     }
   }
   return dataset
+})
+
+// Filter available years for "To" dropdown based on selected "From" year
+const availableToYears = computed(() => {
+  if (!years.value || !yearSlider.value.minValue) {
+    return years.value || []
+  }
+  return years.value.filter(year => year >= yearSlider.value.minValue)
+})
+
+// Check if year range is valid
+const isYearRangeValid = computed(() => {
+  return yearSlider.value.minValue && yearSlider.value.maxValue && 
+         yearSlider.value.maxValue >= yearSlider.value.minValue
+})
+
+// Watch for changes in minValue and adjust maxValue if needed
+watch(() => yearSlider.value.minValue, (newMinValue) => {
+  if (newMinValue && yearSlider.value.maxValue && yearSlider.value.maxValue < newMinValue) {
+    yearSlider.value.maxValue = newMinValue
+  }
 })
 
 const reportData = ref([])

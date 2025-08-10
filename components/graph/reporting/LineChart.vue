@@ -31,8 +31,7 @@ ChartJS.register(
   LineElement,
   CategoryScale,
   LinearScale,
-  PointElement,
-  DataLabels
+  PointElement
 );
 const showTooltip = ref(false)
 
@@ -43,6 +42,7 @@ const chartOptions = {
   responsive: true,
   maintainAspectRatio: true,
   aspectRatio: props.options.aspectRatio ? props.options.aspectRatio : 2.4,
+  plugins: [DataLabels],
   plugins: {
     legend: {
       display: props.options.legends ? true : false,

@@ -6,8 +6,8 @@
         <div class="grid grid-rows-2 gap-1 mx-auto flex-shrink-0">
           <div class="mx-auto" style="visibility:visible;">
             <div
-              class="w-[210mm] absolute top-0 bg-black bg-opacity-25 hover:bg-opacity-75 hover:text-white p-2 mt-2 transition z-50">
-              <div class="flex flex-row justify-end gap-6 ">
+              class="w-[98vw] absolute top-0 left-0 bg-black bg-opacity-25 hover:bg-opacity-75 hover:text-white p-2 mt-2 transition z-50">
+              <div class="flex flex-row justify-center gap-6 ">
                 <button type="button my-auto" class="py-1" @click="generatePDF">
                   <span class="flex items-center">
                     <Icon name="mdi:download-outline" size="24" />
@@ -21,7 +21,7 @@
                 </button>
               </div>
             </div>
-            <div class="pdf-content" id="pdfContent-1">
+            <div class="pdf-content mx-auto" id="pdfContent-1">
               <div class="content page-1">
                 <p class="page-number text-center">1</p>
                 <div class="p-2 flex mb-4">
@@ -43,17 +43,17 @@
                       <tr class="">
                         <td class="">1. Jumlah Penduduk Kab./Kota</td>
                         <td class="px-2 ">:</td>
-                        <td class="">{{ realData.sensus.jumlah_penduduk[latestIndex].toLocaleString('id-ID') }}</td>
+                        <td class="">{{ realData.sensus.jumlah_penduduk[latestIndex].toLocaleString('id-ID') }} Orang</td>
                       </tr>
                       <tr class="">
                         <td class="">2. Jumlah Angkatan Kerja Kab./Kota</td>
                         <td class="px-2 ">:</td>
-                        <td class="">{{ realData.sensus.jumlah_angkatan_kerja[latestIndex].toLocaleString('id-ID') }}</td>
+                        <td class="">{{ realData.sensus.jumlah_angkatan_kerja[latestIndex].toLocaleString('id-ID') }} Orang</td>
                       </tr>
                       <tr class="">
                         <td class="">3. Jumlah Tenaga Kerja Bekerja Kab./Kota</td>
                         <td class="px-2 ">:</td>
-                        <td class="">{{ realData.agregat.jumlah_tenaga_kerja_bekerja[latestIndex].toLocaleString('id-ID') }}</td>
+                        <td class="">{{ realData.agregat.jumlah_tenaga_kerja_bekerja[latestIndex].toLocaleString('id-ID') }} Orang</td>
                       </tr>
                       <tr class="">
                         <td class="">4. Produk Domestik Regional Bruto (ADHK) Kab./Kota</td>
@@ -83,9 +83,9 @@
                   <p class="text-lg font-bold">Hasil Pengukuran Produktivitas Makro</p>
                   <ol class="list-none ml-2 text-sm">
                     <li>
-                      <p>1. Produktivitas Tenaga Kerja (juta/orang/tahun) :</p>
+                      <p>1. Produktivitas Tenaga Kerja (Rp milyar/orang/tahun) :</p>
                       <div class="w-[120mm]">
-                        <GraphReportingLineChart :chart-data="data_1" title="" :key="state" :millions="true"
+                        <GraphReportingLineChart :chart-data="data_1" title="" :key="state" :bilion="true"
                           :options="{ legends: false, datalabels: true }" />
                       </div>
                     </li>
@@ -102,20 +102,20 @@
               </div>
 
             </div>
-            <div class="pdf-content" id="pdfContent-2">
+            <div class="pdf-content mx-auto" id="pdfContent-2">
               <div class="content page-2">
                 <p class="page-number text-center">2</p>
                 <div class="border border-black p-2 mb-4">
                   <ol class="list-none ml-2 text-sm" start="3">
                     <li>
-                      <p>3. Produktivitas Upah :</p>
+                      <p>3. Produktivitas Upah (Rp juta/orang/tahun):</p>
                       <div class="w-[120mm]">
-                        <GraphReportingLineChart :chart-data="data_3" title="" :key="state" 
+                        <GraphReportingLineChart :chart-data="data_3" title="" :millions="true" :key="state" 
                           :options="{ legends: false, datalabels: true }" />
                       </div>
                     </li>
                     <li>
-                      <p>4. Produktivitas Jam Kerja (juta/orang/jam) :</p>
+                      <p>4. Produktivitas Jam Kerja (Rp juta/orang/jam) :</p>
                       <div class="w-[120mm]">
                         <GraphReportingLineChart :chart-data="data_4" title="" :millions="true" :key="state"
                           :options="{ legends: false, datalabels: true }" />
@@ -125,7 +125,8 @@
                 </div>
               </div>
             </div>
-            <div class="pdf-content" id="pdfContent-3">
+            
+            <div class="pdf-content mx-auto" id="pdfContent-3">
               <div class="content page-3">
                 <p class="page-number text-center">3</p>
                 <div class="border border-black p-2 mb-2">
@@ -232,70 +233,38 @@
                       </table>
                     </li>
                   </ol>
+                </div>
+              </div>
+            </div>
 
+            <div class="pdf-content landscape-page" id="pdfContent-4">
+              <div class="content page-4 landscape">
+                <p class="page-number text-center">4</p>
+                <div class="border border-black p-2 mb-4">
                   <p class="text-lg font-bold mt-2">Hasil Pengukuran Produktivitas Sektoral Per Lapangan Usaha (Dalam
                     Diagram)</p>
                   <p class="text-center text-sm">Tabel 1. Pengukuran Produktivitas Makro {{ props.kota === 'Kepulauan Seribu'? 'Kabupaten' : 'Kota' }} Administrasi {{ realData.nama }}</p>
-                  <table class="w-full text-xs font-normal mt-4">
-                    <thead>
-                      <tr class="border-b border-gray-300">
-                        <td class="w-[5%] text-center font-semibold">No</td>
-                        <td class="w-[8%] text-center font-semibold">Kode</td>
-                        <td class="w-[42%] font-semibold">Deskripsi</td>
-                        <td class="w-[45%] text-center font-semibold" colspan="5">Produktivitas (rp/orang/tahun)</td>
-                      </tr>
-                      <tr class="border-b border-gray-300">
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td v-for="year in rawdata.metadata.tahun.slice(-5)" :key="year" class="w-[9%] text-center font-semibold">
-                          {{ year }}
-                        </td>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(kode, index) in Object.keys(rawdata.kota[props.kota].lapangan_usaha)" :key="kode" class="border-b border-gray-200">
-                        <td class="text-center">{{ index + 1 }}</td>
-                        <td class="text-center">{{ kode }}</td>
-                        <td>{{ rawdata.metadata.lapangan_usaha.dict[kode] }}</td>
-                        <td v-for="year in rawdata.metadata.tahun.slice(-5)" :key="year" class="text-end px-2">
-                          {{ rawdata.kota[props.kota].lapangan_usaha[kode].produktivitas_tenaga_kerja[rawdata.metadata.tahun.indexOf(year)].toLocaleString('id-ID') }}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-
-            <div class="pdf-content" id="pdfContent-4">
-              <div class="content page-4">
-                <p class="page-number text-center">4</p>
-                <div class="border border-black p-2 mb-4">
                   <table class="w-full text-xs font-normal">
-                    <thead>
+                    <thead class="bg-gray-200 text-center">
                       <tr class="border-b border-gray-300">
-                        <td class="w-[5%] text-center font-semibold">No</td>
-                        <td class="w-[8%] text-center font-semibold">Kode</td>
-                        <td class="w-[42%] font-semibold">Deskripsi</td>
-                        <td class="w-[45%] text-center font-semibold" colspan="5">Produktivitas (rp/orang/tahun)</td>
+                        <td class="w-[5%] text-center font-semibold" rowspan="2">No</td>
+                        <td class="w-[8%] text-center font-semibold" rowspan="2">Kode</td>
+                        <td class="w-[42%] font-semibold" rowspan="2">Deskripsi</td>
+                        <td class="w-[45%] text-center font-semibold" colspan="5">Produktivitas (Rp juta/orang/tahun)</td>
                       </tr>
                       <tr class="border-b border-gray-300">
-                        <td></td>
-                        <td></td>
-                        <td></td>
                         <td v-for="year in rawdata.metadata.tahun.slice(-5)" :key="year" class="w-[9%] text-center font-semibold">
                           {{ year }}
                         </td>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr v-for="(kode, index) in Object.keys(rawdata.kota[props.kota].lapangan_usaha)" :key="kode" class="border-b border-gray-200">
+                      <tr v-for="(kode, index) in Object.keys(realData.lapangan_usaha)" :key="kode" class="border-b border-gray-200">
                         <td class="text-center">{{ index + 1 }}</td>
                         <td class="text-center">{{ kode }}</td>
                         <td>{{ rawdata.metadata.lapangan_usaha.dict[kode] }}</td>
                         <td v-for="year in rawdata.metadata.tahun.slice(-5)" :key="year" class="text-end px-2">
-                          {{ rawdata.kota[props.kota].lapangan_usaha[kode].produktivitas_tenaga_kerja[rawdata.metadata.tahun.indexOf(year)].toLocaleString('id-ID') }}
+                          {{ realData.lapangan_usaha[kode].produktivitas_tenaga_kerja[rawdata.metadata.tahun.indexOf(year)].toLocaleString('id-ID') }}
                         </td>
                       </tr>
                     </tbody>
@@ -303,86 +272,13 @@
                 </div>
               </div>
             </div>
-
-            <div class="pdf-content" id="pdfContent-5">
-              <div class="content page-5">
-                <p class="page-number text-center">5</p>
-                <div class="border border-black p-2 mb-4">
-                  <table class="w-full text-xs font-normal">
-                    <thead>
-                      <tr class="border-b border-gray-300">
-                        <td class="w-[5%] text-center font-semibold">No</td>
-                        <td class="w-[8%] text-center font-semibold">Kode</td>
-                        <td class="w-[42%] font-semibold">Deskripsi</td>
-                        <td class="w-[45%] text-center font-semibold" colspan="5">Produktivitas (rp/orang/tahun)</td>
-                      </tr>
-                      <tr class="border-b border-gray-300">
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td v-for="year in rawdata.metadata.tahun.slice(-5)" :key="year" class="w-[9%] text-center font-semibold">
-                          {{ year }}
-                        </td>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(kode, index) in Object.keys(rawdata.kota[props.kota].lapangan_usaha)" :key="kode" class="border-b border-gray-200">
-                        <td class="text-center">{{ index + 1 }}</td>
-                        <td class="text-center">{{ kode }}</td>
-                        <td>{{ rawdata.metadata.lapangan_usaha.dict[kode] }}</td>
-                        <td v-for="year in rawdata.metadata.tahun.slice(-5)" :key="year" class="text-end px-2">
-                          {{ rawdata.kota[props.kota].lapangan_usaha[kode].produktivitas_tenaga_kerja[rawdata.metadata.tahun.indexOf(year)].toLocaleString('id-ID') }}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-
-            <div class="pdf-content" id="pdfContent-6">
-              <div class="content page-6">
-                <p class="page-number text-center">6</p>
-                <div class="border border-black p-2 mb-4">
-                  <table class="w-full text-xs font-normal">
-                    <thead>
-                      <tr class="border-b border-gray-300">
-                        <td class="w-[5%] text-center font-semibold">No</td>
-                        <td class="w-[8%] text-center font-semibold">Kode</td>
-                        <td class="w-[42%] font-semibold">Deskripsi</td>
-                        <td class="w-[45%] text-center font-semibold" colspan="5">Produktivitas (rp/orang/tahun)</td>
-                      </tr>
-                      <tr class="border-b border-gray-300">
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td v-for="year in rawdata.metadata.tahun.slice(-5)" :key="year" class="w-[9%] text-center font-semibold">
-                          {{ year }}
-                        </td>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(kode, index) in Object.keys(rawdata.kota[props.kota].lapangan_usaha)" :key="kode" class="border-b border-gray-200">
-                        <td class="text-center">{{ index + 1 }}</td>
-                        <td class="text-center">{{ kode }}</td>
-                        <td>{{ rawdata.metadata.lapangan_usaha.dict[kode] }}</td>
-                        <td v-for="year in rawdata.metadata.tahun.slice(-5)" :key="year" class="text-end px-2">
-                          {{ rawdata.kota[props.kota].lapangan_usaha[kode].produktivitas_tenaga_kerja[rawdata.metadata.tahun.indexOf(year)].toLocaleString('id-ID') }}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-
           </div>
 
 
         </div>
       </div>
     </div>
-    <Loading v-if="loading" text="Generating Report..." />
+    <Loading v-if="loading" text="Generating Report..." :progress="progress" :progress-text="progressText" />
   </div>
 
 </template>
@@ -408,6 +304,8 @@ const realData = props.rawdata.kota.filter(x => x.nama === props.kota)[0]
 const state = ref(0)
 
 const loading = ref(false)
+const progress = ref(0)
+const progressText = ref('')
 
 const data_1 = computed(() => {
   let dataset = {
@@ -438,7 +336,7 @@ const data_2 = computed(() => {
       },
     ],
   }
-  let calcData = realData.agregat.jumlah_tenaga_kerja_bekerja.slice(-5)
+  let calcData = realData.agregat.growth_produktivitas_tenaga_kerja.slice(-5)
   dataset.datasets[0].data = calcData
   return dataset
 })
@@ -585,6 +483,8 @@ const data_7 = computed(() => {
 const generatePDF = async () => {
   try {
     loading.value = true
+    progress.value = 0
+    progressText.value = 'Initializing PDF generation...'
     let title = `[example] Sertifikat_Produktivitas.pdf`
 
     const doc = new jsPDF({
@@ -594,18 +494,56 @@ const generatePDF = async () => {
       compress: true
     });
 
-    for (let i = 1; i <= 6; i++) {
-      let canvas = await html2canvas(document.getElementById(`pdfContent-${i}`), {
+    // Get all PDF content elements
+    const pdfElements = document.querySelectorAll('[id^="pdfContent-"]');
+    const sortedElements = Array.from(pdfElements).sort((a, b) => {
+      const aNum = parseInt(a.id.replace('pdfContent-', ''));
+      const bNum = parseInt(b.id.replace('pdfContent-', ''));
+      return aNum - bNum;
+    });
+
+    const totalPages = sortedElements.length;
+    progressText.value = `Found ${totalPages} pages to process`
+
+    for (let i = 0; i < sortedElements.length; i++) {
+      const currentPage = i + 1;
+      const percentage = Math.round((currentPage / totalPages) * 100);
+      progress.value = percentage;
+      progressText.value = `Processing page ${currentPage} of ${totalPages}...`
+      
+      const element = sortedElements[i];
+      const pageNum = element.id.replace('pdfContent-', '');
+      
+      // Check if this is a landscape page (after page 4)
+      const isLandscape = parseInt(pageNum) >= 4;
+      
+      let canvas = await html2canvas(element, {
         scale: 2,
       });
-      if (i > 1) doc.addPage();
-      doc.addImage(canvas, 'PNG', 0, 0, 210, 297);
+      
+      if (i === 0) {
+        // First page - use the initial page that's already created
+        doc.addImage(canvas, 'PNG', 0, 0, 210, 297);
+      } else if (isLandscape) {
+        doc.addPage('a4', 'landscape');
+        // For landscape pages, use landscape orientation
+        doc.addImage(canvas, 'PNG', 0, 0, 297, 210);
+      } else {
+        doc.addPage('a4', 'potrait');
+        // For portrait pages, use portrait orientation
+        doc.addImage(canvas, 'PNG', 0, 0, 210, 297);
+      }
     }
 
+    progress.value = 100
+    progressText.value = 'Finalizing PDF...'
+    
     loading.value = false
     doc.save(title);
   } catch (error) {
     loading.value = false
+    progress.value = 0
+    progressText.value = ''
     console.error('Error generating PDF:', error)
     throw error
   }
@@ -733,5 +671,29 @@ td {
   bottom: 40px;
   right: 50%;
   font-size: 1em;
+}
+
+/* Landscape page styles */
+.landscape-page {
+  background-color: #ffffff;
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: 210mm; /* Swapped dimensions for landscape */
+  width: 297mm;  /* Swapped dimensions for landscape */
+}
+
+.landscape-page .content.landscape {
+  padding: 3em 4em 2em; /* Adjusted padding for landscape */
+  position: relative;
+  height: 100%;
+  transform: rotate(0deg); /* Ensure no rotation */
+}
+
+.landscape-page .page-number {
+  position: absolute;
+  bottom: 30px;
+  right: 50%;
+  font-size: 1em;
+  transform: translateX(50%);
 }
 </style>

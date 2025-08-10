@@ -10,6 +10,7 @@ import {
   CategoryScale,
   LinearScale,
 } from 'chart.js';
+import DataLabels from 'chartjs-plugin-datalabels'
 ChartJS.register(
   Title,
   Tooltip,
@@ -25,6 +26,7 @@ const props = defineProps<{
   data: MakroDataAPIResponse;
   chartData: any;
   paramKey: keyof ParameterProduktivitasMakro;
+  options: any;
 }>();
 
 // Sort lapangan_usaha berdasarkan rata-rata nilai per tahun.
@@ -125,8 +127,33 @@ const chartOptions = {
   indexAxis: 'y' as any,
   responsive: true,
   maintainAspectRatio: false,
-  aspectRatio: 0.3,
+  aspectRatio: 0.15,
   plugins: {
+    datalabels: {
+      display: props.options?.datalabels !== false,
+      anchor: 'end',
+      align: 'right',
+      formatter: function (value) {
+        if (props.options?.unit === 'juta') {
+          return `${(value / 1000000).toFixed(2)}`;
+        } else if (props.options?.unit === 'milyar') {
+          return `${(value / 1000000000).toFixed(2)}`;
+        } else if (props.options?.unit === 'ribu') {
+          return `${(value / 1000).toFixed(2)}`;
+        } else if (props.options?.unit === 'per ribu') {
+          return `${(value * 1000).toFixed(2)}`;
+        }  else if (props.options?.unit === 'per juta') {
+          return `${(value * 1000000).toFixed(2)}`;
+        } else {
+          return `${value.toFixed(2)} ${props.options?.unit || ''}`;
+        }
+      },
+      color: 'black',
+      font: {
+        weight: 'normal',
+        size: 10
+      }
+    },
     legend: {
       display: false,
       position: "top" as any,
@@ -144,6 +171,7 @@ const chartOptions = {
   scales: {
     x: {
       stacked: false,
+      display: false,
       ticks: {
         color: "#666666",
       },
@@ -170,9 +198,6 @@ const chartOptions = {
         axis.width = Math.max(axis.width, 180);
       }
     },
-  },
-  datalabels: {
-    display: false,
   }
 }
 
@@ -194,8 +219,8 @@ const chartOptions = {
     <!-- Outer container to enable horizontal scrolling -->
     <div class="w-full overflow-y-auto overflow-x-auto custom-scrollbar">
       <!-- Inner container with a larger width to enable scrolling -->
-      <div :style="{maxHeight: 100, height: 100 }">
-                 <Bar :options="chartOptions" :data="chartDataSorted" />
+      <div :style="{maxHeight: 100, height: 100 }" class="px-2">
+                 <Bar :options="chartOptions" :data="chartDataSorted" :plugins="[DataLabels]" />
       </div>
     </div>
   </div>

@@ -5,10 +5,10 @@
       <div class="mx-auto mt-2 overflow-y-auto h-[98vh]">
         <!-- <p class="text-white">{{ rawdata }}</p> -->
         <div class="grid grid-rows-2 gap-1 mx-auto flex-shrink-0">
-          <div class="mx-auto" style="visibility:visible;">
+          <div class="mx-auto flex flex-col w-full" style="visibility:visible;">
             <div
-              class="w-[210mm] absolute top-0 bg-black bg-opacity-25 hover:bg-opacity-75 hover:text-white p-2 mt-2 transition z-50">
-              <div class="flex flex-row justify-end gap-6 ">
+              class="w-[98vw] absolute top-0 left-0 bg-black bg-opacity-25 hover:bg-opacity-75 hover:text-white p-2 mt-2 transition z-50">
+              <div class="flex flex-row justify-center gap-6 ">
                 <button type="button my-auto" class="py-1" @click="generatePDF">
                   <span class="flex items-center">
                     <Icon name="mdi:download-outline" size="24" />
@@ -23,7 +23,7 @@
               </div>
             </div>
             <!-- <p class="text-white"> {{ rawdata }}</p> -->
-            <div class="pdf-content" id="pdfContent-1">
+            <div class="pdf-content mx-auto" id="pdfContent-1">
               <div class="content page-1">
                 <p class="page-number text-center">1</p>
                 <div class="p-2 flex mb-4">
@@ -99,7 +99,7 @@
                       </div>
                     </li>
                     <li>
-                      <p>2. Pertumbuhan Produktivitas Tenaga Kerja yoy :</p>
+                      <p>2. Pertumbuhan Produktivitas Tenaga Kerja yoy (%) :</p>
                       <div class="w-[120mm]">
                         <GraphReportingLineChart :chart-data="data_2" title="" :key="state" :millions="false"
                           :options="{ legends: false, datalabels: true }" />
@@ -109,9 +109,32 @@
                 </div>
               </div>
             </div>
-            <div class="pdf-content" id="pdfContent-2">
+            <div class="pdf-content mx-auto" id="pdfContent-2">
               <div class="content page-2">
                 <p class="page-number text-center">2</p>
+                <div class="border border-black p-2 mb-4">
+                  <ol class="list-none ml-2 text-sm" start="3">
+                    <li>
+                      <p>3. Produktivitas Upah (Rp juta/orang/tahun):</p>
+                      <div class="w-[120mm]">
+                        <GraphReportingLineChart :chart-data="data_3" title="" :millions="true" :key="state" 
+                          :options="{ legends: false, datalabels: true }" />
+                      </div>
+                    </li>
+                    <li>
+                      <p>4. Produktivitas Jam Kerja (Rp juta/orang/jam) :</p>
+                      <div class="w-[120mm]">
+                        <GraphReportingLineChart :chart-data="data_4" title="" :millions="true" :key="state"
+                          :options="{ legends: false, datalabels: true }" />
+                      </div>
+                    </li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+            <div class="pdf-content mx-auto" id="pdfContent-3">
+              <div class="content page-3">
+                <p class="page-number text-center">3</p>
                 <div class="border border-black p-2 mb-4">
                   <p class="text-lg font-bold">Hasil Pengukuran Produktivitas Makro</p>
                   <ol class="list-none ml-2 text-sm mt-4">
@@ -124,7 +147,7 @@
                           <tr>
                             <td class="px-2 py-1 w-[10%]">{{ data_6["Sektor PDRB terbesar"][0] }}</td>
                             <td class="px-2 py-1 w-[55%]">{{ data_6["Sektor PDRB terbesar"][1] }}</td>
-                            <td class="px-2 py-1 w-[35%] text-right">{{ data_6["Sektor PDRB terbesar"][2] }}</td>
+                            <td class="px-2 py-1 w-[35%] text-right">{{ data_6["Sektor PDRB terbesar"][2] }} Juta</td>
                           </tr>
                         </tbody>
                       </table>
@@ -138,7 +161,7 @@
                           <tr>
                             <td class="px-2 py-1 w-[10%]">{{ data_6["Sektor Penyerapan TK terbesar"][0] }}</td>
                             <td class="px-2 py-1 w-[55%]">{{ data_6["Sektor Penyerapan TK terbesar"][1] }}</td>
-                            <td class="px-2 py-1 w-[35%] text-right">{{ data_6["Sektor Penyerapan TK terbesar"][2] }} orang</td>
+                            <td class="px-2 py-1 w-[35%] text-right">{{ data_6["Sektor Penyerapan TK terbesar"][2] }} Orang</td>
                           </tr>
                         </tbody>
                       </table>
@@ -152,7 +175,7 @@
                           <tr>
                             <td class="px-2 py-1 w-[10%]">{{ data_6["Sektor Produktivitas terbesar"][0] }}</td>
                             <td class="px-2 py-1 w-[55%]">{{ data_6["Sektor Produktivitas terbesar"][1] }}</td>
-                            <td class="px-2 py-1 w-[35%] text-right">{{ data_6["Sektor Produktivitas terbesar"][2] }} <p class="text-xs">per orang/tahun</p></td>
+                            <td class="px-2 py-1 w-[35%] text-right">{{ data_6["Sektor Produktivitas terbesar"][2] }} <p class="text-xs">per Orang/Tahun</p></td>
                           </tr>
                         </tbody>
                       </table>
@@ -166,7 +189,7 @@
                           <tr>
                             <td class="px-2 py-1 w-[10%]">{{ data_6["Sektor Produktivitas terendah"][0] }}</td>
                             <td class="px-2 py-1 w-[55%]">{{ data_6["Sektor Produktivitas terendah"][1] }}</td>
-                            <td class="px-2 py-1 w-[35%] text-right">{{ data_6["Sektor Produktivitas terendah"][2] }} <p class="text-xs">per orang/tahun</p></td>
+                            <td class="px-2 py-1 w-[35%] text-right">{{ data_6["Sektor Produktivitas terendah"][2] }} <p class="text-xs">per Orang/Tahun</p></td>
                           </tr>
                         </tbody>
                       </table>
@@ -203,14 +226,14 @@
                 </div>
               </div>
             </div>
-            <div class="pdf-content landscape-page" id="pdfContent-3">
-                <div class="content page-3 landscape">
-                  <p class="page-number text-center">3</p>
+            <div class="pdf-content landscape-page mx-auto" id="pdfContent-4">
+                <div class="content page-4 landscape">
+                  <p class="page-number text-center">4</p>
                   <div class="border border-black p-2 mb-4">
                     <p class="text-lg font-bold mb-1">Hasil Pengukuran Produktivitas Makro Per Daerah Tingkat I</p>
                     <p class="text-center text-sm mb-3">Tabel 1. Pengukuran Produktivitas Makro DKI Jakarta</p>
                     <table class="w-full text-xs font-normal">
-                      <thead>
+                      <thead class="bg-gray-200 text-center">
                         <tr class="border-b border-gray-300">
                           <td class="w-[5%] text-center font-semibold" rowspan="2">No</td>
                           <td class="w-[8%] text-center font-semibold" rowspan="2">Kode</td>
@@ -243,9 +266,9 @@
             <div
               v-for="(region, regionIndex) in Object.keys(rawdata.kota).filter(key => key !== 'Provinsi DKI Jakarta')"
               :key="`region-${region}`">
-              <div class="pdf-content landscape-page" :id="`pdfContent-${4 + regionIndex * 3}`">
-                <div class="content page-4 landscape">
-                  <p class="page-number text-center">{{ regionIndex + 4 }}</p>
+              <div class="pdf-content landscape-page mx-auto" :id="`pdfContent-${5 + regionIndex}`">
+                <div class="content page-5 landscape">
+                  <p class="page-number text-center">{{ regionIndex + 5 }}</p>
                   <div class="border border-black p-2 mb-4">
                     <p class="text-lg font-bold mb-1">Hasil Pengukuran Produktivitas Makro Per Daerah Tingkat II (Dalam
                       Diagram)</p>
@@ -253,12 +276,12 @@
                       rawdata.kota[region].nama
                       }}</p>
                     <table class="w-full text-xs font-normal">
-                      <thead>
+                      <thead class="bg-gray-200 text-center">
                         <tr class="border-b border-gray-300">
                           <td class="w-[5%] text-center font-semibold" rowspan="2">No</td>
                           <td class="w-[8%] text-center font-semibold" rowspan="2">Kode</td>
                           <td class="w-[42%] font-semibold" rowspan="2">Deskripsi</td>
-                          <td class="w-[45%] text-center font-semibold" colspan="5">Produktivitas (rp/orang/tahun)</td>
+                          <td class="w-[45%] text-center font-semibold" colspan="5">Produktivitas (Rp juta/orang/tahun)</td>
                         </tr>
                         <tr class="border-b border-gray-300">
                           <td v-for="year in rawdata.metadata.tahun.slice(-5)" :key="year" class="w-[9%] text-center font-semibold">
@@ -287,7 +310,8 @@
         </div>
       </div>
     </div>
-    <Loading v-if="loading" text="Generating Report..." />
+    <Loading v-if="loading" text="Generating Report..." :progress="progress" :progress-text="progressText">
+    </Loading>
   </div>
 
 </template>
@@ -310,6 +334,8 @@ const latestIndex = props.rawdata.metadata.tahun.length - 1
 const state = ref(0)
 
 const loading = ref(false)
+const progress = ref(0)
+const progressText = ref('')
 
 const data_1 = computed(() => {
   let dataset = {
@@ -536,6 +562,8 @@ const data_8 = computed(() => {
 const generatePDF = async () => {
   try {
     loading.value = true
+    progress.value = 0
+    progressText.value = 'Initializing PDF generation...'
     let title = `[example] Sertifikat_Produktivitas.pdf`
 
     const doc = new jsPDF({
@@ -553,33 +581,49 @@ const generatePDF = async () => {
       return aNum - bNum;
     });
 
-    for (let i = 0; i < sortedElements.length; i++) {
-      console.log(`Processing page ${i + 1}`)
+    const totalPages = sortedElements.length;
+    progressText.value = `Found ${totalPages} pages to process`
+
+    for (let i = 0; i < totalPages; i++) {
+      const currentPage = i + 1;
+      const percentage = Math.round((currentPage / totalPages) * 100);
+      progress.value = percentage;
+      progressText.value = `Processing page ${currentPage} of ${totalPages}...`
+      
+      // console.log(`Processing page ${currentPage}`)
       const element = sortedElements[i];
       const pageNum = element.id.replace('pdfContent-', '');
       
-      // Check if this is a landscape page (after page 3)
-      const isLandscape = parseInt(pageNum) > 3;
+      // Check if this is a landscape page (after page 4)
+      const isLandscape = parseInt(pageNum) >= 4;
       
       let canvas = await html2canvas(element, {
         scale: 2,
       });
       
-      if (i > 0) doc.addPage();
-      
-      if (isLandscape) {
-        // For landscape pages, use landscape orientation
+      if (i === 0) {
+        // First page - use the initial page that's already created
+        doc.addImage(canvas, 'PNG', 0, 0, 210, 297);
+      } else if (isLandscape) {
+        // Add new landscape page
+        doc.addPage('a4', 'landscape');
         doc.addImage(canvas, 'PNG', 0, 0, 297, 210);
       } else {
-        // For portrait pages, use portrait orientation
+        // Add new portrait page
+        doc.addPage('a4', 'portrait');
         doc.addImage(canvas, 'PNG', 0, 0, 210, 297);
       }
     }
 
+    progress.value = 100
+    progressText.value = 'Finalizing PDF...'
+    
     loading.value = false
     doc.save(title);
   } catch (error) {
     loading.value = false
+    progress.value = 0
+    progressText.value = ''
     console.error('Error generating PDF:', error)
     throw error
   }

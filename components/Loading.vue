@@ -12,12 +12,31 @@
       </svg>
       <span class="sr-only">Loading...</span>
       <p class="mt-2 text-4xl font-bold text-white">{{ text }}</p>
+      
+      <!-- Progress Bar -->
+      <div v-if="progress !== undefined" class="mt-4 w-80 mx-auto">
+        <div class="flex justify-between text-sm text-white mb-2">
+          <span>Progress</span>
+          <span>{{ Math.round(progress) }}%</span>
+        </div>
+        <div class="w-full bg-gray-700 rounded-full h-3">
+          <div class="bg-green-600 h-3 rounded-full transition-all duration-300 ease-out" 
+               :style="{ width: `${progress}%` }"></div>
+        </div>
+        <p v-if="progressText" class="mt-2 text-sm text-gray-300">{{ progressText }}</p>
+      </div>
+      
+      <slot name="subtext"></slot>
     </div>
   </div>
 </template>
 
 <script setup>
-const props = defineProps(['text'])
+const props = defineProps({
+  text: String,
+  progress: Number,
+  progressText: String
+})
 </script>
 
 <style scoped>
