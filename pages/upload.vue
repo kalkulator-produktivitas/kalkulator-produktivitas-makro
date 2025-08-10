@@ -1,7 +1,8 @@
 <template>
-  <div>
-    <div class="md:mx-auto mt-6 mx-auto flex">
+  <div >
+    <div class="md:mx-auto mt-6 mx-auto flex" v-if="loaded">
       <div class="flex shrink-0 w-[3%]">
+        {{ selectedProvince }}
       </div>
       <div class="px-1 py-1 absolute flex top-5 left-[12%] items-center bg-blue-700 rounded-full z-10">
         <Icon name="mdi:arrow-left-circle" class="cursor-pointer rounded-full border border-white bg-white"
@@ -33,10 +34,11 @@
               <div class="flex gap-4">
 
                 <div class="border border-slate-200 rounded-lg p-6 mx-auto">
-                  <div class="flex justify-between">
-                    <p class="block text-md text-gray-700 mb-2 w-[20%]">
+                  <p class="block text-md text-gray-700 mb-2 w-[20%]">
                       Pilih File Excel
                     </p>
+                  <div class="flex justify-between">
+                    
                     <div class="flex mb-4 w-full justify-between">
                       <!-- Province Selection (shown when templateType is 'province') -->
                       <div v-if="templateType === 'province'" class="flex gap-2">
@@ -56,7 +58,8 @@
                       </div>
 
                       <!-- City Selection (shown when templateType is 'city') -->
-                      <div v-if="templateType === 'city'" class="flex gap-2">
+                      <div v-if="templateType === 'city'" class="gap-2">
+                        <div class="flex gap-2">
                         <select v-model="selectedProvinceForCity"
                           @change="getKotaList"
                           class="p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-[200px]">
@@ -74,16 +77,25 @@
                             {{ kota.nama }}
                           </option>
                         </select>
-
-                        <a class="text-[#034EA2] hover:underline cursor-pointer my-auto flex items-center"
+                      <a class="text-[#034EA2] hover:underline cursor-pointer my-auto flex items-center"
                           :class="{ 'opacity-50 cursor-not-allowed': !selectedCity }"
                           @click="downloadCityTemplate">
                           <Icon name="mdi:download" size="6mm" class="text-[#034EA2] my-auto" />
                           Download Template
-                        </a>
+                        </a>  
+                      </div>
+                       
+                        
+
+                    <div class="flex mt-2 justify-center">
+                      <p class="text-sm my-auto mr-4">Masukkan Tahun</p>
+                    <input type="number" v-model="tahunInput" class="p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-[100px] text-center">
+                      </div>
                       </div>
                     </div>
                   </div>
+
+                  
                   <div class="border-2 border-dashed border-green-700 bg-green-50 rounded-lg p-8 text-center relative">
                     <div class="flex flex-col items-center">
                       <Icon name="mdi:cloud-upload-outline" size="12mm"
@@ -103,7 +115,7 @@
         </div>
       </div>
     </div>
-    <div class="md:mx-auto mt-6 mx-auto flex">
+    <div class="md:mx-auto mt-6 mx-auto flex" v-if="loaded">
       <div class="shrink-0 w-[5%]"></div>
       <div class="border border-slate-200 rounded-lg p-6 w-[92vw] flex flex-col overflow-y-auto max-h-[300px] relative">
         <h2 class="text-[#034EA2] font-bold mb-4">Uploaded Files</h2>
@@ -184,7 +196,7 @@
 
 <script setup>
 const global = useRuntimeConfig();
-import { getUploadsList, postUpload, getTemplate, getTemplateKota } from '~/_service/upload/uploads';
+import { getUploadsList, postUpload, getTemplate, getTemplateKota, postUploadKota } from '~/_service/upload/uploads';
 import { getProvince, getCity } from '~/_service/navigasi/nav';
 import { useRequest } from '~/composables/useRequest';
 import { ErrorApiResponse } from '~/_service/http/schema';
@@ -193,6 +205,7 @@ const selectedFile = ref(null);
 
 const uploadList = useRequest(getUploadsList);
 const upload = useRequest(postUpload);
+const uploadKota = useRequest(postUploadKota);
 const template = useRequest(getTemplate);
 const templateKota = useRequest(getTemplateKota);
 const uploaded = ref([]);
@@ -203,22 +216,14 @@ const templateType = ref('province')
 const selectedProvince = ref('')
 const selectedProvinceForCity = ref('')
 const selectedCity = ref('')
+const tahunInput = ref(2020)
 
 const provinceList = useRequest(getProvince);
 const kotaList = useRequest(getCity);
 const provinces = ref([])
 const kotas = ref([])
 
-try {
-  const res = await provinceList.call()
-  provinces.value = res.list
-} catch (e) {
-  if (e instanceof ErrorApiResponse) {
-    console.error(`ERROR | code: ${e.code} | message: ${e.message}`)
-  } else {
-    console.error('UNKNOWN ERROR: ', (e)?.message ?? 'Unknown Error')
-  }
-}
+const loaded = ref(false)
 
 const modal = ref({
   show: false,
@@ -229,10 +234,14 @@ const modal = ref({
 
 const loading = ref(false);
 
-try {
-  const res = await uploadList.call()
-  uploaded.value = res.list
-} catch (e) {
+onMounted(async () => {   
+  try {
+    const res = await provinceList.call()
+    provinces.value = res.list
+    const res2  = await uploadList.call()
+    uploaded.value = res2.list
+    loaded.value = true
+  } catch (e) {
   if (e instanceof ErrorApiResponse) {
     // console.log(e);
     console.error(`ERROR | code: ${e.code} | message: ${e.message}`)
@@ -249,6 +258,9 @@ try {
     loading.value = false
   }
 }
+})
+
+
 
 const dateFormatter = (date) => {
   return new Date(date).toLocaleString('en-US', {
@@ -271,8 +283,14 @@ const uploadFile = async () => {
     const formData = new FormData()
     formData.append('file', selectedFile.value)
 
-    // Pass the FormData to the upload call
-    await upload.call(formData, "dki_jakarta")
+    if (templateType.value === 'province') {
+      // Pass the FormData to the upload call
+      await upload.call(formData, selectedProvince.value)
+    } else {
+      // Pass the FormData to the upload call
+      console.log(selectedCity.value)
+      await uploadKota.call(formData, selectedCity.value, tahunInput.value)
+    }
 
     // Refresh the list after successful upload
     const res = await uploadList.call("dki_jakarta")

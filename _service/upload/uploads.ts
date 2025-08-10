@@ -21,6 +21,16 @@ export const postUpload = (formData: any, id_provinsi: string): Promise<ApiSucce
   })
 }
 
+export const postUploadKota = (formData: any, id_kota: string, tahun: string): Promise<ApiSuccessResponse<any>> => {
+  return request({
+    url: `/v1/makro/files/kota?id_kota=${id_kota}&tahun=${tahun}`,
+    method: 'POST',
+    skipAuthToken: true,
+    contentType: 'multipart/form-data',
+    body: formData
+  })
+}
+
 export const getTemplate = (): Promise<ApiSuccessResponse<any>> => {
   return request({
     url: `/v1/makro/files/template?id_provinsi=dki_jakarta`,
