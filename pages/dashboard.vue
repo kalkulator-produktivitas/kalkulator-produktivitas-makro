@@ -8,7 +8,8 @@
         <p class="font-bold text-xl">Dashboard Produktivitas Makro</p>
         <div class="mt-2 flex gap-4 justify-between w-[70%]">
           <div class="flex gap-4">
-            <div class="px-2 py-3 flex items-center bg-[#034EA2] text-white hover:bg-[#023b7d] transition-all duration-300 rounded-full text-sm">
+            <div
+              class="px-2 py-3 flex items-center bg-[#034EA2] text-white hover:bg-[#023b7d] transition-all duration-300 rounded-full text-sm">
               <Icon name="mdi:arrow-left-circle" class="cursor-pointer rounded-full border border-white bg-white"
                 @click="navigateTo('/')" size="20" />
               <p class="text-white cursor-pointer mr-2" @click="navigateTo('/')">Back</p>
@@ -24,19 +25,17 @@
           <div class="w-full flex justify-center items-center gap-4">
             <div class="flex items-center gap-2">
               <label class="text-sm text-gray-700 font-medium">From:</label>
-              <select v-model="yearSlider.minValue" 
+              <select v-model="yearSlider.minValue"
                 class="px-3 py-1.5 rounded-lg border border-blue-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option v-for="year in years" :key="year" :value="year" class="py-1">
                   {{ year }}
                 </option>
               </select>
             </div>
-            
+
             <div class="flex items-center gap-2">
               <label class="text-sm text-gray-700 font-medium">To:</label>
-              <select v-model="yearSlider.maxValue" 
-                :class="`px-3 py-1.5 rounded-lg border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  !isYearRangeValid ? 'border-red-300 focus:ring-red-500' : 'border-blue-200 focus:ring-blue-500'
+              <select v-model="yearSlider.maxValue" :class="`px-3 py-1.5 rounded-lg border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${!isYearRangeValid ? 'border-red-300 focus:ring-red-500' : 'border-blue-200 focus:ring-blue-500'
                 }`">
                 <option v-for="year in availableToYears" :key="year" :value="year" class="py-1">
                   {{ year }}
@@ -49,10 +48,9 @@
               Submit
             </button>
           </div>
-          
+
           <!-- Validation message -->
-          <div v-if="yearSlider.minValue && yearSlider.maxValue && !isYearRangeValid" 
-               class="text-center mt-2">
+          <div v-if="yearSlider.minValue && yearSlider.maxValue && !isYearRangeValid" class="text-center mt-2">
             <p class="text-red-500 text-sm">"To" year cannot be lower than "From" year</p>
           </div>
 
@@ -69,7 +67,7 @@
           <div class="w-full">
             <!-- Toggle Sidebar Button -->
             <div class="flex justify-end mb-4">
-              <button @click="toggleSidebar" 
+              <button @click="toggleSidebar"
                 class="flex items-center gap-2 px-3 py-2 bg-[#034EA2] text-white rounded-lg hover:bg-[#023b7d] transition-all duration-300">
                 <Icon :name="sidebarOpen ? 'mdi:chevron-right' : 'mdi:chevron-left'" size="20" />
                 <span class="text-sm">{{ sidebarOpen ? 'Hide' : 'Show' }} Filters</span>
@@ -91,15 +89,16 @@
                   :options="{ legends: false, datalabels: true, height: '320px' }" />
               </div>
               <div class="">
-                <GraphMacroLineChart :chart-data="data_8" title="Produktivitas Bruto Dalam Negeri" :key="state"
-                  :millions="true" :options="{ legends: false, datalabels: true, height: '320px' }" />
+                <GraphMacroLineChart :chart-data="data_8"
+                  title="Produktivitas Domestik Regional Bruto Atas Dasar Harga Konstan" :key="state" :millions="true"
+                  :options="{ legends: false, datalabels: true, height: '320px' }" />
               </div>
               <div class="">
-                <GraphMacroLineChart :chart-data="data_9" title="Jumlah Tenaga Kerja" :key="state"
-                  :millions="false" :options="{ legends: false, datalabels: true, height: '320px' }" />
+                <GraphMacroLineChart :chart-data="data_9" title="Jumlah Tenaga Kerja" :key="state" :millions="false"
+                  :options="{ legends: false, datalabels: true, height: '320px' }" />
               </div>
             </div>
-            
+
             <!-- Additional Line Chart Section -->
             <!-- <div class="mt-4 w-full">
               <GraphMacroLineChart 
@@ -111,43 +110,18 @@
                 :options="{ legends: true, datalabels: false, fullWidth: true, height: '450px' }" 
               />
             </div> -->
-            
+
             <!-- Bar Charts Section - 2 Columns -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
-              <GraphMacroHorizontalBarChart 
-                v-if="dashboardApi.data"
-                title="Produktivitas Tenaga Kerja (Rp milyar/orang/tahun)"
-                paramKey="produktivitas_tenaga_kerja"
-                :data="dashboardApi.data.value"
-                :chart-data="data_4"
-                :key="state"
-                :options="{ datalabels: true, unit: 'milyar' }"
-              />
-              <GraphMacroHorizontalBarChart 
-                v-if="dashboardApi.data"
-                title="Produktivitas Jam Kerja (Rp juta/orang/jam)"
-                paramKey="produktivitas_jam_kerja"
-                :data="dashboardApi.data.value"
-                :chart-data="data_5"
-                :key="state"
-              />
-              <GraphMacroHorizontalBarChart 
-                v-if="dashboardApi.data"
-                title="Produktivitas Upah (Rp /orang/tahun)"
-                paramKey="produktivitas_upah"
-                :data="dashboardApi.data.value"
-                :chart-data="data_6"
-                :key="state"
-                :options="{ datalabels: true, unit: 'per juta' }"
-              />
-              <GraphMacroHorizontalBarChart 
-                v-if="dashboardApi.data"
-                title="Pertumbuhan Produktivitas Tenaga Kerja (%)"
-                paramKey="growth_produktivitas_tenaga_kerja"
-                :data="dashboardApi.data.value"
-                :chart-data="data_7"
-                :key="state"
-              />
+              <GraphMacroStackedBarChart v-if="dashboardApi.data"
+                title="Produktivitas Tenaga Kerja (Rp milyar/orang/tahun)" :chart-data="data_4" :key="state"
+                :ribuan="true" />
+              <GraphMacroStackedBarChart v-if="dashboardApi.data" title="Produktivitas Jam Kerja (Rp juta/orang/jam)"
+                :chart-data="data_5" :key="state" :ribuan="false" :options="{ unit: 'juta' }" />
+              <GraphMacroStackedBarChart v-if="dashboardApi.data" title="Produktivitas Upah (Rp /orang/tahun)"
+                :chart-data="data_6" :key="state" :options="{ unit: 'per ribu' }" />
+              <GraphMacroHorizontalBarChart v-if="dashboardApi.data" title="Pertumbuhan Produktivitas Tenaga Kerja (%)"
+                :data="rawData2" :chart-data="data_7" :key="state" :options="{ unit: '%' }" />
             </div>
           </div>
 
@@ -155,9 +129,10 @@
           <div v-if="sidebarOpen" class="fixed inset-0 z-50">
             <!-- Darkened Overlay -->
             <div class="absolute inset-0 bg-black bg-opacity-50" @click="toggleSidebar"></div>
-            
+
             <!-- Sidebar Panel -->
-            <div class="absolute right-0 top-0 h-full w-80 bg-white shadow-xl transform transition-transform duration-300 ease-in-out">
+            <div
+              class="absolute right-0 top-0 h-full w-80 bg-white shadow-xl transform transition-transform duration-300 ease-in-out">
               <div class="h-full flex flex-col">
                 <!-- Header -->
                 <div class="flex justify-between items-start border-b border-slate-300 p-4">
@@ -169,7 +144,7 @@
                     <Icon name="mdi:close" size="24" />
                   </button>
                 </div>
-                
+
                 <!-- Filter Actions -->
                 <div class="flex gap-2 p-4 border-b border-slate-200">
                   <button @click="addAll"
@@ -181,7 +156,7 @@
                     Hapus Semua
                   </button>
                 </div>
-                
+
                 <!-- Filter List -->
                 <div class="flex-1 overflow-y-auto p-4">
                   <div v-for="usaha of lapanganUsaha" :key="usaha.nama" class="flex items-start mb-3"
@@ -221,7 +196,7 @@ import { getDashboardApi, getYearsApi } from '~/_service/dashboard/dashboardData
 import { getCity, getProvince } from '~/_service/navigasi/nav';
 import { useRequest } from '~/composables/useRequest';
 import { ErrorApiResponse } from '~/_service/http/schema';
-import { ChartColors, BrightColors } from '~/assets/helpers/colors'
+import { ChartColors, BrightColors, PastelColors } from '~/assets/helpers/colors'
 import { kodeUsaha } from '~/assets/helpers/kode_usaha'
 
 const route = useRoute()
@@ -263,7 +238,7 @@ try {
   isLoading.value = true
   years.value = await yearsApi.call(route.query.id_provinsi)
   years.value = years.value.tahun
-  if (years.value.length !== 0) { 
+  if (years.value.length !== 0) {
     buttonActive.value = true
     yearSlider.value.min = Math.min(...years.value)
     yearSlider.value.max = Math.max(...years.value)
@@ -500,7 +475,7 @@ const data_1_new = computed(() => {
   // Add all cities data
   if (rawData2.value["kota"] && rawData2.value["kota"].length > 0) {
     const colors = ["#E74C3C", "#F39C12", "#27AE60", "#8E44AD", "#3498DB", "#E67E22", "#1ABC9C", "#9B59B6"]
-    
+
     rawData2.value["kota"].forEach((kota, index) => {
       const kotaData = kota?.agregat?.produktivitas_tenaga_kerja || []
       if (kotaData.length > 0) {
@@ -524,12 +499,12 @@ const data_2_new = computed(() => {
     labels: [],
     datasets: [],
   }
-  
+
   // Check if rawData2 exists and has required properties
   if (!rawData2.value || !rawData2.value.provinsi || !rawData2.value.metadata) {
     return dataset
   }
-  
+
   // Add province data
   const provinsiData = rawData2.value["provinsi"]["agregat"]["growth_produktivitas_tenaga_kerja"] || []
   if (provinsiData.length > 0) {
@@ -544,7 +519,7 @@ const data_2_new = computed(() => {
   // Add all cities data
   if (rawData2.value["kota"] && rawData2.value["kota"].length > 0) {
     const colors = ["#E74C3C", "#F39C12", "#27AE60", "#8E44AD", "#3498DB", "#E67E22", "#1ABC9C", "#9B59B6"]
-    
+
     rawData2.value["kota"].forEach((kota, index) => {
       const kotaData = kota?.agregat?.growth_produktivitas_tenaga_kerja || []
       if (kotaData.length > 0) {
@@ -568,12 +543,12 @@ const data_3_new = computed(() => {
     labels: [],
     datasets: [],
   }
-  
+
   // Check if rawData2 exists and has required properties
   if (!rawData2.value || !rawData2.value.provinsi || !rawData2.value.metadata) {
     return dataset
   }
-  
+
   // Add province data
   const provinsiData = rawData2.value["provinsi"]["agregat"]["produktivitas_upah"] || []
   if (provinsiData.length > 0) {
@@ -588,7 +563,7 @@ const data_3_new = computed(() => {
   // Add all cities data
   if (rawData2.value["kota"] && rawData2.value["kota"].length > 0) {
     const colors = ["#E74C3C", "#F39C12", "#27AE60", "#8E44AD", "#3498DB", "#E67E22", "#1ABC9C", "#9B59B6"]
-    
+
     rawData2.value["kota"].forEach((kota, index) => {
       const kotaData = kota?.agregat?.produktivitas_upah || []
       if (kotaData.length > 0) {
@@ -631,7 +606,7 @@ const data_8 = computed(() => {
   // Add all cities data
   if (rawData2.value["kota"] && rawData2.value["kota"].length > 0) {
     const colors = ["#E74C3C", "#F39C12", "#27AE60", "#8E44AD", "#3498DB", "#E67E22", "#1ABC9C", "#9B59B6"]
-    
+
     rawData2.value["kota"].forEach((kota, index) => {
       const kotaData = kota?.agregat?.pdrb_adhk || []
       if (kotaData.length > 0) {
@@ -676,7 +651,7 @@ const data_9 = computed(() => {
   // Add all cities data
   if (rawData2.value["kota"] && rawData2.value["kota"].length > 0) {
     const colors = ["#E74C3C", "#F39C12", "#27AE60", "#8E44AD", "#3498DB", "#E67E22", "#1ABC9C", "#9B59B6"]
-    
+
     rawData2.value["kota"].forEach((kota, index) => {
       const kotaData = kota?.agregat?.jumlah_tenaga_kerja_bekerja || []
       if (kotaData.length > 0) {
@@ -697,33 +672,33 @@ const data_9 = computed(() => {
 
 const data_4 = computed(() => {
   let dataNew = data.value
-  
+
   const dataset = {
     labels: [],
     datasets: [],
   }
-  
+
   // Check if required data exists
   if (!rawData2.value?.metadata?.tahun || !dataNew) {
     return dataset
   }
-  
-  for (let year of rawData2.value.metadata.tahun) {
-    dataset.datasets.push({
-      label: year,
-      data: [],
-      backgroundColor: BrightColors[rawData2.value.metadata.tahun.indexOf(year)],
-      borderRadius: 100,
-    })
-  }
 
-  for (let x in dataNew) {
-    dataset.labels.push(`${kodeUsaha[x] || x}`)
-    for (let i = 0; i <= rawData2.value.metadata.tahun.length - 1; i++) {
-      const value = dataNew[x]?.['produktivitas_tenaga_kerja']?.[i]
-      dataset.datasets[i].data.push(parseFloat(value) || 0)
+  // Set years as labels (x-axis)
+  dataset.labels = rawData2.value.metadata.tahun
+
+  // Create a dataset for each lapangan usaha (sector)
+  for (let kode in dataNew) {
+    const sectorData = dataNew[kode]?.['produktivitas_tenaga_kerja'] || []
+    if (sectorData.length > 0) {
+      dataset.datasets.push({
+        label: kodeUsaha[kode] || kode,
+        data: sectorData.map(val => parseFloat(val) || 0),
+        backgroundColor: BrightColors[dataset.datasets.length % BrightColors.length],
+        borderRadius: 5,
+      })
     }
   }
+
   return dataset
 })
 
@@ -732,15 +707,15 @@ const data_4_line = computed(() => {
     labels: [],
     datasets: [],
   }
-  
+
   // Check if required data exists
   if (!rawData2.value?.metadata?.tahun || !data.value) {
     return dataset
   }
-  
+
   // Create a dataset for each lapangan usaha kode
   const colors = ["#3867D6", "#E74C3C", "#F39C12", "#27AE60", "#8E44AD", "#3498DB", "#E67E22", "#1ABC9C", "#9B59B6", "#34495E", "#95A5A6", "#F1C40F", "#E91E63", "#9C27B0", "#673AB7", "#3F51B5", "#2196F3", "#00BCD4"]
-  
+
   for (let kode in data.value) {
     const kodeData = data.value[kode]?.produktivitas_tenaga_kerja || []
     if (kodeData.length > 0) {
@@ -752,102 +727,116 @@ const data_4_line = computed(() => {
       })
     }
   }
-  
+
   dataset.labels = (rawData2.value.metadata.tahun || []).slice(0, Math.max(...dataset.datasets.map(ds => ds.data.length)))
-  
+
   return dataset
 })
 
 const data_5 = computed(() => {
   let dataNew = data.value
+
   const dataset = {
     labels: [],
     datasets: [],
   }
-  
+
   // Check if required data exists
   if (!rawData2.value?.metadata?.tahun || !dataNew) {
     return dataset
   }
-  
-  for (let year of rawData2.value.metadata.tahun) {
-    dataset.datasets.push({
-      label: year,
-      data: [],
-      backgroundColor: BrightColors[rawData2.value.metadata.tahun.indexOf(year)],
-      borderRadius: 100,
-    })
-  }
 
-  for (let x in dataNew) {
-    dataset.labels.push(`${kodeUsaha[x] || x}`)
-    for (let i = 0; i <= rawData2.value.metadata.tahun.length - 1; i++) {
-      const value = dataNew[x]?.['produktivitas_jam_kerja']?.[i]
-      dataset.datasets[i].data.push(parseFloat(value) || 0)
+  // Set years as labels (x-axis)
+  dataset.labels = rawData2.value.metadata.tahun
+
+  // Create a dataset for each lapangan usaha (sector)
+  for (let kode in dataNew) {
+    const sectorData = dataNew[kode]?.['produktivitas_jam_kerja'] || []
+    if (sectorData.length > 0) {
+      dataset.datasets.push({
+        label: kodeUsaha[kode] || kode,
+        data: sectorData.map(val => parseFloat(val) || 0),
+        backgroundColor: BrightColors[dataset.datasets.length % BrightColors.length],
+        borderRadius: 5,
+      })
     }
   }
+
   return dataset
 })
 
 const data_6 = computed(() => {
   let dataNew = data.value
+
   const dataset = {
     labels: [],
     datasets: [],
   }
-  
+
   // Check if required data exists
   if (!rawData2.value?.metadata?.tahun || !dataNew) {
     return dataset
   }
-  
-  for (let year of rawData2.value.metadata.tahun) {
-    dataset.datasets.push({
-      label: year,
-      data: [],
-      backgroundColor: BrightColors[rawData2.value.metadata.tahun.indexOf(year)],
-      borderRadius: 100,
-    })
-  }
 
-  for (let x in dataNew) {
-    dataset.labels.push(`${kodeUsaha[x] || x}`)
-    for (let i = 0; i <= rawData2.value.metadata.tahun.length - 1; i++) {
-      const value = dataNew[x]?.['produktivitas_upah']?.[i]
-      dataset.datasets[i].data.push(parseFloat(value) || 0)
+  // Set years as labels (x-axis)
+  dataset.labels = rawData2.value.metadata.tahun
+
+  // Create a dataset for each lapangan usaha (sector)
+  for (let kode in dataNew) {
+    const sectorData = dataNew[kode]?.['produktivitas_upah'] || []
+    if (sectorData.length > 0) {
+      dataset.datasets.push({
+        label: kodeUsaha[kode] || kode,
+        data: sectorData.map(val => parseFloat(val) || 0),
+        backgroundColor: BrightColors[dataset.datasets.length % BrightColors.length],
+        borderRadius: 5,
+      })
     }
   }
+
   return dataset
 })
 
 const data_7 = computed(() => {
   let dataNew = data.value
+
   const dataset = {
     labels: [],
     datasets: [],
+    metadata: {
+      tahun: []
+    }
   }
-  
+
   // Check if required data exists
   if (!rawData2.value?.metadata?.tahun || !dataNew) {
     return dataset
   }
-  
-  for (let year of rawData2.value.metadata.tahun) {
+
+  // Set sectors as labels (y-axis for horizontal bar chart)
+  const sectors = Object.keys(dataNew).map(kode => kodeUsaha[kode] || kode)
+  dataset.labels = sectors
+
+  // Add metadata for the legend - this is what the component expects
+  dataset.metadata.tahun = rawData2.value.metadata.tahun
+
+  // Create a dataset for each year
+  const years = rawData2.value.metadata.tahun
+  years.forEach((year, yearIndex) => {
+    const yearData = sectors.map(sector => {
+      const kode = Object.keys(dataNew).find(k => kodeUsaha[k] === sector || k === sector)
+      const sectorData = dataNew[kode]?.['growth_produktivitas_tenaga_kerja'] || []
+      return parseFloat(sectorData[yearIndex]) || 0
+    })
+
     dataset.datasets.push({
       label: year,
-      data: [],
-      backgroundColor: BrightColors[rawData2.value.metadata.tahun.indexOf(year)],
-      borderRadius: 100,
+      data: yearData,
+      backgroundColor: BrightColors[yearIndex % BrightColors.length],
+      borderRadius: 5,
     })
-  }
+  })
 
-  for (let x in dataNew) {
-    dataset.labels.push(`Kode ${x}`)
-    for (let i = 0; i <= rawData2.value.metadata.tahun.length - 1; i++) {
-      const value = dataNew[x]?.['growth_produktivitas_tenaga_kerja']?.[i]
-      dataset.datasets[i].data.push(parseFloat(value) || 0)
-    }
-  }
   return dataset
 })
 
@@ -861,8 +850,8 @@ const availableToYears = computed(() => {
 
 // Check if year range is valid
 const isYearRangeValid = computed(() => {
-  return yearSlider.value.minValue && yearSlider.value.maxValue && 
-         yearSlider.value.maxValue >= yearSlider.value.minValue
+  return yearSlider.value.minValue && yearSlider.value.maxValue &&
+    yearSlider.value.maxValue >= yearSlider.value.minValue
 })
 
 // Watch for changes in minValue and adjust maxValue if needed
@@ -895,25 +884,25 @@ const downloadData = async () => {
     isLoading.value = true
     // Reset sidebar state to prevent conflicts
     sidebarOpen.value = false
-    
+
     // Clear existing data first
     rawData2.value = null
     data.value = null
     fullData.value = null
     hasData.value = false
-    
+
     // Clear tab list and rebuild
     tabList.value = []
     if (listProvince) {
       tabList.value.push(listProvince.nama)
     }
-    
+
     if (listKota && listKota.list) {
       listKota.list.forEach(x => {
         tabList.value.push(x.nama)
       })
     }
-    
+
     const res = await dashboardApi.call(yearSlider.value.minValue, yearSlider.value.maxValue, route.query.id_provinsi)
     rawData2.value = res
     data.value = rawData2.value["provinsi"]["lapangan_usaha"]

@@ -2,13 +2,14 @@
   <div
     class="flex flex-col relative bg-white rounded-xl border border-slate-200 hover:shadow-xl transition-shadow duration-300">
     <div class="flex justify-between px-3 pt-2 bg-gradient-to-r rounded-t-xl">
-      
+
       <p class="font-bold text-md ml-2 text-[#034EA2] text-balance">{{ title }}</p>
       <div class="justify-end flex text-xs gap-1">
         <div v-for="year in years" :key="year" class="flex gap-1">
-          <div :style="{ backgroundColor: BrightColors[years.indexOf(year)] }" class="w-2 h-2 rounded-full my-auto"></div>
+          <div :style="{ backgroundColor: BrightColors[years.indexOf(year)] }" class="w-2 h-2 rounded-full my-auto">
+          </div>
           <p class="my-auto">{{ year }}</p>
-        </div>       
+        </div>
       </div>
     </div>
     <!-- Outer container to enable horizontal scrolling -->
@@ -48,7 +49,7 @@ const props = defineProps(['title', 'chartData', 'ribuan', 'years'])
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
-  aspectRatio: 2,
+  aspectRatio: 0.8,
   plugins: {
     legend: {
       display: false,
@@ -69,6 +70,8 @@ const chartOptions = {
       stacked: false,
       ticks: {
         color: "#666666",
+        maxRotation: 90,
+        minRotation: 90,
       },
     },
     y: {

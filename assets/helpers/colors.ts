@@ -67,3 +67,27 @@ export const BrightColors: Array<string> = [
     '#FF8B94', // Bright Salmon
     '#45B7D1', // Bright Azure
 ];
+
+export const PastelColors: Array<string> = [
+    '#FFB3BA', // Pastel Pink
+    '#BAFFC9', // Pastel Green
+    '#BAE1FF', // Pastel Blue
+    '#FFFFBA', // Pastel Yellow
+    '#FFB3F7', // Pastel Purple
+    '#B3FFE6', // Pastel Mint
+    '#FFD4B3', // Pastel Orange
+    '#E6B3FF', // Pastel Lavender
+    '#B3D4FF', // Pastel Sky Blue
+    '#FFE6B3', // Pastel Peach
+    '#B3FFB3', // Pastel Lime
+    '#FFB3D4', // Pastel Rose
+    '#D4B3FF', // Pastel Violet
+    '#B3FFF0', // Pastel Aqua
+    '#FFB3A3', // Pastel Coral
+    '#A3B3FF', // Pastel Periwinkle
+    '#B3A3FF', // Pastel Indigo
+    '#FFA3B3', // Pastel Salmon
+    '#A3FFB3', // Pastel Spring Green
+    '#B3A3FF', // Pastel Slate Blue
+    '#FFB3E6', // Pastel Magenta
+];

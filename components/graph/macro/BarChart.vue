@@ -1,10 +1,13 @@
 <template>
-  <div class="flex flex-col relative bg-white rounded-xl border border-slate-200 hover:shadow-xl transition duration-300 w-full">
+  <div
+    class="flex flex-col relative bg-white rounded-xl border border-slate-200 hover:shadow-xl transition duration-300 w-full">
     <div class="flex justify-between px-3 pt-2 bg-gradient-to-r rounded-t-xl">
       <p class="font-bold text-md ml-2 text-[#034EA2]">{{ title }}</p>
     </div>
-    <div class="">
-      <Bar :options="chartOptions" :data="chartData" />
+    <div class="overflow-x-auto">
+      <div class="min-w-[800px]">
+        <Bar :options="chartOptions" :data="chartData" />
+      </div>
     </div>
   </div>
 
@@ -36,8 +39,7 @@ const props = defineProps(['title', 'chartData', 'ribuan'])
 
 const chartOptions = {
   responsive: true,
-  maintainAspectRatio: true,
-  aspectRatio: 2.4,
+  maintainAspectRatio: false,
   plugins: {
     legend: {
       display: false, // Hides the legend
@@ -61,6 +63,9 @@ const chartOptions = {
       },
       ticks: {
         color: "#666666",
+        maxRotation: 45,
+        minRotation: 0,
+        autoSkip: false,
       },
     },
     y: {
