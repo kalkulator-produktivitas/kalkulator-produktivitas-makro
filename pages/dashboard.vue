@@ -77,6 +77,19 @@
             <!-- Line Charts Section -->
             <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 mt-4">
               <div class="">
+                <GraphMacroLineChart :chart-data="data_8"
+                  title="Produk Domestik Regional Bruto Atas Dasar Harga Konstan" :key="state" :millions="true"
+                  :options="{ legends: false, datalabels: true, height: '320px' }" />
+              </div>
+              <div class="">
+                <GraphMacroLineChart :chart-data="data_9" title="Jumlah Tenaga Kerja" :key="state" :millions="false"
+                  :options="{ legends: false, datalabels: true, height: '320px' }" />
+              </div>
+              <div class="">
+                <GraphMacroLineChart :chart-data="data_10" title="Rata-Rata Upah Setahun" :key="state" :millions="false"
+                  :options="{ legends: false, datalabels: true, height: '320px' }" />
+              </div>
+              <div class="">
                 <GraphMacroLineChart :chart-data="data_1_new" title="Produktivitas Tenaga Kerja (Juta)" :key="state"
                   :millions="false" :options="{ legends: false, datalabels: true, height: '320px' }" />
               </div>
@@ -86,15 +99,6 @@
               </div>
               <div class="">
                 <GraphMacroLineChart :chart-data="data_3_new" title="Produktivitas Upah" :key="state" :millions="false"
-                  :options="{ legends: false, datalabels: true, height: '320px' }" />
-              </div>
-              <div class="">
-                <GraphMacroLineChart :chart-data="data_8"
-                  title="Produktivitas Domestik Regional Bruto Atas Dasar Harga Konstan" :key="state" :millions="true"
-                  :options="{ legends: false, datalabels: true, height: '320px' }" />
-              </div>
-              <div class="">
-                <GraphMacroLineChart :chart-data="data_9" title="Jumlah Tenaga Kerja" :key="state" :millions="false"
                   :options="{ legends: false, datalabels: true, height: '320px' }" />
               </div>
             </div>
@@ -658,6 +662,54 @@ const data_9 = computed(() => {
         dataset.datasets.push({
           label: kota.nama,
           data: kotaData.filter(x => x !== null),
+          backgroundColor: colors[index % colors.length],
+          borderRadius: 5,
+        })
+      }
+    })
+  }
+
+  dataset.labels = (rawData2.value.metadata.tahun || []).slice(0, Math.max(...dataset.datasets.map(ds => ds.data.length)))
+
+  return dataset
+})
+
+const data_10 = computed(() => {
+  let dataset = {
+    labels: [],
+    datasets: [],
+  }
+
+  // Check if rawData2 exists and has required properties
+  if (!rawData2.value || !rawData2.value.provinsi || !rawData2.value.metadata) {
+    return dataset
+  }
+
+  // Add province data
+  const provinsiData = rawData2.value["provinsi"]["agregat"]["jumlah_rata_rata_upah"] || []
+  if (provinsiData.length > 0) {
+    dataset.datasets.push({
+      label: "DKI Jakarta",
+      data: provinsiData
+        .filter(x => x !== null)
+        .map(x => x * 12), // di setahunkan
+      backgroundColor: "#3867D6",
+      borderRadius: 5,
+    })
+  }
+
+  // Add all cities data
+  if (rawData2.value["kota"] && rawData2.value["kota"].length > 0) {
+    const colors = ["#E74C3C", "#F39C12", "#27AE60", "#8E44AD", "#3498DB", "#E67E22", "#1ABC9C", "#9B59B6"]
+
+    rawData2.value["kota"].forEach((kota, index) => {
+      const kotaData = kota?.agregat?.jumlah_rata_rata_upah || []
+      if (kotaData.length > 0) {
+        dataset.datasets.push({
+          label: kota.nama,
+          data: kotaData
+            .filter(x => x !== null)
+            .map(x => Math.round(x * 12)), // di setahunkan
           backgroundColor: colors[index % colors.length],
           borderRadius: 5,
         })
