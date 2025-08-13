@@ -86,7 +86,7 @@
                   :options="{ legends: false, datalabels: true, height: '320px' }" />
               </div>
               <div class="">
-                <GraphMacroLineChart :chart-data="data_10" title="Rata-Rata Upah" :key="state" :millions="false"
+                <GraphMacroLineChart :chart-data="data_10" title="Rata-Rata Upah Setahun" :key="state" :millions="false"
                   :options="{ legends: false, datalabels: true, height: '320px' }" />
               </div>
               <div class="">
