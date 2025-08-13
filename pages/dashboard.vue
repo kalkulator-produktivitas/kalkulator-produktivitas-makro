@@ -78,7 +78,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 mt-4">
               <div class="">
                 <GraphMacroLineChart :chart-data="data_8"
-                  title="Produkt Domestik Regional Bruto Atas Dasar Harga Konstan" :key="state" :millions="true"
+                  title="Produk Domestik Regional Bruto Atas Dasar Harga Konstan" :key="state" :millions="true"
                   :options="{ legends: false, datalabels: true, height: '320px' }" />
               </div>
               <div class="">
