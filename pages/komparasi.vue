@@ -3,7 +3,7 @@
     <div class="md:mx-auto mt-6 mx-auto flex">
       <div class="flex shrink-0 w-[3%]">
       </div>
-      <div class="px-1 py-1 absolute flex top-5 left-[12%] items-center bg-blue-700 rounded-full z-10">
+      <div class="px-1 py-1 absolute flex top-5 left-[15%] items-center bg-blue-700 rounded-full z-10">
         <Icon name="mdi:arrow-left-circle" class="cursor-pointer rounded-full border border-white bg-white"
           @click="navigateTo('/')" size="32" />
 
@@ -32,8 +32,7 @@
                         </option>
                       </select>
 
-                      <select v-model="selectedCity1"
-                        :disabled="!selectedProvince1 || kotas1.length === 0"
+                      <select v-model="selectedCity1" :disabled="!selectedProvince1 || kotas1.length === 0"
                         class="flex-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <option value="" disabled>Pilih kota...</option>
                         <option v-for="kota in kotas1" :key="kota.id" :value="kota.id">
@@ -55,8 +54,7 @@
                         </option>
                       </select>
 
-                      <select v-model="selectedCity2"
-                        :disabled="!selectedProvince2 || kotas2.length === 0"
+                      <select v-model="selectedCity2" :disabled="!selectedProvince2 || kotas2.length === 0"
                         class="flex-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <option value="" disabled>Pilih kota...</option>
                         <option v-for="kota in kotas2" :key="kota.id" :value="kota.id">
@@ -81,7 +79,8 @@
                     Hapus Semua
                   </button>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-60 overflow-y-auto border border-slate-200 rounded-lg p-4">
+                <div
+                  class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-60 overflow-y-auto border border-slate-200 rounded-lg p-4">
                   <div v-for="usaha in lapanganUsaha" :key="usaha.kode" class="flex items-start">
                     <input :id="usaha.kode" type="checkbox" v-model="usaha.status"
                       class="mt-1 w-4 h-4 text-[#034EA2] bg-gray-100 border-gray-300 rounded">
@@ -92,22 +91,14 @@
                 </div>
               </div>
 
-              <!-- Year Range Selection -->
+              <!-- Year Selection -->
               <div>
-                <p class="text-lg font-medium mb-4">Rentang Tahun</p>
-                <div class="flex items-center gap-4">
-                  <div class="flex items-center gap-2">
-                    <label class="text-sm font-medium">Dari:</label>
-                    <select v-model="yearFrom" class="p-2 border border-gray-300 rounded-md">
-                      <option v-for="year in availableYears" :key="year" :value="year">{{ year }}</option>
-                    </select>
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <label class="text-sm font-medium">Sampai:</label>
-                    <select v-model="yearTo" class="p-2 border border-gray-300 rounded-md">
-                      <option v-for="year in availableYears" :key="year" :value="year">{{ year }}</option>
-                    </select>
-                  </div>
+                <p class="text-lg font-medium mb-4">Pilih Tahun</p>
+                <div class="flex items-center gap-2">
+                  <label class="text-sm font-medium">Tahun:</label>
+                  <select v-model="selectedYear" class="p-2 border border-gray-300 rounded-md">
+                    <option v-for="year in availableYears" :key="year" :value="year">{{ year }}</option>
+                  </select>
                 </div>
               </div>
 
@@ -126,7 +117,7 @@
         <div v-if="showResults" class="mt-8">
           <div class="border border-slate-200 rounded-lg p-6">
             <h2 class="text-xl font-bold text-[#034EA2] mb-6">Hasil Komparasi</h2>
-            
+
             <!-- Summary Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div class="border border-slate-200 rounded-lg p-4">
@@ -203,13 +194,17 @@
                       <td class="border border-slate-200 p-3">
                         <span class="font-medium text-[#034EA2]">{{ usaha.kode }}</span> - {{ usaha.nama }}
                       </td>
-                                           <td class="border border-slate-200 p-3 text-center">{{ getCityValue(mockData.city1, usaha.kode) }}</td>
-                     <td class="border border-slate-200 p-3 text-center">{{ getCityValue(mockData.city2, usaha.kode) }}</td>
-                     <td class="border border-slate-200 p-3 text-center">
-                       <span :class="getDifferenceClass(getCityValue(mockData.city1, usaha.kode), getCityValue(mockData.city2, usaha.kode))">
-                         {{ getDifference(getCityValue(mockData.city1, usaha.kode), getCityValue(mockData.city2, usaha.kode)) }}
-                       </span>
-                     </td>
+                      <td class="border border-slate-200 p-3 text-center">{{ getCityValue(mockData.city1, usaha.kode) }}
+                      </td>
+                      <td class="border border-slate-200 p-3 text-center">{{ getCityValue(mockData.city2, usaha.kode) }}
+                      </td>
+                      <td class="border border-slate-200 p-3 text-center">
+                        <span
+                          :class="getDifferenceClass(getCityValue(mockData.city1, usaha.kode), getCityValue(mockData.city2, usaha.kode))">
+                          {{ getDifference(getCityValue(mockData.city1, usaha.kode), getCityValue(mockData.city2,
+                            usaha.kode)) }}
+                        </span>
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -227,6 +222,7 @@ import { getProvince, getCity } from '~/_service/navigasi/nav';
 import { useRequest } from '~/composables/useRequest';
 import { ErrorApiResponse } from '~/_service/http/schema';
 import { kodeUsaha } from '~/assets/helpers/kode_usaha';
+import { getDashboardApi, getYearsApi } from '~/_service/dashboard/dashboardData';
 
 // City selection
 const selectedProvince1 = ref('')
@@ -237,13 +233,13 @@ const selectedCity2 = ref('')
 // API calls
 const provinceList = useRequest(getProvince);
 const kotaList = useRequest(getCity);
+const dashboardApi = useRequest(getDashboardApi);
 const provinces = ref<any[]>([])
 const kotas1 = ref<any[]>([])
 const kotas2 = ref<any[]>([])
 
 // Year selection
-const yearFrom = ref(2020)
-const yearTo = ref(2023)
+const selectedYear = ref(2023)
 const availableYears = ref([2018, 2019, 2020, 2021, 2022, 2023])
 
 // Type definitions
@@ -336,7 +332,7 @@ const mockData = ref<{ city1: MockCityData; city2: MockCityData }>({
 
 // Computed properties
 const selectedLapanganUsaha = computed(() => {
-  return lapanganUsaha.value.filter(usaha => usaha.status)
+  return lapanganUsaha.value.filter((usaha: LapanganUsaha) => usaha.status)
 })
 
 const canCompare = computed(() => {
@@ -351,7 +347,7 @@ const getKotaList1 = async () => {
       selectedCity1.value = ''
       return
     }
-    
+
     const res = await kotaList.call(selectedProvince1.value)
     kotas1.value = res.list
     selectedCity1.value = ''
@@ -367,7 +363,7 @@ const getKotaList2 = async () => {
       selectedCity2.value = ''
       return
     }
-    
+
     const res = await kotaList.call(selectedProvince2.value)
     kotas2.value = res.list
     selectedCity2.value = ''
@@ -384,17 +380,30 @@ const clearAllKodeUsaha = () => {
   lapanganUsaha.value.forEach((usaha: LapanganUsaha) => usaha.status = false)
 }
 
-const compareCities = () => {
+const compareCities = async () => {
   if (!canCompare.value) return
-  
-  // Get city names
-  const city1 = kotas1.value.find((k: any) => k.id === selectedCity1.value)
-  const city2 = kotas2.value.find((k: any) => k.id === selectedCity2.value)
-  
-  city1Name.value = city1?.nama || 'Kota 1'
-  city2Name.value = city2?.nama || 'Kota 2'
-  
-  showResults.value = true
+
+  try {
+    // Call dashboard API for both cities with the selected year
+    const city1Data = await dashboardApi.call(selectedYear.value, selectedYear.value, selectedCity1.value)
+    const city2Data = await dashboardApi.call(selectedYear.value, selectedYear.value, selectedCity2.value)
+
+    // Get city names
+    const city1 = kotas1.value.find((k: any) => k.id === selectedCity1.value)
+    const city2 = kotas2.value.find((k: any) => k.id === selectedCity2.value)
+
+    city1Name.value = city1?.nama || 'Kota 1'
+    city2Name.value = city2?.nama || 'Kota 2'
+
+    // Store the data for comparison
+    // You can process city1Data and city2Data here to populate the comparison table
+    console.log('City 1 Data:', city1Data)
+    console.log('City 2 Data:', city2Data)
+
+    showResults.value = true
+  } catch (error) {
+    console.error('Error comparing cities:', error)
+  }
 }
 
 const getDifference = (value1: number, value2: number) => {

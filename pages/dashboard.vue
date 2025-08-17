@@ -82,16 +82,16 @@
                   :options="{ legends: false, datalabels: true, height: '320px' }" />
               </div>
               <div class="">
-                <GraphMacroLineChart :chart-data="data_9" title="Jumlah Tenaga Kerja (Orang)" :key="state" :millions="false"
-                  :options="{ legends: false, datalabels: true, height: '320px' }" />
-              </div>
-              <div class="">
-                <GraphMacroLineChart :chart-data="data_10" title="Rata-Rata Upah Setahun (Rp)" :key="state" :millions="false"
-                  :options="{ legends: false, datalabels: true, height: '320px' }" />
-              </div>
-              <div class="">
-                <GraphMacroLineChart :chart-data="data_1_new" title="Produktivitas Tenaga Kerja (Rp Juta / Orang)" :key="state"
+                <GraphMacroLineChart :chart-data="data_9" title="Jumlah Tenaga Kerja (Orang)" :key="state"
                   :millions="false" :options="{ legends: false, datalabels: true, height: '320px' }" />
+              </div>
+              <div class="">
+                <GraphMacroLineChart :chart-data="data_10" title="Rata-Rata Upah Setahun (Rp)" :key="state"
+                  :millions="false" :options="{ legends: false, datalabels: true, height: '320px' }" />
+              </div>
+              <div class="">
+                <GraphMacroLineChart :chart-data="data_1_new" title="Produktivitas Tenaga Kerja (Rp Juta / Orang)"
+                  :key="state" :millions="false" :options="{ legends: false, datalabels: true, height: '320px' }" />
               </div>
               <div class="">
                 <GraphMacroLineChart :chart-data="data_2_new" title="Pertumbuhan Produktivitas Tenaga Kerja (%)"
@@ -100,6 +100,32 @@
               <div class="">
                 <GraphMacroLineChart :chart-data="data_3_new" title="Produktivitas Upah" :key="state" :millions="false"
                   :options="{ legends: false, datalabels: true, height: '320px' }" />
+              </div>
+            </div>
+
+            <!-- Sector Information Cards -->
+            <div v-if="dashboardApi.data && Object.keys(data_11).length > 0" class="mt-6">
+              <!-- <h3 class="text-lg font-semibold text-gray-800 mb-4">Informasi Sektor</h3> -->
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div v-for="(info, key) in data_11" :key="key"
+                  class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow duration-300">
+                  <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                      <h4 class="text-sm font-medium text-gray-700 mb-2">{{ key }}</h4>
+                      <div class="space-y-1">
+                        <!-- <p class="text-xs text-gray-500">Kode: </p> -->
+                        <p class="text-sm font-semibold text-gray-900">{{ info[1] }} <span
+                            class="text-xs text-gray-500">({{ info[0] }})</span></p>
+                        <p v-if="key === 'Sektor PDRB terbesar'" class="text-sm text-blue-600 font-medium">{{ info[2] }}
+                          Jt</p>
+                        <p v-else-if="key.includes('terendah')" class="text-sm text-red-600 font-medium">{{
+                          info[2] }}
+                          Jt</p>
+                        <p v-else class="text-sm text-blue-600 font-medium">{{ info[2] }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -165,9 +191,11 @@
                 <div class="flex-1 overflow-y-auto p-4">
                   <div v-for="usaha of lapanganUsaha" :key="usaha.nama" class="flex items-start mb-3"
                     @change="applyFilter">
-                    <input :id="usaha.kode" type="checkbox" v-model="usaha.status"
-                      class="mt-1 w-4 h-4 text-[#034EA2] bg-gray-100 border-gray-300 rounded dark:border-gray-600">
-                    <label :for="usaha.kode" class="ms-3 text-sm leading-relaxed"
+                    <div class="flex-shrink-0">
+                      <input :id="usaha.kode" type="checkbox" v-model="usaha.status"
+                        class="mt-1 w-4 h-4 text-[#034EA2] bg-gray-100 border-gray-300 rounded dark:border-gray-600">
+                    </div>
+                    <label :for="usaha.kode" class="ms-3 text-sm leading-relaxed flex-1"
                       :class="`${usaha.kode ? 'text-[#034EA2]' : 'text-gray-900'}`">
                       {{ usaha.nama }} (Kode {{ usaha.kode }})</label>
                   </div>
@@ -890,6 +918,92 @@ const data_7 = computed(() => {
   })
 
   return dataset
+})
+
+const data_11 = computed(() => {
+  if (!rawData2.value?.provinsi?.lapangan_usaha || !rawData2.value?.metadata?.tahun) {
+    return {}
+  }
+
+  const lapanganUsaha = rawData2.value.provinsi.lapangan_usaha;
+  const latestIndex = rawData2.value.metadata.tahun.length - 1;
+
+  // Initialize objects to track max/min values
+  let maxPDRB = { key: null, value: -Infinity };
+  let maxTK = { key: null, value: -Infinity };
+  let maxProduktivitas = { key: null, value: -Infinity };
+  let minProduktivitas = { key: null, value: Infinity };
+  let maxGrowth = { key: null, value: -Infinity };
+  let minGrowth = { key: null, value: Infinity };
+
+  // Find all metrics in one pass
+  Object.entries(lapanganUsaha).forEach(([key, value]) => {
+    // PDRB
+    const lastPDRB = value.pdrb_adhk[latestIndex] || 0;
+    if (lastPDRB > maxPDRB.value) {
+      maxPDRB = { key, value: lastPDRB };
+    }
+
+    // Tenaga Kerja
+    const lastTK = value.jumlah_tenaga_kerja_bekerja[latestIndex] || 0;
+    if (lastTK > maxTK.value) {
+      maxTK = { key, value: lastTK };
+    }
+
+    // Produktivitas
+    const lastProduktivitas = value.produktivitas_tenaga_kerja[latestIndex] || 0;
+    if (lastProduktivitas > maxProduktivitas.value) {
+      maxProduktivitas = { key, value: lastProduktivitas };
+    }
+    if (lastProduktivitas < minProduktivitas.value) {
+      minProduktivitas = { key, value: lastProduktivitas };
+    }
+
+    // Growth
+    const lastGrowth = value.growth_produktivitas_tenaga_kerja[latestIndex] || 0;
+    if (lastGrowth > maxGrowth.value) {
+      maxGrowth = { key, value: lastGrowth };
+    }
+    if (lastGrowth < minGrowth.value) {
+      minGrowth = { key, value: lastGrowth };
+    }
+  });
+
+  // Get names from metadata
+  const getNama = (key) => rawData2.value.metadata.lapangan_usaha.dict[key];
+
+  return {
+    "Sektor PDRB terbesar": {
+      0: maxPDRB.key,
+      1: getNama(maxPDRB.key),
+      2: `Rp ${maxPDRB.value.toLocaleString('id-ID')}`
+    },
+    "Sektor Penyerapan TK terbesar": {
+      0: maxTK.key,
+      1: getNama(maxTK.key),
+      2: maxTK.value.toLocaleString('id-ID')
+    },
+    "Sektor Produktivitas terbesar": {
+      0: maxProduktivitas.key,
+      1: getNama(maxProduktivitas.key),
+      2: `Rp ${maxProduktivitas.value.toLocaleString('id-ID')}`
+    },
+    "Sektor Produktivitas terendah": {
+      0: minProduktivitas.key,
+      1: getNama(minProduktivitas.key),
+      2: `Rp ${minProduktivitas.value.toLocaleString('id-ID')}`
+    },
+    "Sektor Peningkatan Produktivitas terbesar": {
+      0: maxGrowth.key,
+      1: getNama(maxGrowth.key),
+      2: `${maxGrowth.value.toLocaleString('id-ID')}%`
+    },
+    "Sektor Peningkatan Produktivitas terendah": {
+      0: minGrowth.key,
+      1: getNama(minGrowth.key),
+      2: `${minGrowth.value.toLocaleString('id-ID')}%`
+    }
+  };
 })
 
 // Filter available years for "To" dropdown based on selected "From" year
