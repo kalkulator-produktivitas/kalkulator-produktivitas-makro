@@ -82,7 +82,7 @@
                 <div
                   class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-60 overflow-y-auto border border-slate-200 rounded-lg p-4">
                   <div v-for="usaha in lapanganUsaha" :key="usaha.kode" class="flex items-start">
-                    <input :id="usaha.kode" type="checkbox" v-model="usaha.status"
+                    <input :id="usaha.kode" type="checkbox" v-model="usaha.status" @change="applyFilter"
                       class="mt-1 w-4 h-4 text-[#034EA2] bg-gray-100 border-gray-300 rounded">
                     <label :for="usaha.kode" class="ms-3 text-sm leading-relaxed cursor-pointer">
                       <span class="font-medium text-[#034EA2]">{{ usaha.kode }}</span> - {{ usaha.nama }}
@@ -117,6 +117,51 @@
         <div v-if="showResults" class="mt-8">
           <div class="border border-slate-200 rounded-lg p-6">
             <h2 class="text-xl font-bold text-[#034EA2] mb-6">Hasil Komparasi</h2>
+
+            <!-- City Comparison Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              <!-- Left City Charts -->
+              <div class="border border-slate-200 rounded-lg p-4">
+                <h3 class="font-bold text-lg mb-4 text-center">{{ city1Name }}</h3>
+                <div class="space-y-4">
+                  <!-- Bar Chart for PDRB -->
+                  <GraphMacroBarChart2 v-if="city1FilteredData" :chart-data="city1Data_pdrb"
+                    title="Produk Domestik Regional Bruto Atas Dasar Harga Konstan (Rp)" :key="`city1-pdrb`"
+                    :millions="true" />
+
+                  <!-- Stacked Bar Charts -->
+                  <GraphMacroStackedBarChart v-if="city1FilteredData"
+                    title="Produktivitas Tenaga Kerja (Rp milyar/orang/tahun)" :chart-data="city1Data_4" key="`city1"
+                    :ribuan="true" />
+                  <GraphMacroStackedBarChart v-if="city1FilteredData"
+                    title="Produktivitas Jam Kerja (Rp juta/orang/jam)" :chart-data="city1Data_5" key="`city1-5"
+                    :ribuan="false" :options="{ unit: 'juta' }" />
+                  <GraphMacroStackedBarChart v-if="city1FilteredData" title="Produktivitas Upah (Rp /orang/tahun)"
+                    :chart-data="city1Data_6" key="`city1-6" :options="{ unit: 'per ribu' }" />
+                </div>
+              </div>
+
+              <!-- Right City Charts -->
+              <div class="border border-slate-200 rounded-lg p-4">
+                <h3 class="font-bold text-lg mb-4 text-center">{{ city2Name }}</h3>
+                <div class="space-y-4">
+                  <!-- Bar Chart for PDRB -->
+                  <GraphMacroBarChart2 v-if="city2FilteredData" :chart-data="city2Data_pdrb"
+                    title="Produk Domestik Regional Bruto Atas Dasar Harga Konstan (Rp)" :key="`city2-pdrb`"
+                    :millions="true" />
+
+                  <!-- Stacked Bar Charts -->
+                  <GraphMacroStackedBarChart v-if="city2FilteredData"
+                    title="Produktivitas Tenaga Kerja (Rp milyar/orang/tahun)" :chart-data="city2Data_4" key="`city2"
+                    :ribuan="true" />
+                  <GraphMacroStackedBarChart v-if="city2FilteredData"
+                    title="Produktivitas Jam Kerja (Rp juta/orang/jam)" :chart-data="city2Data_5" key="`city2-5"
+                    :ribuan="false" :options="{ unit: 'juta' }" />
+                  <GraphMacroStackedBarChart v-if="city2FilteredData" title="Produktivitas Upah (Rp /orang/tahun)"
+                    :chart-data="city2Data_6" key="`city2-6" :options="{ unit: 'per ribu' }" />
+                </div>
+              </div>
+            </div>
 
             <!-- Summary Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -223,12 +268,20 @@ import { useRequest } from '~/composables/useRequest';
 import { ErrorApiResponse } from '~/_service/http/schema';
 import { kodeUsaha } from '~/assets/helpers/kode_usaha';
 import { getDashboardApi, getYearsApi } from '~/_service/dashboard/dashboardData';
+import { BrightColors } from '~/assets/helpers/colors';
 
 // City selection
 const selectedProvince1 = ref('')
 const selectedProvince2 = ref('')
 const selectedCity1 = ref('')
 const selectedCity2 = ref('')
+const modal = ref({
+  type: 'ERROR',
+  message: '',
+  show: false,
+  status: ''
+})
+const loading = ref(false)
 
 // API calls
 const provinceList = useRequest(getProvince);
@@ -281,6 +334,14 @@ const lapanganUsaha = ref<LapanganUsaha[]>([
 const showResults = ref(false)
 const city1Name = ref('')
 const city2Name = ref('')
+
+// Raw data from API calls
+const city1RawData = ref(null)
+const city2RawData = ref(null)
+
+// Filtered data for each city
+const city1FilteredData = ref(null)
+const city2FilteredData = ref(null)
 
 // Mock data for demonstration
 const mockData = ref<{ city1: MockCityData; city2: MockCityData }>({
@@ -339,6 +400,294 @@ const canCompare = computed(() => {
   return selectedCity1.value && selectedCity2.value && selectedLapanganUsaha.value.length > 0
 })
 
+// City 1 Chart Data - Produktivitas Tenaga Kerja
+const city1Data_4 = computed(() => {
+  const dataset: any = {
+    labels: [],
+    datasets: [],
+  }
+
+  if (!(city1RawData.value as any)?.metadata?.tahun || !city1FilteredData.value) {
+    return dataset
+  }
+
+  // Set years as labels (x-axis)
+  dataset.labels = (city1RawData.value as any).metadata.tahun
+
+  // Create a dataset for each lapangan usaha (sector)
+  const filteredUsaha = lapanganUsaha.value.filter((x: LapanganUsaha) => x.status === true)
+  const filteredKode = filteredUsaha.map((x: LapanganUsaha) => x.kode)
+
+  filteredKode.forEach((kode: string, index: number) => {
+    if (city1FilteredData.value && city1FilteredData.value[kode]) {
+      const sectorData: any = city1FilteredData.value[kode]?.['produktivitas_tenaga_kerja'] || []
+      if (sectorData?.length > 0) {
+        dataset.datasets.push({
+          label: kodeUsaha[kode] || kode,
+          data: sectorData.map((val: any) => parseFloat(val) || 0),
+          backgroundColor: BrightColors[index % BrightColors.length],
+          borderRadius: 5,
+        })
+      }
+    }
+  })
+
+  return dataset
+})
+
+// City 1 Chart Data - Produktivitas Jam Kerja
+const city1Data_5 = computed(() => {
+  const dataset: any = {
+    labels: [],
+    datasets: [],
+  }
+
+  if (!(city1RawData.value as any)?.metadata?.tahun || !city1FilteredData.value) {
+    return dataset
+  }
+
+  // Set years as labels (x-axis)
+  dataset.labels = (city1RawData.value as any).metadata.tahun
+
+  // Create a dataset for each lapangan usaha (sector)
+  const filteredUsaha = lapanganUsaha.value.filter((x: LapanganUsaha) => x.status === true)
+  const filteredKode = filteredUsaha.map((x: LapanganUsaha) => x.kode)
+
+  filteredKode.forEach((kode: string, index: number) => {
+    if (city1FilteredData.value && city1FilteredData.value[kode]) {
+      const sectorData: any = city1FilteredData.value[kode]?.['produktivitas_jam_kerja'] || []
+      if (sectorData?.length > 0) {
+        dataset.datasets.push({
+          label: kodeUsaha[kode] || kode,
+          data: sectorData.map((val: any) => parseFloat(val) || 0),
+          backgroundColor: BrightColors[index % BrightColors.length],
+          borderRadius: 5,
+        })
+      }
+    }
+  })
+
+  return dataset
+})
+
+// City 1 Chart Data - Produktivitas Upah
+const city1Data_6 = computed(() => {
+  const dataset: any = {
+    labels: [],
+    datasets: [],
+  }
+
+  if (!(city1RawData.value as any)?.metadata?.tahun || !city1FilteredData.value) {
+    return dataset
+  }
+
+  // Set years as labels (x-axis)
+  dataset.labels = (city1RawData.value as any).metadata.tahun
+
+  // Create a dataset for each lapangan usaha (sector)
+  const filteredUsaha = lapanganUsaha.value.filter((x: LapanganUsaha) => x.status === true)
+  const filteredKode = filteredUsaha.map((x: LapanganUsaha) => x.kode)
+
+  filteredKode.forEach((kode: string, index: number) => {
+    if (city1FilteredData.value && city1FilteredData.value[kode]) {
+      const sectorData: any = city1FilteredData.value[kode]?.['produktivitas_upah'] || []
+      if (sectorData?.length > 0) {
+        dataset.datasets.push({
+          label: kodeUsaha[kode] || kode,
+          data: sectorData.map((val: any) => parseFloat(val) || 0),
+          backgroundColor: BrightColors[index % BrightColors.length],
+          borderRadius: 5,
+        })
+      }
+    }
+  })
+
+  return dataset
+})
+
+// City 2 Chart Data - Produktivitas Tenaga Kerja
+const city2Data_4 = computed(() => {
+  const dataset: any = {
+    labels: [],
+    datasets: [],
+  }
+
+  if (!(city2RawData.value as any)?.metadata?.tahun || !city2FilteredData.value) {
+    return dataset
+  }
+
+  // Set years as labels (x-axis)
+  dataset.labels = (city2RawData.value as any).metadata.tahun
+
+  // Create a dataset for each lapangan usaha (sector)
+  const filteredUsaha = lapanganUsaha.value.filter((x: LapanganUsaha) => x.status === true)
+  const filteredKode = filteredUsaha.map((x: LapanganUsaha) => x.kode)
+
+  filteredKode.forEach((kode: string, index: number) => {
+    if (city2FilteredData.value && city2FilteredData.value[kode]) {
+      const sectorData: any = city2FilteredData.value[kode]?.['produktivitas_tenaga_kerja'] || []
+      if (sectorData?.length > 0) {
+        dataset.datasets.push({
+          label: kodeUsaha[kode] || kode,
+          data: sectorData.map((val: any) => parseFloat(val) || 0),
+          backgroundColor: BrightColors[index % BrightColors.length],
+          borderRadius: 5,
+        })
+      }
+    }
+  })
+
+  return dataset
+})
+
+// City 2 Chart Data - Produktivitas Jam Kerja
+const city2Data_5 = computed(() => {
+  const dataset: any = {
+    labels: [],
+    datasets: [],
+  }
+
+  if (!(city2RawData.value as any)?.metadata?.tahun || !city2FilteredData.value) {
+    return dataset
+  }
+
+  // Set years as labels (x-axis)
+  dataset.labels = (city2RawData.value as any).metadata.tahun
+
+  // Create a dataset for each lapangan usaha (sector)
+  const filteredUsaha = lapanganUsaha.value.filter((x: LapanganUsaha) => x.status === true)
+  const filteredKode = filteredUsaha.map((x: LapanganUsaha) => x.kode)
+
+  filteredKode.forEach((kode: string, index: number) => {
+    if (city2FilteredData.value && city2FilteredData.value[kode]) {
+      const sectorData: any = city2FilteredData.value[kode]?.['produktivitas_jam_kerja'] || []
+      if (sectorData?.length > 0) {
+        dataset.datasets.push({
+          label: kodeUsaha[kode] || kode,
+          data: sectorData.map((val: any) => parseFloat(val) || 0),
+          backgroundColor: BrightColors[index % BrightColors.length],
+          borderRadius: 5,
+        })
+      }
+    }
+  })
+
+  return dataset
+})
+
+// City 2 Chart Data - Produktivitas Upah
+const city2Data_6 = computed(() => {
+  const dataset: any = {
+    labels: [],
+    datasets: [],
+  }
+
+  if (!(city2RawData.value as any)?.metadata?.tahun || !city2FilteredData.value) {
+    return dataset
+  }
+
+  // Set years as labels (x-axis)
+  dataset.labels = (city2RawData.value as any).metadata.tahun
+
+  // Create a dataset for each lapangan usaha (sector)
+  const filteredUsaha = lapanganUsaha.value.filter((x: LapanganUsaha) => x.status === true)
+  const filteredKode = filteredUsaha.map((x: LapanganUsaha) => x.kode)
+
+  filteredKode.forEach((kode: string, index: number) => {
+    if (city2FilteredData.value && city2FilteredData.value[kode]) {
+      const sectorData: any = city2FilteredData.value[kode]?.['produktivitas_upah'] || []
+      if (sectorData?.length > 0) {
+        dataset.datasets.push({
+          label: kodeUsaha[kode] || kode,
+          data: sectorData.map((val: any) => parseFloat(val) || 0),
+          backgroundColor: BrightColors[index % BrightColors.length],
+          borderRadius: 5,
+        })
+      }
+    }
+  })
+
+  return dataset
+})
+
+// City 1 PDRB Bar Chart Data
+const city1Data_pdrb = computed(() => {
+  const dataset: any = {
+    labels: [],
+    datasets: [],
+  }
+
+  if (!city1FilteredData.value || !(city1RawData.value as any)?.metadata?.tahun) {
+    return dataset
+  }
+
+  // Get the latest year index (since we're only showing one year)
+  const yearIndex = (city1RawData.value as any).metadata.tahun.length - 1
+
+  // Create labels from filtered lapangan usaha
+  const filteredUsaha = lapanganUsaha.value.filter((x: LapanganUsaha) => x.status === true)
+  const filteredKode = filteredUsaha.map((x: LapanganUsaha) => x.kode)
+
+  dataset.labels = filteredKode.map((kode: string) => kodeUsaha[kode] || kode)
+
+  // Create data array for the selected year
+  const pdrb_data = filteredKode.map((kode: string) => {
+    if (city1FilteredData.value && city1FilteredData.value[kode]) {
+      const sectorData: any = city1FilteredData.value[kode]?.['pdrb_adhk'] || []
+      return parseFloat(sectorData[yearIndex]) || 0
+    }
+    return 0
+  })
+
+  dataset.datasets.push({
+    label: selectedYear.value.toString(),
+    data: pdrb_data,
+    backgroundColor: BrightColors.map((color, index) => color),
+    borderRadius: 5,
+  })
+
+  return dataset
+})
+
+// City 2 PDRB Bar Chart Data
+const city2Data_pdrb = computed(() => {
+  const dataset: any = {
+    labels: [],
+    datasets: [],
+  }
+
+  if (!city2FilteredData.value || !(city2RawData.value as any)?.metadata?.tahun) {
+    return dataset
+  }
+
+  // Get the latest year index (since we're only showing one year)
+  const yearIndex = (city2RawData.value as any).metadata.tahun.length - 1
+
+  // Create labels from filtered lapangan usaha
+  const filteredUsaha = lapanganUsaha.value.filter((x: LapanganUsaha) => x.status === true)
+  const filteredKode = filteredUsaha.map((x: LapanganUsaha) => x.kode)
+
+  dataset.labels = filteredKode.map((kode: string) => kodeUsaha[kode] || kode)
+
+  // Create data array for the selected year
+  const pdrb_data = filteredKode.map((kode: string) => {
+    if (city2FilteredData.value && city2FilteredData.value[kode]) {
+      const sectorData: any = city2FilteredData.value[kode]?.['pdrb_adhk'] || []
+      return parseFloat(sectorData[yearIndex]) || 0
+    }
+    return 0
+  })
+
+  dataset.datasets.push({
+    label: selectedYear.value.toString(),
+    data: pdrb_data,
+    backgroundColor: BrightColors.map((color, index) => color),
+    borderRadius: 5,
+  })
+
+  return dataset
+})
+
 // Functions
 const getKotaList1 = async () => {
   try {
@@ -374,19 +723,81 @@ const getKotaList2 = async () => {
 
 const selectAllKodeUsaha = () => {
   lapanganUsaha.value.forEach((usaha: LapanganUsaha) => usaha.status = true)
+  applyFilter()
 }
 
 const clearAllKodeUsaha = () => {
   lapanganUsaha.value.forEach((usaha: LapanganUsaha) => usaha.status = false)
+  applyFilter()
+}
+
+// Extract specific city data from raw API response
+const extractCityData = () => {
+  if (!city1RawData.value || !city2RawData.value) return
+
+  // Find the specific city data in the kota array from each raw data
+  const city1 = kotas1.value.find((k: any) => k.id === selectedCity1.value)
+  const city2 = kotas2.value.find((k: any) => k.id === selectedCity2.value)
+
+  if ((city1RawData.value as any).kota && (city1RawData.value as any).kota.length > 0) {
+    const cityData1 = (city1RawData.value as any).kota.find((c: any) => c.nama === city1?.nama)
+    if (cityData1) {
+      city1FilteredData.value = cityData1.lapangan_usaha
+    }
+  }
+
+  if ((city2RawData.value as any).kota && (city2RawData.value as any).kota.length > 0) {
+    const cityData2 = (city2RawData.value as any).kota.find((c: any) => c.nama === city2?.nama)
+    if (cityData2) {
+      city2FilteredData.value = cityData2.lapangan_usaha
+    }
+  }
+
+  // Apply filter based on selected lapangan usaha
+  applyFilter()
+}
+
+// Apply filter based on selected lapangan usaha - similar to dashboard.vue
+const applyFilter = () => {
+  if (!city1FilteredData.value || !city2FilteredData.value) return
+
+  const filteredUsaha = lapanganUsaha.value.filter((x: LapanganUsaha) => x.status === true)
+  const filteredKode = filteredUsaha.map((x: LapanganUsaha) => x.kode)
+
+  // Filter city1 data
+  const filtered1 = Object.fromEntries(
+    Object.entries(city1FilteredData.value).filter(([key]) =>
+      filteredKode.includes(key)
+    )
+  )
+
+  // Filter city2 data
+  const filtered2 = Object.fromEntries(
+    Object.entries(city2FilteredData.value).filter(([key]) =>
+      filteredKode.includes(key)
+    )
+  )
+
+  console.log('Filtered City 1 Data:', filtered1)
+  console.log('Filtered City 2 Data:', filtered2)
+
+  // Trigger chart updates by updating the filtered data
+  // The computed properties will automatically recalculate
 }
 
 const compareCities = async () => {
   if (!canCompare.value) return
 
   try {
-    // Call dashboard API for both cities with the selected year
-    const city1Data = await dashboardApi.call(selectedYear.value, selectedYear.value, selectedCity1.value)
-    const city2Data = await dashboardApi.call(selectedYear.value, selectedYear.value, selectedCity2.value)
+    loading.value = true
+
+    // Call dashboard API for both cities' provinces with the selected year
+    const city1Data = await dashboardApi.call(selectedYear.value, selectedYear.value, selectedProvince1.value)
+    const city2Data = await dashboardApi.call(selectedYear.value, selectedYear.value, selectedProvince2.value)
+
+    // Store raw data from API
+    city1RawData.value = city1Data
+    city2RawData.value = city2Data
 
     // Get city names
     const city1 = kotas1.value.find((k: any) => k.id === selectedCity1.value)
@@ -395,14 +806,29 @@ const compareCities = async () => {
     city1Name.value = city1?.nama || 'Kota 1'
     city2Name.value = city2?.nama || 'Kota 2'
 
-    // Store the data for comparison
-    // You can process city1Data and city2Data here to populate the comparison table
-    console.log('City 1 Data:', city1Data)
-    console.log('City 2 Data:', city2Data)
+    // Extract specific city data from the raw data
+    extractCityData()
+
+    console.log('City 1 Raw Data:', city1RawData.value)
+    console.log('City 2 Raw Data:', city2RawData.value)
+    console.log('City 1 Filtered Data:', city1FilteredData.value)
+    console.log('City 2 Filtered Data:', city2FilteredData.value)
 
     showResults.value = true
-  } catch (error) {
-    console.error('Error comparing cities:', error)
+    loading.value = false
+  } catch (e) {
+    loading.value = false
+    if (e instanceof ErrorApiResponse) {
+      console.error(`ERROR | code: ${e.code} | message: ${e.message}`)
+      modal.value.type = 'ERROR'
+      modal.value.message = e.message
+      modal.value.show = true
+    } else {
+      console.error('UNKNOWN ERROR: ', (e as any)?.message ?? 'Unknown Error')
+      modal.value.type = 'ERROR'
+      modal.value.message = 'UNKNOWN ERROR: '
+      modal.value.show = true
+    }
   }
 }
 

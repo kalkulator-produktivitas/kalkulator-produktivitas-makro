@@ -1,6 +1,6 @@
 <template>
   <div class="">
-    <div id="layout" class="md:mx-auto mx-auto flex w-[95vw]">
+    <div v-if="years.length !== 0" id="layout" class="md:mx-auto mx-auto flex w-[95vw]">
       <div class="flex shrink-0 w-[3%]">
 
       </div>
@@ -209,12 +209,14 @@
         </div>
       </div>
     </div>
+    <!-- {{ data["A"]["produktivitas_tenaga_kerja"] }} -->
     <!-- {{ yearSlider }} -->
     <ReportProvinsiGen v-if="reportType === 'Provinsi' && preview === true" class="fixed inset-0 z-50"
       @close-preview="reloadApp" :rawdata="rawData2" />
     <ReportKotaGen v-if="reportType === 'Kabupaten' && preview === true" :kota="subTab" class="fixed inset-0 z-50"
       @close-preview="reloadApp" :rawdata="rawData2" />
-    <Popup v-if="modal.show === true" :title="modal.title" :message="modal.message" @close="closeModal" />
+    <Popup v-if="modal.show === true" :title="modal.title" :message="modal.message" :status="modal.status"
+      @close="closeModal" />
     <Loading v-if="isLoading" text="Fetching Data..." />
   </div>
 </template>
@@ -266,39 +268,52 @@ const fullData = ref()
 let listProvince
 let listKota
 
-try {
-  isLoading.value = true
-  years.value = await yearsApi.call(route.query.id_provinsi)
-  years.value = years.value.tahun
-  if (years.value.length !== 0) {
-    buttonActive.value = true
-    yearSlider.value.min = Math.min(...years.value)
-    yearSlider.value.max = Math.max(...years.value)
-    yearSlider.value.minValue = yearSlider.value.min
-    yearSlider.value.maxValue = yearSlider.value.max
-    listProvince = await provinceApi.call()
-    listProvince = listProvince.list.filter(x => x.id === route.query.id_provinsi)[0]
-    tabList.value.push(listProvince.nama)
-    subTab.value = listProvince.nama
-    listKota = await cityApi.call(listProvince.id)
-    isLoading.value = false
-  } else {
-    hasData.value = false
-    isLoading.value = false
-    buttonActive.value = false
-    yearSlider.value.min = null
-    yearSlider.value.max = null
-    yearSlider.value.minValue = null
-    yearSlider.value.maxValue = null
+onMounted(async () => {
+  try {
+    isLoading.value = true
+    years.value = await yearsApi.call(route.query.id_provinsi)
+    years.value = years.value.tahun
+    if (years.value.length !== 0) {
+      buttonActive.value = true
+      yearSlider.value.min = Math.min(...years.value)
+      yearSlider.value.max = Math.max(...years.value)
+      yearSlider.value.minValue = yearSlider.value.min
+      yearSlider.value.maxValue = yearSlider.value.max
+      listProvince = await provinceApi.call()
+      listProvince = listProvince.list.filter(x => x.id === route.query.id_provinsi)[0]
+      tabList.value.push(listProvince.nama)
+      subTab.value = listProvince.nama
+      listKota = await cityApi.call(listProvince.id)
+      tabList.value.push(...listKota.list.map(x => x.nama))
+      isLoading.value = false
+    } else {
+      hasData.value = false
+      isLoading.value = false
+      buttonActive.value = false
+      yearSlider.value.min = null
+      yearSlider.value.max = null
+      yearSlider.value.minValue = null
+      yearSlider.value.maxValue = null
 
+    }
+  } catch (e) {
+    if (e instanceof ErrorApiResponse) {
+      // console.log(e);
+      console.error(`ERROR | code: ${e.code} | message: ${e.message}`)
+      modal.value.type = 'ERROR'
+      modal.value.message = e.message
+      modal.value.show = true
+      isLoading.value = false
+    } else {
+      // console.log(e);
+      console.error('UNKNOWN ERROR: ', (e)?.message ?? 'Unknown Error')
+      modal.value.type = 'ERROR'
+      modal.value.message = 'UNKNOWN ERROR: '
+      modal.value.show = true
+      isLoading.value = false
+    }
   }
-} catch (e) {
-  if (e instanceof ErrorApiResponse) {
-    console.error(`ERROR | code: ${e.code} | message: ${e.message}`)
-  } else {
-    console.error('UNKNOWN ERROR: ', (e)?.message ?? 'Unknown Error')
-  }
-}
+})
 
 // sort array ascending
 const asc = arr => arr.sort((a, b) => a - b);
@@ -541,7 +556,7 @@ const data_2_new = computed(() => {
   const provinsiData = rawData2.value["provinsi"]["agregat"]["growth_produktivitas_tenaga_kerja"] || []
   if (provinsiData.length > 0) {
     dataset.datasets.push({
-      label: "DKI Jakarta",
+      label: rawData2.value["provinsi"]["nama"],
       data: provinsiData.filter(x => x !== null),
       backgroundColor: "#3867D6",
       borderRadius: 5,
@@ -585,7 +600,7 @@ const data_3_new = computed(() => {
   const provinsiData = rawData2.value["provinsi"]["agregat"]["produktivitas_upah"] || []
   if (provinsiData.length > 0) {
     dataset.datasets.push({
-      label: "DKI Jakarta",
+      label: rawData2.value["provinsi"]["nama"],
       data: provinsiData.filter(x => x !== null),
       backgroundColor: "#3867D6",
       borderRadius: 5,
@@ -628,7 +643,7 @@ const data_8 = computed(() => {
   const provinsiData = rawData2.value["provinsi"]["agregat"]["pdrb_adhk"] || []
   if (provinsiData.length > 0) {
     dataset.datasets.push({
-      label: "DKI Jakarta",
+      label: rawData2.value["provinsi"]["nama"],
       data: provinsiData.filter(x => x !== null),
       backgroundColor: "#3867D6",
       borderRadius: 5,
@@ -673,7 +688,7 @@ const data_9 = computed(() => {
   const provinsiData = rawData2.value["provinsi"]["agregat"]["jumlah_tenaga_kerja_bekerja"] || []
   if (provinsiData.length > 0) {
     dataset.datasets.push({
-      label: "DKI Jakarta",
+      label: rawData2.value["provinsi"]["nama"],
       data: provinsiData.filter(x => x !== null),
       backgroundColor: "#3867D6",
       borderRadius: 5,
@@ -717,7 +732,7 @@ const data_10 = computed(() => {
   const provinsiData = rawData2.value["provinsi"]["agregat"]["jumlah_rata_rata_upah"] || []
   if (provinsiData.length > 0) {
     dataset.datasets.push({
-      label: "DKI Jakarta",
+      label: rawData2.value["provinsi"]["nama"],
       data: provinsiData
         .filter(x => x !== null)
         .map(x => x * 12), // di setahunkan

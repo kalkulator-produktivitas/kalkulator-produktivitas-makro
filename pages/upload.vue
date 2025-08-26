@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div>
     <div class="md:mx-auto mt-6 mx-auto flex" v-if="loaded">
       <div class="flex shrink-0 w-[3%]">
         {{ selectedProvince }}
@@ -18,7 +18,7 @@
             <div class="flex flex-col gap-4">
 
               <p class="text-lg">Tentukan jenis file yang akan anda Upload</p>
-              
+
               <!-- Template Type Selection -->
               <div class="flex gap-4 mb-4">
                 <div class="flex items-center gap-2">
@@ -35,10 +35,10 @@
 
                 <div class="border border-slate-200 rounded-lg p-6 mx-auto">
                   <p class="block text-md text-gray-700 mb-2 w-[20%]">
-                      Pilih File Excel
-                    </p>
+                    Pilih File Excel
+                  </p>
                   <div class="flex justify-between">
-                    
+
                     <div class="flex mb-4 w-full justify-between">
                       <!-- Province Selection (shown when templateType is 'province') -->
                       <div v-if="templateType === 'province'" class="flex gap-2">
@@ -60,42 +60,40 @@
                       <!-- City Selection (shown when templateType is 'city') -->
                       <div v-if="templateType === 'city'" class="gap-2">
                         <div class="flex gap-2">
-                        <select v-model="selectedProvinceForCity"
-                          @change="getKotaList"
-                          class="p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-[200px]">
-                          <option value="" disabled>Pilih provinsi...</option>
-                          <option v-for="province in provinces" :key="province.id" :value="province.id">
-                            {{ province.nama_lengkap }}
-                          </option>
-                        </select>
+                          <select v-model="selectedProvinceForCity" @change="getKotaList"
+                            class="p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-[200px]">
+                            <option value="" disabled>Pilih provinsi...</option>
+                            <option v-for="province in provinces" :key="province.id" :value="province.id">
+                              {{ province.nama_lengkap }}
+                            </option>
+                          </select>
 
-                        <select v-model="selectedCity"
-                          :disabled="!selectedProvinceForCity || kotas.length === 0"
-                          class="p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-[200px]">
-                          <option value="" disabled>Pilih kota...</option>
-                          <option v-for="kota in kotas" :key="kota.id" :value="kota.id">
-                            {{ kota.nama }}
-                          </option>
-                        </select>
-                      <a class="text-[#034EA2] hover:underline cursor-pointer my-auto flex items-center"
-                          :class="{ 'opacity-50 cursor-not-allowed': !selectedCity }"
-                          @click="downloadCityTemplate">
-                          <Icon name="mdi:download" size="6mm" class="text-[#034EA2] my-auto" />
-                          Download Template
-                        </a>  
-                      </div>
-                       
-                        
+                          <select v-model="selectedCity" :disabled="!selectedProvinceForCity || kotas.length === 0"
+                            class="p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-[200px]">
+                            <option value="" disabled>Pilih kota...</option>
+                            <option v-for="kota in kotas" :key="kota.id" :value="kota.id">
+                              {{ kota.nama }}
+                            </option>
+                          </select>
+                          <a class="text-[#034EA2] hover:underline cursor-pointer my-auto flex items-center"
+                            :class="{ 'opacity-50 cursor-not-allowed': !selectedCity }" @click="downloadCityTemplate">
+                            <Icon name="mdi:download" size="6mm" class="text-[#034EA2] my-auto" />
+                            Download Template
+                          </a>
+                        </div>
 
-                    <div class="flex mt-2 justify-center">
-                      <p class="text-sm my-auto mr-4">Masukkan Tahun</p>
-                    <input type="number" v-model="tahunInput" class="p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-[100px] text-center">
-                      </div>
+
+
+                        <div class="flex mt-2 justify-center">
+                          <p class="text-sm my-auto mr-4">Masukkan Tahun</p>
+                          <input type="number" v-model="tahunInput"
+                            class="p-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-[100px] text-center">
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  
+
                   <div class="border-2 border-dashed border-green-700 bg-green-50 rounded-lg p-8 text-center relative">
                     <div class="flex flex-col items-center">
                       <Icon name="mdi:cloud-upload-outline" size="12mm"
@@ -234,30 +232,30 @@ const modal = ref({
 
 const loading = ref(false);
 
-onMounted(async () => {   
+onMounted(async () => {
   try {
     const res = await provinceList.call()
     provinces.value = res.list
-    const res2  = await uploadList.call()
+    const res2 = await uploadList.call()
     uploaded.value = res2.list
     loaded.value = true
   } catch (e) {
-  if (e instanceof ErrorApiResponse) {
-    // console.log(e);
-    console.error(`ERROR | code: ${e.code} | message: ${e.message}`)
-    modal.value.type = 'ERROR'
-    modal.value.message = e.message
-    modal.value.show = true
-    loading.value = false
-  } else {
-    // console.log(e);
-    console.error('UNKNOWN ERROR: ', (e)?.message ?? 'Unknown Error')
-    modal.value.type = 'ERROR'
-    modal.value.message = 'UNKNOWN ERROR: '
-    modal.value.show = true
-    loading.value = false
+    if (e instanceof ErrorApiResponse) {
+      // console.log(e);
+      console.error(`ERROR | code: ${e.code} | message: ${e.message}`)
+      modal.value.type = 'ERROR'
+      modal.value.message = e.message
+      modal.value.show = true
+      loading.value = false
+    } else {
+      // console.log(e);
+      console.error('UNKNOWN ERROR: ', (e)?.message ?? 'Unknown Error')
+      modal.value.type = 'ERROR'
+      modal.value.message = 'UNKNOWN ERROR: '
+      modal.value.show = true
+      loading.value = false
+    }
   }
-}
 })
 
 
@@ -288,8 +286,9 @@ const uploadFile = async () => {
       await upload.call(formData, selectedProvince.value)
     } else {
       // Pass the FormData to the upload call
-      console.log(selectedCity.value)
-      await uploadKota.call(formData, selectedCity.value, tahunInput.value)
+      // console.log(selectedCity.value)
+      const response = await uploadKota.call(formData, selectedCity.value, tahunInput.value)
+      console.log(response)
     }
 
     // Refresh the list after successful upload
@@ -330,7 +329,7 @@ const getKotaList = async () => {
       selectedCity.value = ''
       return
     }
-    
+
     const res = await kotaList.call(selectedProvinceForCity.value)
     kotas.value = res.list
     selectedCity.value = '' // Reset city selection when province changes
