@@ -1,7 +1,7 @@
 <template>
   <div class="">
-    <div v-if="years.length !== 0" id="layout" class="md:mx-auto mx-auto flex w-[95vw]">
-      <div class="flex shrink-0 w-[3%]">
+    <div v-if="years.length !== 0" id="layout" class="md:mx-auto mx-auto flex w-[92vw]">
+      <div class="flex shrink-0 w-[1%]">
 
       </div>
       <div class="lg:relative mt-8 w-full">
@@ -75,34 +75,52 @@
             </div>
 
             <!-- Line Charts Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 mt-4">
-              <div class="">
-                <GraphMacroLineChart :chart-data="data_8"
-                  title="Produk Domestik Regional Bruto Atas Dasar Harga Konstan (Rp)" :key="state" :millions="true"
-                  :options="{ legends: false, datalabels: true, height: '320px' }" />
+            <div class="space-y-4 mt-4">
+              <!-- First Row -->
+              <div class="overflow-x-auto">
+                <div class="flex gap-4 min-w-max">
+                  <div class="min-w-[400px] w-[450px]">
+                    <GraphMacroLineChart :chart-data="data_8"
+                      title="Produk Domestik Regional Bruto Atas Dasar Harga Konstan (Rp)" :key="state" :millions="true"
+                      :options="{ legends: false, datalabels: true, height: '320px' }" />
+                  </div>
+                  <div class="min-w-[400px] w-[450px]">
+                    <GraphMacroLineChart :chart-data="data_9" title="Jumlah Tenaga Kerja (Orang)" :key="state"
+                      :millions="false" :options="{ legends: false, datalabels: true, height: '320px' }" />
+                  </div>
+                  <div class="min-w-[400px] w-[450px]">
+                    <GraphMacroLineChart :chart-data="data_10" title="Rata-Rata Upah Setahun (Rp)" :key="state"
+                      :millions="false" :options="{ legends: false, datalabels: true, height: '320px' }" />
+                  </div>
+                  <div class="min-w-[400px] w-[450px]">
+                    <GraphMacroLineChart :chart-data="data_12" title="Rata-Rata Jam Kerja Setahun (Jam)" :key="state"
+                      :millions="false" :options="{ legends: false, datalabels: true, height: '320px' }" />
+                  </div>
+                </div>
               </div>
-              <div class="">
-                <GraphMacroLineChart :chart-data="data_9" title="Jumlah Tenaga Kerja (Orang)" :key="state"
-                  :millions="false" :options="{ legends: false, datalabels: true, height: '320px' }" />
-              </div>
-              <div class="">
-                <GraphMacroLineChart :chart-data="data_10" title="Rata-Rata Upah Setahun (Rp)" :key="state"
-                  :millions="false" :options="{ legends: false, datalabels: true, height: '320px' }" />
-              </div>
-              <div class="">
-                <GraphMacroLineChart :chart-data="data_1_new" title="Produktivitas Tenaga Kerja (Rp Juta / Orang)"
-                  :key="state" :millions="false" :options="{ legends: false, datalabels: true, height: '320px' }" />
-              </div>
-              <div class="">
-                <GraphMacroLineChart :chart-data="data_2_new" title="Pertumbuhan Produktivitas Tenaga Kerja (%)"
-                  :key="state" :millions="false" :options="{ legends: false, datalabels: true, height: '320px' }" />
-              </div>
-              <div class="">
-                <GraphMacroLineChart :chart-data="data_3_new" title="Produktivitas Upah" :key="state" :millions="false"
-                  :options="{ legends: false, datalabels: true, height: '320px' }" />
+
+              <!-- Second Row -->
+              <div class="overflow-x-auto">
+                <div class="flex gap-4 min-w-max">
+                  <div class="min-w-[400px] w-[450px]">
+                    <GraphMacroLineChart :chart-data="data_1_new" title="Produktivitas Tenaga Kerja (Rp Juta / Orang)"
+                      :key="state" :millions="false" :options="{ legends: false, datalabels: true, height: '320px' }" />
+                  </div>
+                  <div class="min-w-[400px] w-[450px]">
+                    <GraphMacroLineChart :chart-data="data_2_new" title="Pertumbuhan Produktivitas Tenaga Kerja (%)"
+                      :key="state" :millions="false" :options="{ legends: false, datalabels: true, height: '320px' }" />
+                  </div>
+                  <div class="min-w-[400px] w-[450px]">
+                    <GraphMacroLineChart :chart-data="data_3_new" title="Produktivitas Upah" :key="state"
+                      :millions="false" :options="{ legends: false, datalabels: true, height: '320px' }" />
+                  </div>
+                  <div class="min-w-[400px] w-[450px]">
+                    <GraphMacroLineChart :chart-data="data_4_new" title="Produktivitas Jam Kerja" :key="state"
+                      :millions="false" :options="{ legends: false, datalabels: true, height: '320px' }" />
+                  </div>
+                </div>
               </div>
             </div>
-
             <!-- Sector Information Cards -->
             <div v-if="dashboardApi.data && Object.keys(data_11).length > 0" class="mt-6">
               <!-- <h3 class="text-lg font-semibold text-gray-800 mb-4">Informasi Sektor</h3> -->
@@ -628,6 +646,50 @@ const data_3_new = computed(() => {
   return dataset
 })
 
+const data_4_new = computed(() => {
+  let dataset = {
+    labels: [],
+    datasets: [],
+  }
+
+  // Check if rawData2 exists and has required properties
+  if (!rawData2.value || !rawData2.value.provinsi || !rawData2.value.metadata) {
+    return dataset
+  }
+
+  // Add province data
+  const provinsiData = rawData2.value["provinsi"]["agregat"]["produktivitas_jam_kerja"] || []
+  if (provinsiData.length > 0) {
+    dataset.datasets.push({
+      label: rawData2.value["provinsi"]["nama"],
+      data: provinsiData.filter(x => x !== null),
+      backgroundColor: "#3867D6",
+      borderRadius: 5,
+    })
+  }
+
+  // Add all cities data
+  if (rawData2.value["kota"] && rawData2.value["kota"].length > 0) {
+    const colors = ["#E74C3C", "#F39C12", "#27AE60", "#8E44AD", "#3498DB", "#E67E22", "#1ABC9C", "#9B59B6"]
+
+    rawData2.value["kota"].forEach((kota, index) => {
+      const kotaData = kota?.agregat?.produktivitas_jam_kerja || []
+      if (kotaData.length > 0) {
+        dataset.datasets.push({
+          label: kota.nama,
+          data: kotaData.filter(x => x !== null),
+          backgroundColor: colors[index % colors.length],
+          borderRadius: 5,
+        })
+      }
+    })
+  }
+
+  dataset.labels = (rawData2.value.metadata.tahun || []).slice(0, Math.max(...dataset.datasets.map(ds => ds.data.length)))
+  return dataset
+})
+
+
 const data_8 = computed(() => {
   let dataset = {
     labels: [],
@@ -747,6 +809,54 @@ const data_10 = computed(() => {
 
     rawData2.value["kota"].forEach((kota, index) => {
       const kotaData = kota?.agregat?.jumlah_rata_rata_upah || []
+      if (kotaData.length > 0) {
+        dataset.datasets.push({
+          label: kota.nama,
+          data: kotaData
+            .filter(x => x !== null)
+            .map(x => Math.round(x * 12)), // di setahunkan
+          backgroundColor: colors[index % colors.length],
+          borderRadius: 5,
+        })
+      }
+    })
+  }
+
+  dataset.labels = (rawData2.value.metadata.tahun || []).slice(0, Math.max(...dataset.datasets.map(ds => ds.data.length)))
+
+  return dataset
+})
+
+const data_12 = computed(() => {
+  let dataset = {
+    labels: [],
+    datasets: [],
+  }
+
+  // Check if rawData2 exists and has required properties
+  if (!rawData2.value || !rawData2.value.provinsi || !rawData2.value.metadata) {
+    return dataset
+  }
+
+  // Add province data
+  const provinsiData = rawData2.value["provinsi"]["agregat"]["jumlah_rata_rata_jam_kerja"] || []
+  if (provinsiData.length > 0) {
+    dataset.datasets.push({
+      label: rawData2.value["provinsi"]["nama"],
+      data: provinsiData
+        .filter(x => x !== null)
+        .map(x => x * 12), // di setahunkan
+      backgroundColor: "#3867D6",
+      borderRadius: 5,
+    })
+  }
+
+  // Add all cities data
+  if (rawData2.value["kota"] && rawData2.value["kota"].length > 0) {
+    const colors = ["#E74C3C", "#F39C12", "#27AE60", "#8E44AD", "#3498DB", "#E67E22", "#1ABC9C", "#9B59B6"]
+
+    rawData2.value["kota"].forEach((kota, index) => {
+      const kotaData = kota?.agregat?.jumlah_rata_rata_jam_kerja || []
       if (kotaData.length > 0) {
         dataset.datasets.push({
           label: kota.nama,
@@ -1115,7 +1225,8 @@ const downloadData = async () => {
 <style scoped>
 /* Customize scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -1124,11 +1235,11 @@ const downloadData = async () => {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #5a5a5a;
+  background: #a8a8a8;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f3f;
+  background: #727272;
 }
 </style>
