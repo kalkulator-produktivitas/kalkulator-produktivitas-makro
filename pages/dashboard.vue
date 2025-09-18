@@ -81,7 +81,7 @@
                 <div class="flex gap-4 min-w-max">
                   <div class="min-w-[400px] w-[450px]">
                     <GraphMacroLineChart :chart-data="data_8"
-                      title="Produk Domestik Regional Bruto Atas Dasar Harga Konstan (Rp)" :key="state" :millions="true"
+                      title="Produk Domestik Regional Bruto Atas Dasar Harga Konstan (Rp)" :key="state" :unit="'juta'"
                       :options="{ legends: false, datalabels: true, height: '320px' }" />
                   </div>
                   <div class="min-w-[400px] w-[450px]">
@@ -138,7 +138,7 @@
                           Jt</p>
                         <p v-else-if="key.includes('terendah')" class="text-sm text-red-600 font-medium">{{
                           info[2] }}
-                          Jt</p>
+                        </p>
                         <p v-else class="text-sm text-blue-600 font-medium">{{ info[2] }}</p>
                       </div>
                     </div>
@@ -164,8 +164,8 @@
               <GraphMacroStackedBarChart v-if="dashboardApi.data"
                 title="Produktivitas Tenaga Kerja (Rp milyar/orang/tahun)" :chart-data="data_4" :key="state"
                 :ribuan="true" />
-              <GraphMacroStackedBarChart v-if="dashboardApi.data" title="Produktivitas Jam Kerja (Rp juta/orang/jam)"
-                :chart-data="data_5" :key="state" :ribuan="false" :options="{ unit: 'juta' }" />
+              <GraphMacroStackedBarChart v-if="dashboardApi.data" title="Produktivitas Jam Kerja (Rp juta/jam)"
+                :chart-data="data_5" :key="state" :ribuan="false" />
               <GraphMacroStackedBarChart v-if="dashboardApi.data" title="Produktivitas Upah (Rp /orang/tahun)"
                 :chart-data="data_6" :key="state" :options="{ unit: 'per ribu' }" />
               <GraphMacroHorizontalBarChart v-if="dashboardApi.data" title="Pertumbuhan Produktivitas Tenaga Kerja (%)"
@@ -257,8 +257,6 @@ const dashboardApi = useRequest(getDashboardApi);
 const yearsApi = useRequest(getYearsApi);
 const provinceApi = useRequest(getProvince);
 const cityApi = useRequest(getCity);
-
-import macro from '~/assets/macro.json'
 
 let years = ref([])
 
@@ -508,11 +506,15 @@ const changeTab = (x) => {
   if (subTab.value === listProvince.nama) {
     reportType.value = "Provinsi"
     data.value = rawData2.value["provinsi"]["lapangan_usaha"]
+    fullData.value = rawData2.value["provinsi"]["lapangan_usaha"]
   } else if (listKota.list.map(kota => kota.nama).includes(subTab.value)) {
     reportType.value = "Kabupaten"
     let kotaData = rawData2.value["kota"].filter(x => x.nama === subTab.value)[0]
     data.value = kotaData.lapangan_usaha
+    fullData.value = kotaData.lapangan_usaha
   }
+  // Force filter reapplication to ensure data consistency
+  applyFilter()
 }
 
 const data_1_new = computed(() => {
@@ -527,7 +529,7 @@ const data_1_new = computed(() => {
   }
 
   // Add province data
-  const provinsiData = rawData2.value["provinsi"]["agregat"]["produktivitas_tenaga_kerja"] || []
+  const provinsiData = rawData2.value["provinsi"]["sensus"]["produktivitas_tenaga_kerja"] || []
   if (provinsiData.length > 0) {
     dataset.datasets.push({
       label: rawData2.value.provinsi.nama,
@@ -571,7 +573,7 @@ const data_2_new = computed(() => {
   }
 
   // Add province data
-  const provinsiData = rawData2.value["provinsi"]["agregat"]["growth_produktivitas_tenaga_kerja"] || []
+  const provinsiData = rawData2.value["provinsi"]["sensus"]["growth_produktivitas_tenaga_kerja"] || []
   if (provinsiData.length > 0) {
     dataset.datasets.push({
       label: rawData2.value["provinsi"]["nama"],
@@ -615,7 +617,7 @@ const data_3_new = computed(() => {
   }
 
   // Add province data
-  const provinsiData = rawData2.value["provinsi"]["agregat"]["produktivitas_upah"] || []
+  const provinsiData = rawData2.value["provinsi"]["sensus"]["produktivitas_upah"] || []
   if (provinsiData.length > 0) {
     dataset.datasets.push({
       label: rawData2.value["provinsi"]["nama"],
@@ -658,7 +660,7 @@ const data_4_new = computed(() => {
   }
 
   // Add province data
-  const provinsiData = rawData2.value["provinsi"]["agregat"]["produktivitas_jam_kerja"] || []
+  const provinsiData = rawData2.value["provinsi"]["sensus"]["produktivitas_jam_kerja"] || []
   if (provinsiData.length > 0) {
     dataset.datasets.push({
       label: rawData2.value["provinsi"]["nama"],
@@ -702,7 +704,7 @@ const data_8 = computed(() => {
   }
 
   // Add province data
-  const provinsiData = rawData2.value["provinsi"]["agregat"]["pdrb_adhk"] || []
+  const provinsiData = rawData2.value["provinsi"]["sensus"]["pdrb_adhk"] || []
   if (provinsiData.length > 0) {
     dataset.datasets.push({
       label: rawData2.value["provinsi"]["nama"],
@@ -747,7 +749,7 @@ const data_9 = computed(() => {
   }
 
   // Add province data
-  const provinsiData = rawData2.value["provinsi"]["agregat"]["jumlah_tenaga_kerja_bekerja"] || []
+  const provinsiData = rawData2.value["provinsi"]["sensus"]["jumlah_tenaga_kerja_bekerja"] || []
   if (provinsiData.length > 0) {
     dataset.datasets.push({
       label: rawData2.value["provinsi"]["nama"],
@@ -791,7 +793,7 @@ const data_10 = computed(() => {
   }
 
   // Add province data
-  const provinsiData = rawData2.value["provinsi"]["agregat"]["jumlah_rata_rata_upah"] || []
+  const provinsiData = rawData2.value["provinsi"]["sensus"]["jumlah_rata_rata_upah"] || []
   if (provinsiData.length > 0) {
     dataset.datasets.push({
       label: rawData2.value["provinsi"]["nama"],
@@ -839,7 +841,7 @@ const data_12 = computed(() => {
   }
 
   // Add province data
-  const provinsiData = rawData2.value["provinsi"]["agregat"]["jumlah_rata_rata_jam_kerja"] || []
+  const provinsiData = rawData2.value["provinsi"]["sensus"]["jumlah_rata_rata_jam_kerja"] || []
   if (provinsiData.length > 0) {
     dataset.datasets.push({
       label: rawData2.value["provinsi"]["nama"],
@@ -1198,6 +1200,20 @@ const downloadData = async () => {
     rawData2.value = res
     data.value = rawData2.value["provinsi"]["lapangan_usaha"]
     fullData.value = rawData2.value["provinsi"]["lapangan_usaha"]
+
+    // Check if a city is selected and call cityAPI if needed
+    let cityApiData = null
+    if (listKota && listKota.list && listKota.list.map(kota => kota.nama).includes(subTab.value)) {
+      console.log(`City is selected: ${subTab.value}`)
+      // Find the selected city's ID
+      const selectedCity = listKota.list.find(kota => kota.nama === subTab.value)
+      if (selectedCity) {
+        console.log(`Calling cityAPI for city ID: ${selectedCity.id}`)
+        cityApiData = await cityApi.call(selectedCity.id)
+        console.log('City API Data:', cityApiData)
+      }
+    }
+
     hasData.value = true
   } catch (e) {
     if (e instanceof ErrorApiResponse) {
