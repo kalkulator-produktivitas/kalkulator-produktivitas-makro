@@ -529,7 +529,7 @@ const data_1_new = computed(() => {
   }
 
   // Add province data
-  const provinsiData = rawData2.value["provinsi"]["sensus"]["produktivitas_tenaga_kerja"] || []
+  const provinsiData = rawData2.value["provinsi"]["agregat"]["produktivitas_tenaga_kerja"] || []
   if (provinsiData.length > 0) {
     dataset.datasets.push({
       label: rawData2.value.provinsi.nama,
@@ -573,7 +573,7 @@ const data_2_new = computed(() => {
   }
 
   // Add province data
-  const provinsiData = rawData2.value["provinsi"]["sensus"]["growth_produktivitas_tenaga_kerja"] || []
+  const provinsiData = rawData2.value["provinsi"]["agregat"]["growth_produktivitas_tenaga_kerja"] || []
   if (provinsiData.length > 0) {
     dataset.datasets.push({
       label: rawData2.value["provinsi"]["nama"],
@@ -617,7 +617,7 @@ const data_3_new = computed(() => {
   }
 
   // Add province data
-  const provinsiData = rawData2.value["provinsi"]["sensus"]["produktivitas_upah"] || []
+  const provinsiData = rawData2.value["provinsi"]["agregat"]["produktivitas_upah"] || []
   if (provinsiData.length > 0) {
     dataset.datasets.push({
       label: rawData2.value["provinsi"]["nama"],
@@ -660,7 +660,7 @@ const data_4_new = computed(() => {
   }
 
   // Add province data
-  const provinsiData = rawData2.value["provinsi"]["sensus"]["produktivitas_jam_kerja"] || []
+  const provinsiData = rawData2.value["provinsi"]["agregat"]["produktivitas_jam_kerja"] || []
   if (provinsiData.length > 0) {
     dataset.datasets.push({
       label: rawData2.value["provinsi"]["nama"],
@@ -793,7 +793,7 @@ const data_10 = computed(() => {
   }
 
   // Add province data
-  const provinsiData = rawData2.value["provinsi"]["sensus"]["jumlah_rata_rata_upah"] || []
+  const provinsiData = rawData2.value["provinsi"]["sensus"]["upah_rata_rata"] || []
   if (provinsiData.length > 0) {
     dataset.datasets.push({
       label: rawData2.value["provinsi"]["nama"],
@@ -841,13 +841,13 @@ const data_12 = computed(() => {
   }
 
   // Add province data
-  const provinsiData = rawData2.value["provinsi"]["sensus"]["jumlah_rata_rata_jam_kerja"] || []
+  const provinsiData = rawData2.value["provinsi"]["sensus"]["jumlah_jam_kerja"] || []
   if (provinsiData.length > 0) {
     dataset.datasets.push({
       label: rawData2.value["provinsi"]["nama"],
       data: provinsiData
         .filter(x => x !== null)
-        .map(x => x * 12), // di setahunkan
+        .map(x => x / 7 * 30 * 12), // di setahunkan
       backgroundColor: "#3867D6",
       borderRadius: 5,
     })
@@ -864,7 +864,7 @@ const data_12 = computed(() => {
           label: kota.nama,
           data: kotaData
             .filter(x => x !== null)
-            .map(x => Math.round(x * 12)), // di setahunkan
+            .map(x => Math.round(x / 7 * 30 * 12)), // di setahunkan
           backgroundColor: colors[index % colors.length],
           borderRadius: 5,
         })
