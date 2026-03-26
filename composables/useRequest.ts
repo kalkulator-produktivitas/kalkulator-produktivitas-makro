@@ -1,4 +1,4 @@
-import { ApiSuccessResponse } from "~/_service/http/schema";
+import type { ApiSuccessResponse } from "~/_service/http/schema";
 
 export type ServiceFunc<T = unknown> = (...args: any[]) => Promise<ApiSuccessResponse<T>>;
 

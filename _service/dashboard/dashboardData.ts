@@ -1,7 +1,7 @@
 // An example of using 'request' function
 
 import { request } from "~/_service/http/request";
-import { ApiSuccessResponse } from "~/_service/http/schema";
+import type { ApiSuccessResponse } from "~/_service/http/schema";
 import { GetDashboard } from "./interface";
 
 export const getDashboardApi = (start: number, end: number, id_provinsi: string): Promise<ApiSuccessResponse<any>> => {
