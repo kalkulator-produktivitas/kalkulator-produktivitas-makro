@@ -7,18 +7,24 @@
         <div class="grid grid-rows-2 gap-1 mx-auto flex-shrink-0">
           <div class="mx-auto flex flex-col w-full" style="visibility:visible;">
             <div
-              class="w-[98vw] absolute top-0 left-0 bg-black bg-opacity-25 hover:bg-opacity-75 hover:text-white p-2 mt-2 transition z-50">
-              <div class="flex flex-row justify-center gap-6 ">
-                <button type="button my-auto" class="py-1" @click="generatePDF">
-                  <span class="flex items-center">
-                    <Icon name="mdi:download-outline" size="24" />
-                    Download
-                  </span>
+              class="w-full sticky top-0 bg-white/80 backdrop-blur-md border-b border-gray-100 px-4 py-2 flex items-center justify-between z-50">
+              <div class="flex items-center gap-2 text-gray-500">
+                <Icon name="mdi:file-document-outline" size="18" />
+                <span class="text-xs font-medium uppercase tracking-wider">Preview</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <button 
+                  type="button" 
+                  class="flex items-center gap-1.5 px-3 py-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors text-sm font-medium" 
+                  @click="generatePDF">
+                  <Icon name="mdi:download" size="18" />
+                  <span>Download</span>
                 </button>
-                <button type="button" class="py-1 my-auto" @click="$emit('close-preview')">
-                  <span class="flex items-center">
-                    <Icon name="mdi:close-outline" size="24" />
-                  </span>
+                <button 
+                  type="button" 
+                  class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-all" 
+                  @click="$emit('close-preview')">
+                  <Icon name="mdi:close" size="20" />
                 </button>
               </div>
             </div>

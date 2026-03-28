@@ -4,7 +4,7 @@
       <p class="font-bold text-md ml-2 text-[#034EA2]">{{ title }}</p>
     </div>
     <div class="">
-      <Line :options="chartOptions" class="px-4" :data="chartData" />
+      <Line :options="chartOptions" class="px-4" :data="chartData" :plugins="[DataLabels]" />
     </div>
   </div>
 
@@ -42,7 +42,6 @@ const chartOptions = {
   responsive: true,
   maintainAspectRatio: true,
   aspectRatio: props.options.aspectRatio ? props.options.aspectRatio : 2.4,
-  plugins: [DataLabels],
   plugins: {
     legend: {
       display: props.options.legends ? true : false,

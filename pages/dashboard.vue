@@ -174,53 +174,59 @@
           </div>
 
           <!-- Fixed Overlay Sidebar -->
-          <div v-if="sidebarOpen" class="fixed inset-0 z-50">
-            <!-- Darkened Overlay -->
-            <div class="absolute inset-0 bg-black bg-opacity-50" @click="toggleSidebar"></div>
+          <Transition name="sidebar">
+            <div v-if="sidebarOpen" class="fixed inset-0 z-50">
+              <!-- Darkened Overlay -->
+              <Transition name="fade">
+                <div v-if="sidebarOpen" class="absolute inset-0 bg-black bg-opacity-50" @click="toggleSidebar"></div>
+              </Transition>
 
-            <!-- Sidebar Panel -->
-            <div
-              class="absolute right-0 top-0 h-full w-80 bg-white shadow-xl transform transition-transform duration-300 ease-in-out">
-              <div class="h-full flex flex-col">
-                <!-- Header -->
-                <div class="flex justify-between items-start border-b border-slate-300 p-4">
-                  <div>
-                    <p class="text-[#034EA2] font-bold text-lg">Filters</p>
-                    <p class="text-sm text-gray-600 mt-1">Lapangan Usaha</p>
-                  </div>
-                  <button @click="toggleSidebar" class="text-gray-500 hover:text-gray-700">
-                    <Icon name="mdi:close" size="24" />
-                  </button>
-                </div>
-
-                <!-- Filter Actions -->
-                <div class="flex gap-2 p-4 border-b border-slate-200">
-                  <button @click="addAll"
-                    class="px-3 py-1 text-xs border border-gray-500 bg-white text-black rounded-md hover:bg-gray-200 transition-all duration-300">
-                    Pilih Semua
-                  </button>
-                  <button @click="removeAll"
-                    class="px-3 py-1 text-xs border border-gray-500 bg-white text-black rounded-md hover:bg-gray-200 transition-all duration-300">
-                    Hapus Semua
-                  </button>
-                </div>
-
-                <!-- Filter List -->
-                <div class="flex-1 overflow-y-auto p-4">
-                  <div v-for="usaha of lapanganUsaha" :key="usaha.nama" class="flex items-start mb-3"
-                    @change="applyFilter">
-                    <div class="flex-shrink-0">
-                      <input :id="usaha.kode" type="checkbox" v-model="usaha.status"
-                        class="mt-1 w-4 h-4 text-[#034EA2] bg-gray-100 border-gray-300 rounded dark:border-gray-600">
+              <!-- Sidebar Panel -->
+              <Transition name="slide">
+                <div v-if="sidebarOpen"
+                  class="absolute right-0 top-0 h-full w-80 bg-white shadow-xl">
+                  <div class="h-full flex flex-col">
+                    <!-- Header -->
+                    <div class="flex justify-between items-start border-b border-slate-300 p-4">
+                      <div>
+                        <p class="text-[#034EA2] font-bold text-lg">Filters</p>
+                        <p class="text-sm text-gray-600 mt-1">Lapangan Usaha</p>
+                      </div>
+                      <button @click="toggleSidebar" class="text-gray-500 hover:text-gray-700">
+                        <Icon name="mdi:close" size="24" />
+                      </button>
                     </div>
-                    <label :for="usaha.kode" class="ms-3 text-sm leading-relaxed flex-1"
-                      :class="`${usaha.kode ? 'text-[#034EA2]' : 'text-gray-900'}`">
-                      {{ usaha.nama }} (Kode {{ usaha.kode }})</label>
+
+                    <!-- Filter Actions -->
+                    <div class="flex gap-2 p-4 border-b border-slate-200">
+                      <button @click="addAll"
+                        class="px-3 py-1 text-xs border border-gray-500 bg-white text-black rounded-md hover:bg-gray-200 transition-all duration-300">
+                        Pilih Semua
+                      </button>
+                      <button @click="removeAll"
+                        class="px-3 py-1 text-xs border border-gray-500 bg-white text-black rounded-md hover:bg-gray-200 transition-all duration-300">
+                        Hapus Semua
+                      </button>
+                    </div>
+
+                    <!-- Filter List -->
+                    <div class="flex-1 overflow-y-auto p-4">
+                      <div v-for="usaha of lapanganUsaha" :key="usaha.nama" class="flex items-start mb-3"
+                        @change="applyFilter">
+                        <div class="flex-shrink-0">
+                          <input :id="usaha.kode" type="checkbox" v-model="usaha.status"
+                            class="mt-1 w-4 h-4 text-[#034EA2] bg-gray-100 border-gray-300 rounded dark:border-gray-600">
+                        </div>
+                        <label :for="usaha.kode" class="ms-3 text-sm leading-relaxed flex-1"
+                          :class="`${usaha.kode ? 'text-[#034EA2]' : 'text-gray-900'}`">
+                          {{ usaha.nama }} (Kode {{ usaha.kode }})</label>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Transition>
             </div>
-          </div>
+          </Transition>
         </div>
         <div v-else class="flex justify-center items-center h-[50vh]">
           <p class="text-gray-500">Pilih tahun dan klik "Submit" untuk melihat dashboard</p>
@@ -1257,5 +1263,26 @@ const downloadData = async () => {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #727272;
+}
+
+/* Sidebar Transitions */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-enter-active,
+.slide-leave-active {
+  transition: transform 0.3s ease-out;
+}
+
+.slide-enter-from,
+.slide-leave-to {
+  transform: translateX(100%);
 }
 </style>
