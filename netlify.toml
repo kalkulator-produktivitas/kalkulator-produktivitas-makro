@@ -1,5 +1,10 @@
+# If the build fails installing dependencies in .netlify/plugins/ (ENETUNREACH for
+# *.netlify.app/.../buildhooks.tgz): remove unused integrations in the Netlify UI
+# (Site configuration → Installed integrations), e.g. Neon/Netlify DB. This app has
+# no Neon usage in source; the failure is from the integration installer, not Node.
+
 [build]
-  command = "npm run build"
+  command = "npm run generate"
   publish = ".output/public"
 
 [build.environment]

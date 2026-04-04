@@ -13,6 +13,9 @@ node_modules
 logs
 *.log
 
+# Netlify CLI local state (never commit; can embed unreachable tarball URLs for extensions)
+.netlify
+
 # Misc
 .DS_Store
 .fleet
