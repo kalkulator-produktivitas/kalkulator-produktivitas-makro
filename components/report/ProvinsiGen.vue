@@ -121,9 +121,9 @@
                 <div class="border border-black p-2 mb-4">
                   <ol class="list-none ml-2 text-sm" start="3">
                     <li>
-                      <p>3. Produktivitas Upah (Rp juta/orang/tahun):</p>
+                      <p>3. Produktivitas Upah (Rp orang/tahun):</p>
                       <div class="w-[120mm]">
-                        <GraphReportingLineChart :chart-data="provinsiOnly(chartData3)" title="" :millions="true" :key="state" 
+                        <GraphReportingLineChart :chart-data="provinsiOnly(chartData3)" title="" :millions="false" :key="state" 
                           :options="{ legends: false, datalabels: true }" />
                       </div>
                     </li>
