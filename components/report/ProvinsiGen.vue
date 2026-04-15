@@ -100,14 +100,14 @@
                     <li>
                       <p>1. Produktivitas Tenaga Kerja (Rp milyar/orang/tahun) :</p>
                       <div class="w-[120mm]">
-                        <GraphReportingLineChart :chart-data="data_1" title="" :key="state" :bilion="true"
+                        <GraphReportingLineChart :chart-data="provinsiOnly(chartData1)" title="" :key="state" :bilion="true"
                           :options="{ legends: false, datalabels: true }" />
                       </div>
                     </li>
                     <li>
                       <p>2. Pertumbuhan Produktivitas Tenaga Kerja yoy (%) :</p>
                       <div class="w-[120mm]">
-                        <GraphReportingLineChart :chart-data="data_2" title="" :key="state" :millions="false"
+                        <GraphReportingLineChart :chart-data="provinsiOnly(chartData2)" title="" :key="state" :millions="false"
                           :options="{ legends: false, datalabels: true }" />
                       </div>
                     </li>
@@ -123,14 +123,14 @@
                     <li>
                       <p>3. Produktivitas Upah (Rp juta/orang/tahun):</p>
                       <div class="w-[120mm]">
-                        <GraphReportingLineChart :chart-data="data_3" title="" :millions="true" :key="state" 
+                        <GraphReportingLineChart :chart-data="provinsiOnly(chartData3)" title="" :millions="true" :key="state" 
                           :options="{ legends: false, datalabels: true }" />
                       </div>
                     </li>
                     <li>
                       <p>4. Produktivitas Jam Kerja (Rp juta/orang/jam) :</p>
                       <div class="w-[120mm]">
-                        <GraphReportingLineChart :chart-data="data_4" title="" :millions="true" :key="state"
+                        <GraphReportingLineChart :chart-data="provinsiOnly(chartData4)" title="" :millions="true" :key="state"
                           :options="{ legends: false, datalabels: true }" />
                       </div>
                     </li>
@@ -328,7 +328,7 @@ import html2canvas from 'html2canvas';
 import { ChartColors } from '~/assets/helpers/colors'
 // import rawdata from '~/assets/macro_2_restructured.json'
 
-const props = defineProps(["analysis", "rawdata"])
+const props = defineProps(["analysis", "rawdata", "chartData1", "chartData2", "chartData3", "chartData4"])
 
 const modal = ref({
   show: false,
@@ -343,72 +343,9 @@ const loading = ref(false)
 const progress = ref(0)
 const progressText = ref('')
 
-const data_1 = computed(() => {
-  let dataset = {
-    labels: props.rawdata.metadata.tahun.slice(-5),
-    datasets: [
-      {
-        label: "Produktivitas",
-        data: null,
-        backgroundColor: "#3867D6",
-        borderRadius: 5,
-      },
-    ],
-  }
-  let calcData = props.rawdata.provinsi.agregat.pdrb_adhk.slice(-5)
-  dataset.datasets[0].data = calcData
-  return dataset
-})
-
-const data_2 = computed(() => {
-  let dataset = {
-    labels: props.rawdata.metadata.tahun.slice(-5),
-    datasets: [
-      {
-        label: "Produktivitas",
-        data: null,
-        backgroundColor: "#3867D6",
-        borderRadius: 5,
-      },
-    ],
-  }
-  let calcData = props.rawdata.provinsi.agregat.growth_produktivitas_tenaga_kerja.slice(-5)
-  dataset.datasets[0].data = calcData
-  return dataset
-})
-
-const data_3 = computed(() => {
-  let dataset = {
-    labels: props.rawdata.metadata.tahun.slice(-5),
-    datasets: [
-      {
-        label: "Produktivitas",
-        data: null,
-        backgroundColor: "#3867D6",
-        borderRadius: 5,
-      },
-    ],
-  }
-  let calcData = props.rawdata.provinsi.agregat.jumlah_rata_rata_upah.slice(-5)
-  dataset.datasets[0].data = calcData
-  return dataset
-})
-
-const data_4 = computed(() => {
-  let dataset = {
-    labels: props.rawdata.metadata.tahun.slice(-5),
-    datasets: [
-      {
-        label: "Produktivitas",
-        data: null,
-        backgroundColor: "#3867D6",
-        borderRadius: 5,
-      },
-    ],
-  }
-  let calcData = props.rawdata.provinsi.agregat.jumlah_rata_rata_jam_kerja.slice(-5)
-  dataset.datasets[0].data = calcData
-  return dataset
+const provinsiOnly = (chartData) => ({
+  ...chartData,
+  datasets: chartData?.datasets?.slice(0, 1) ?? []
 })
 
 const data_5 = computed(() => {

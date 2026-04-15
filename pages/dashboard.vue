@@ -236,7 +236,11 @@
     <!-- {{ data["A"]["produktivitas_tenaga_kerja"] }} -->
     <!-- {{ yearSlider }} -->
     <ReportProvinsiGen v-if="reportType === 'Provinsi' && preview === true" class="fixed inset-0 z-50"
-      @close-preview="reloadApp" :rawdata="rawData2" />
+      @close-preview="reloadApp" :rawdata="rawData2"
+      :chart-data-1="data_1_new"
+      :chart-data-2="data_2_new"
+      :chart-data-3="data_3_new"
+      :chart-data-4="data_4_new" />
     <ReportKotaGen v-if="reportType === 'Kabupaten' && preview === true" :kota="subTab" class="fixed inset-0 z-50"
       @close-preview="reloadApp" :rawdata="rawData2" />
     <Popup v-if="modal.show === true" :title="modal.title" :message="modal.message" :status="modal.status"

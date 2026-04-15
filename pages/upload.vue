@@ -1,9 +1,9 @@
 <template>
   <div>
     <div class="md:mx-auto mt-6 mx-auto flex" v-if="loaded">
-      <div class="flex shrink-0 w-[3%]">
+      <!-- <div class="flex shrink-0 w-[3%]">
         {{ selectedProvince }}
-      </div>
+      </div> -->
       <div class="px-1 py-1 absolute flex top-5 left-[12%] items-center bg-blue-700 rounded-full z-10">
         <Icon name="mdi:arrow-left-circle" class="cursor-pointer rounded-full border border-white bg-white"
           @click="navigateTo('/')" size="32" />
